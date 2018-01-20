@@ -1,4 +1,4 @@
-{
+
   "title": "Web page",
   "name": "startbootstrap-freelancer",
   "version": "4.0.0-beta.2",
@@ -17,7 +17,7 @@
   "license": "MIT",
   "author": "Mungcal Ralph",
   "contributors": [
-    "Ralph Mungcal (asp143.github.io)"
+    "Ralph Mungcal (https://asp143.github.io)"
   ],
   "repository": {
     "type": "git",
