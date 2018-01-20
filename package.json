@@ -1,8 +1,8 @@
 {
-  "title": "Freelancer",
+  "title": "Web page",
   "name": "startbootstrap-freelancer",
   "version": "4.0.0-beta.2",
-  "description": "A freelancer portfolio HTML theme for Bootstrap.",
+  "description": "Ralph jonas Mungcal website",
   "keywords": [
     "css",
     "sass",
@@ -11,15 +11,13 @@
     "theme",
     "template"
   ],
-  "homepage": "https://startbootstrap.com/template-overviews/freelancer",
   "bugs": {
-    "url": "https://github.com/BlackrockDigital/startbootstrap-freelancer/issues",
-    "email": "feedback@startbootstrap.com"
+    "email": "ralphmungcal09@gmail.com"
   },
   "license": "MIT",
-  "author": "Start Bootstrap",
+  "author": "Mungcal Ralph",
   "contributors": [
-    "David Miller (http://davidmiller.io/)"
+    "Ralph Mungcal (asp143.github.io)"
   ],
   "repository": {
     "type": "git",
