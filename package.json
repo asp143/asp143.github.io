@@ -1,8 +1,8 @@
 {
-  "name": "tiny-agency",
+  "name": "asp143",
   "version": "1.0.0",
-  "author": "Peter Bray <peter@foxandgeese.com>",
-  "description": "Simple Gatsby.js starter that uses material design and that's perfect for tiny agencies.",
+  "author": "",
+  "description": "Simple personal website",
   "scripts": {
     "develop": "gatsby develop",
     "start": "npm run develop",
