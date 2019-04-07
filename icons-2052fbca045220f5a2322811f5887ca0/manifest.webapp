@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "name": "asp143",
+  "description": null,
+  "icons": {
+    "60": "/asp143/icons-2052fbca045220f5a2322811f5887ca0/firefox_app_60x60.png",
+    "128": "/asp143/icons-2052fbca045220f5a2322811f5887ca0/firefox_app_128x128.png",
+    "512": "/asp143/icons-2052fbca045220f5a2322811f5887ca0/firefox_app_512x512.png"
+  },
+  "developer": {
+    "name": null,
+    "url": null
+  }
+}
