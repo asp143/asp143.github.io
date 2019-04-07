@@ -2,7 +2,7 @@
 title: "Engineering"
 imageLink: "https://d3lubguj0jcn6d.cloudfront.net/engineering.png"
 ---
-
+From planning to deployment. I make sure that the requirement is met.
 - Robust, scalable, and self-healing
 - Node.js, React.js, Angular, and more
 - Aws: Ec2, RDS, S3
