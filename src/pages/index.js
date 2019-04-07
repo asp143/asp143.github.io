@@ -7,7 +7,7 @@ import Tabs from "../components/Tabs";
 import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { Alien, CommentQuestion } from "mdi-material-ui";
-// import { Robot } from "mdi-material-ui";
+import { Robot } from "mdi-material-ui";
 import logo from "../../images/temp.png";
 import withRoot from "../utils/withRoot";
 import Avatar from "@material-ui/core/Avatar";
@@ -89,7 +89,7 @@ const styles = theme => ({
         <div className={props.classes.tabs}>
           <Tabs
             items={[
-              // ["Our Products", <Robot />, <List items={products} />],
+              ["My Work", <Robot />, <List items={products} />],
               ["What do I do?", <CommentQuestion />, <List items={services} />],
             ]}
           />
@@ -136,7 +136,6 @@ export const query = graphql`
           html
           frontmatter {
             title
-            siteLink
             imageLink
             customWidth
             customTopPadding
