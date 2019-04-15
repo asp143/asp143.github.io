@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-sitemap: https://asp143.github.io/sitemap.xml
+sitemap: https://ralphjonas.com/sitemap.xml
