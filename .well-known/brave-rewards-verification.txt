@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: ralphjonas.com
+Token: c6f96447df699086fcafb3acdb5d9f70bd45bfa7cd501db921c9fe7136f81f40
