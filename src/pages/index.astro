@@ -1,0 +1,346 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SvgIcon from '../components/SvgIcon.astro';
+import '../styles/home.css';
+---
+
+<BaseLayout>
+  <main class="portfolio-page">
+    <section class="panel hero-panel">
+      <div class="decor">
+        <div class="up-down">
+          <SvgIcon icon="triangle" hiddenMobile width={48} stroke="#f6993f" left="10%" top="20%" />
+          <SvgIcon icon="hexa" width={48} stroke="#e3342f" left="60%" top="70%" />
+          <SvgIcon icon="box" width={6} fill="#606f7b" left="60%" top="15%" />
+        </div>
+
+        <div class="up-down-wide">
+          <SvgIcon icon="arrowUp" hiddenMobile width={16} fill="#2779bd" left="80%" top="10%" />
+          <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="90%" top="50%" />
+          <SvgIcon icon="circle" width={16} fill="#606f7b" left="70%" top="90%" />
+          <SvgIcon icon="triangle" width={16} stroke="#3d4852" left="30%" top="65%" />
+          <SvgIcon icon="cross" width={16} stroke="#fa7ea8" left="28%" top="15%" />
+          <SvgIcon icon="circle" width={6} fill="#3d4852" left="75%" top="10%" />
+          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#3d4852" left="45%" top="10%" />
+        </div>
+
+        <SvgIcon icon="circle" hiddenMobile width={24} fill="#606f7b" left="5%" top="70%" />
+        <SvgIcon icon="circle" width={6} fill="#3d4852" left="4%" top="20%" />
+        <SvgIcon icon="circle" width={12} fill="#3d4852" left="50%" top="60%" />
+        <SvgIcon icon="upDown" width={8} fill="#3d4852" left="95%" top="90%" />
+        <SvgIcon icon="upDown" hiddenMobile width={24} fill="#606f7b" left="40%" top="80%" />
+        <SvgIcon icon="triangle" width={8} stroke="#606f7b" left="25%" top="5%" />
+        <SvgIcon icon="circle" width={64} fill="#38c172" left="95%" top="5%" />
+        <SvgIcon icon="box" hiddenMobile width={64} fill="#9561e2" left="5%" top="90%" />
+        <SvgIcon icon="box" width={6} fill="#3d4852" left="10%" top="10%" />
+        <SvgIcon icon="box" width={12} fill="#3d4852" left="40%" top="30%" />
+        <SvgIcon icon="hexa" width={16} stroke="#606f7b" left="10%" top="50%" />
+        <SvgIcon icon="hexa" width={8} stroke="#606f7b" left="80%" top="70%" />
+      </div>
+
+      <div class="panel-content hero-content">
+        <h1 class="big-title">Hello, <br /> I'm <span class="name-highlight">Ralph</span>.</h1>
+        <p class="subtitle">Full-Stack Developer &amp; AI Integration Specialist building scalable, practical software.</p>
+      </div>
+    </section>
+
+    <section class="panel projects-panel">
+      <div class="decor">
+        <div class="up-down">
+          <SvgIcon icon="box" width={6} fill="#ffffff" left="85%" top="75%" />
+          <SvgIcon icon="upDown" width={8} fill="#4dc0b5" left="70%" top="20%" />
+          <SvgIcon icon="triangle" width={8} stroke="#f6993f" left="25%" top="5%" />
+          <SvgIcon icon="circle" hiddenMobile width={24} fill="#ffffff" left="17%" top="60%" />
+        </div>
+
+        <div class="up-down-wide">
+          <SvgIcon icon="arrowUp" hiddenMobile width={16} fill="#38c172" left="20%" top="90%" />
+          <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="90%" top="30%" />
+          <SvgIcon icon="circle" width={16} fill="#ffed4a" left="70%" top="90%" />
+          <SvgIcon icon="triangle" hiddenMobile width={16} stroke="#4dc0b5" left="18%" top="75%" />
+          <SvgIcon icon="circle" width={6} fill="#ffffff" left="75%" top="10%" />
+          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#38c172" left="45%" top="10%" />
+        </div>
+
+        <SvgIcon icon="circle" width={6} fill="#ffffff" left="4%" top="20%" />
+        <SvgIcon icon="circle" width={12} fill="#f66d9b" left="80%" top="60%" />
+        <SvgIcon icon="box" width={6} fill="#f6993f" left="10%" top="10%" />
+        <SvgIcon icon="box" width={12} fill="#ffed4a" left="29%" top="26%" />
+        <SvgIcon icon="hexa" width={16} stroke="#e3342f" left="75%" top="30%" />
+        <SvgIcon icon="hexa" width={8} stroke="#ffed4a" left="80%" top="70%" />
+      </div>
+
+      <div class="panel-content">
+        <div class="inner">
+          <h2 class="section-title">Projects</h2>
+
+          <div class="featured-grid">
+            <article class="featured-card">
+              <h3 class="featured-card-title">Flight Rewards Search Platform</h3>
+              <p class="featured-card-desc">
+                Technical lead for a UK-based SaaS platform that helps users find and compare reward flight
+                availability across major airlines. Responsible for backend architecture, API development, admin panel,
+                and subscription/payment systems.
+              </p>
+              <div class="tech-tags">
+                <span class="tech-tag">Node.js</span>
+                <span class="tech-tag">TypeScript</span>
+                <span class="tech-tag">PostgreSQL</span>
+                <span class="tech-tag">GCP</span>
+              </div>
+            </article>
+
+            <article class="featured-card">
+              <h3 class="featured-card-title">Billing &amp; Payment Platform</h3>
+              <p class="featured-card-desc">
+                Built a multi-gateway payment orchestration platform that wraps local payment providers into a unified
+                subscription billing engine with dunning management, smart retry logic, and pro-rated plan changes.
+              </p>
+              <div class="tech-tags">
+                <span class="tech-tag">Node.js</span>
+                <span class="tech-tag">TypeScript</span>
+                <span class="tech-tag">GCP</span>
+                <span class="tech-tag">Event-Driven</span>
+              </div>
+            </article>
+
+            <article class="featured-card">
+              <h3 class="featured-card-title">Airline Data Aggregation Bots</h3>
+              <p class="featured-card-desc">
+                Built a suite of automated scrapers that collect flight availability data from multiple airline sources
+                on scheduled intervals, feeding into a centralized data store.
+              </p>
+              <div class="tech-tags">
+                <span class="tech-tag">TypeScript</span>
+                <span class="tech-tag">Puppeteer/Playwright</span>
+                <span class="tech-tag">Bull/BullMQ</span>
+              </div>
+            </article>
+
+            <article class="featured-card">
+              <h3 class="featured-card-title">Remote MCP Server</h3>
+              <p class="featured-card-desc">
+                Built a Model Context Protocol server accessible via URL, enabling AI assistants to interact with
+                custom tools through SSE transport. Deployed as a containerized service.
+              </p>
+              <div class="tech-tags">
+                <span class="tech-tag">TypeScript</span>
+                <span class="tech-tag">Node.js</span>
+                <span class="tech-tag">Docker</span>
+              </div>
+            </article>
+
+            <article class="featured-card">
+              <h3 class="featured-card-title">Home Infrastructure Lab</h3>
+              <p class="featured-card-desc">
+                Built and maintained a multi-node self-hosted services ecosystem including NAS, media streaming, photo
+                management, workflow automation, and monitoring dashboards across distributed hardware.
+              </p>
+              <div class="tech-tags">
+                <span class="tech-tag">Docker</span>
+                <span class="tech-tag">Linux</span>
+                <span class="tech-tag">TrueNAS</span>
+                <span class="tech-tag">Tailscale</span>
+                <span class="tech-tag">Nginx</span>
+              </div>
+            </article>
+          </div>
+
+          <h3 class="compact-list-heading">Other Projects</h3>
+
+          <div class="compact-list">
+            <article class="compact-item">
+              <div class="compact-item-header">
+                <h4 class="compact-item-title">Airline Route Mapping Service</h4>
+                <p class="compact-item-desc">Managing and querying airline route connections and partnerships across global flight networks.</p>
+              </div>
+              <div class="tech-tags">
+                <span class="tech-tag">TypeScript</span>
+                <span class="tech-tag">Node.js</span>
+              </div>
+            </article>
+
+            <article class="compact-item">
+              <div class="compact-item-header">
+                <h4 class="compact-item-title">Loyalty Points Transfer Engine</h4>
+                <p class="compact-item-desc">Complex loyalty program transfers between airline partners with bonus calculations and partner eligibility.</p>
+              </div>
+              <div class="tech-tags">
+                <span class="tech-tag">Node.js</span>
+                <span class="tech-tag">TypeScript</span>
+                <span class="tech-tag">React</span>
+              </div>
+            </article>
+
+            <article class="compact-item">
+              <div class="compact-item-header">
+                <h4 class="compact-item-title">Subscription Service Architecture</h4>
+                <p class="compact-item-desc">Full subscription lifecycle handling plan changes, grace periods, automated dunning, and revenue recovery.</p>
+              </div>
+              <div class="tech-tags">
+                <span class="tech-tag">Node.js</span>
+                <span class="tech-tag">TypeScript</span>
+                <span class="tech-tag">GCP</span>
+                <span class="tech-tag">Pub/Sub</span>
+              </div>
+            </article>
+
+            <article class="compact-item">
+              <div class="compact-item-header">
+                <h4 class="compact-item-title">AI Development Workflow Standards</h4>
+                <p class="compact-item-desc">Coding guidelines and configuration standards for AI-assisted development across multiple projects.</p>
+              </div>
+            </article>
+
+            <article class="compact-item">
+              <div class="compact-item-header">
+                <h4 class="compact-item-title">Local AI Inference Server</h4>
+                <p class="compact-item-desc">On-premise LLM inference with benchmarked performance, optimized for local development.</p>
+              </div>
+              <div class="tech-tags">
+                <span class="tech-tag">Linux</span>
+                <span class="tech-tag">AI/ML Inference</span>
+              </div>
+            </article>
+
+            <article class="compact-item">
+              <div class="compact-item-header">
+                <h4 class="compact-item-title">Accident Detection Device</h4>
+                <p class="compact-item-desc">Thesis project detecting vehicle accidents and sending SOS messages to nearby rescue teams.</p>
+              </div>
+              <div class="tech-tags">
+                <span class="tech-tag">Raspberry Pi</span>
+                <span class="tech-tag">Python</span>
+              </div>
+            </article>
+
+            <article class="compact-item">
+              <div class="compact-item-header">
+                <h4 class="compact-item-title">Accident Detection Control Panel</h4>
+                <p class="compact-item-desc">Control panel for viewing accident locations via GPS, generating reports, and data visualizations.</p>
+              </div>
+              <div class="tech-tags">
+                <span class="tech-tag">MongoDB</span>
+                <span class="tech-tag">Express.js</span>
+                <span class="tech-tag">Angular</span>
+                <span class="tech-tag">Node.js</span>
+              </div>
+            </article>
+
+            <article class="compact-item">
+              <div class="compact-item-header">
+                <h4 class="compact-item-title">Audit and Report Generator</h4>
+                <p class="compact-item-desc">Web application for generating printable monthly expense reports for a company.</p>
+              </div>
+              <div class="tech-tags">
+                <span class="tech-tag">Angular</span>
+                <span class="tech-tag">Node.js</span>
+                <span class="tech-tag">SQL</span>
+                <span class="tech-tag">AWS</span>
+              </div>
+            </article>
+
+            <article class="compact-item">
+              <div class="compact-item-header">
+                <h4 class="compact-item-title">Freelance Projects</h4>
+                <p class="compact-item-desc">Full-stack development and consulting work for multiple clients on Upwork.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel about-panel">
+      <div class="decor">
+        <div class="up-down">
+          <SvgIcon icon="box" hiddenMobile width={6} fill="#a0d8f1" left="50%" top="75%" />
+          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#3d4852" left="70%" top="20%" />
+          <SvgIcon icon="triangle" width={8} stroke="#3d4852" left="25%" top="5%" />
+          <SvgIcon icon="upDown" hiddenMobile width={24} fill="#f6993f" left="80%" top="80%" />
+        </div>
+
+        <div class="up-down-wide">
+          <SvgIcon icon="arrowUp" hiddenMobile width={16} fill="#9561e2" left="5%" top="80%" />
+          <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="95%" top="50%" />
+          <SvgIcon icon="circle" width={6} fill="#ffffff" left="85%" top="15%" />
+          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#3d4852" left="45%" top="10%" />
+        </div>
+
+        <SvgIcon icon="circle" width={6} fill="#ffffff" left="4%" top="20%" />
+        <SvgIcon icon="circle" width={12} fill="#3d4852" left="70%" top="60%" />
+        <SvgIcon icon="box" width={6} fill="#f6993f" left="10%" top="10%" />
+        <SvgIcon icon="box" width={12} fill="#3d4852" left="20%" top="30%" />
+        <SvgIcon icon="hexa" width={8} stroke="#3d4852" left="80%" top="70%" />
+      </div>
+
+      <div class="panel-content">
+        <div class="inner">
+          <h2 class="section-title">About</h2>
+
+          <div class="about-hero">
+            <img src="/static/avatar-ae5df907c692f3513038ff216a008c83.png" alt="Ralph" class="about-avatar" />
+            <span class="about-sub">
+              Full-Stack Developer &amp; AI Integration Specialist
+            </span>
+          </div>
+
+          <div class="about-copy">
+            <p class="about-desc">
+              Full-stack developer and AI integration specialist. I build products end-to-end and integrate AI to
+              automate workflows and solve real problems.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel contact-panel">
+      <div class="contact-wave">
+        <div class="contact-wave-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 338.05" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path>
+              <animate
+                attributeName="d"
+                values="M 0 100 Q 250 50 400 200 Q 550 350 800 300 L 800 0 L 0 0 L 0 100 Z;M 0 100 Q 200 150 400 200 Q 600 250 800 300 L 800 0 L 0 0 L 0 100 Z;M 0 100 Q 150 350 400 200 Q 650 50 800 300 L 800 0 L 0 0 L 0 100 Z"
+                repeatCount="indefinite"
+                dur="30s"
+              />
+            </path>
+          </svg>
+        </div>
+      </div>
+
+      <div class="decor">
+        <div class="up-down">
+          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#3d4852" left="70%" top="20%" />
+          <SvgIcon icon="triangle" width={8} stroke="#3d4852" left="25%" top="5%" />
+        </div>
+
+        <div class="up-down-wide">
+          <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="95%" top="50%" />
+          <SvgIcon icon="circle" width={6} fill="#ffffff" left="85%" top="15%" />
+          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#3d4852" left="45%" top="10%" />
+        </div>
+
+        <SvgIcon icon="circle" width={6} fill="#ffffff" left="4%" top="20%" />
+        <SvgIcon icon="circle" width={12} fill="#3d4852" left="70%" top="60%" />
+        <SvgIcon icon="box" width={12} fill="#3d4852" left="20%" top="30%" />
+        <SvgIcon icon="hexa" width={8} stroke="#3d4852" left="80%" top="70%" />
+      </div>
+
+      <div class="panel-content">
+        <div class="inner">
+          <h2 class="section-title">Get in touch</h2>
+          <p class="contact-text">
+            Say <a href="mailto:ralphmungcal09@gmail.com">Hi</a> or connect with me on other platforms:
+            <a href="https://www.linkedin.com/in/ralphjonasmungcal">LinkedIn</a> &
+            <a href="https://www.upwork.com/o/profiles/users/_~01108375a06953763f/">Upwork</a>
+          </p>
+        </div>
+      </div>
+
+      <footer class="site-footer">RalphJonasMungcal &copy; 2019</footer>
+    </section>
+  </main>
+</BaseLayout>
