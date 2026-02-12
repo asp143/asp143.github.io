@@ -7,8 +7,28 @@ const currentYear = new Date().getFullYear();
 ---
 
 <BaseLayout>
+  <div class="scroll-progress" aria-hidden="true"></div>
+
+  <nav class="section-nav" aria-label="Page sections">
+    <a href="#hero" class="section-dot active" data-section="hero" aria-label="Hero">
+      <span class="dot-label">Home</span>
+    </a>
+    <a href="#projects" class="section-dot" data-section="projects" aria-label="Projects">
+      <span class="dot-label">Projects</span>
+    </a>
+    <a href="#about" class="section-dot" data-section="about" aria-label="About">
+      <span class="dot-label">About</span>
+    </a>
+    <a href="#blog" class="section-dot" data-section="blog" aria-label="Blog">
+      <span class="dot-label">Blog</span>
+    </a>
+    <a href="#contact" class="section-dot" data-section="contact" aria-label="Contact">
+      <span class="dot-label">Contact</span>
+    </a>
+  </nav>
+
   <main class="portfolio-page">
-    <section class="panel hero-panel">
+    <section id="hero" class="panel hero-panel">
       <div class="decor">
         <div class="up-down">
           <SvgIcon icon="triangle" hiddenMobile width={48} stroke="#f6993f" left="10%" top="20%" />
@@ -38,7 +58,7 @@ const currentYear = new Date().getFullYear();
       </div>
     </section>
 
-    <section class="panel projects-panel">
+    <section id="projects" class="panel projects-panel">
       <div class="decor">
         <div class="up-down">
           <SvgIcon icon="upDown" width={8} fill="#4dc0b5" left="70%" top="20%" />
@@ -240,7 +260,7 @@ const currentYear = new Date().getFullYear();
       </div>
     </section>
 
-    <section class="panel about-panel">
+    <section id="about" class="panel about-panel">
       <div class="decor">
         <div class="up-down">
           <SvgIcon icon="triangle" width={8} stroke="#3d4852" left="25%" top="5%" />
@@ -284,7 +304,7 @@ const currentYear = new Date().getFullYear();
       </div>
     </section>
 
-    <section class="panel blog-panel">
+    <section id="blog" class="panel blog-panel">
       <div class="decor">
         <div class="up-down">
           <SvgIcon icon="triangle" width={8} stroke="#f6c744" left="15%" top="10%" />
@@ -304,7 +324,7 @@ const currentYear = new Date().getFullYear();
           <h2 class="section-title reveal">Blog</h2>
 
           <div class="blog-grid">
-            <a href="https://ralphdev.bearblog.dev/secure-your-cloud-build-secrets/" class="blog-card reveal" style="--i:1" target="_blank" rel="noopener noreferrer">
+            <a href="https://ralphdev.bearblog.dev/gcp-secrets/" class="blog-card reveal" style="--i:1" target="_blank" rel="noopener noreferrer">
               <time class="blog-date">Jan 31, 2026</time>
               <h3 class="blog-card-title">Secure your cloud build secrets</h3>
             </a>
@@ -332,7 +352,7 @@ const currentYear = new Date().getFullYear();
       </div>
     </section>
 
-    <section class="panel contact-panel">
+    <section id="contact" class="panel contact-panel">
       <div class="contact-wave">
         <div class="contact-wave-inner">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 338.05" preserveAspectRatio="none" aria-hidden="true" focusable="false">
@@ -386,18 +406,66 @@ const currentYear = new Date().getFullYear();
   </main>
 
   <script>
-    const observer = new IntersectionObserver(
+    // Reveal on scroll
+    const revealObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('in-view');
-            observer.unobserve(entry.target);
+            revealObserver.unobserve(entry.target);
           }
         });
       },
       { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
     );
+    document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
 
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+    // Scroll progress bar
+    const progressBar = document.querySelector('.scroll-progress') as HTMLElement;
+    const scrollIndicator = document.querySelector('.scroll-indicator') as HTMLElement;
+
+    function updateProgress() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
+      progressBar.style.transform = `scaleX(${progress})`;
+
+      // Fade out hero scroll indicator as user scrolls
+      if (scrollIndicator) {
+        const fade = Math.max(1 - scrollTop / (window.innerHeight * 0.3), 0);
+        scrollIndicator.style.opacity = String(fade);
+      }
+    }
+
+    // Section nav dot tracking
+    const sections = document.querySelectorAll<HTMLElement>('.panel[id]');
+    const dots = document.querySelectorAll<HTMLElement>('.section-dot');
+
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            dots.forEach((dot) => {
+              dot.classList.toggle('active', dot.dataset.section === id);
+            });
+          }
+        });
+      },
+      { threshold: 0, rootMargin: '-50% 0px -50% 0px' }
+    );
+    sections.forEach((section) => sectionObserver.observe(section));
+
+    // Smooth scroll for dot navigation
+    dots.forEach((dot) => {
+      dot.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.getElementById(dot.dataset.section || '');
+        target?.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
   </script>
 </BaseLayout>
