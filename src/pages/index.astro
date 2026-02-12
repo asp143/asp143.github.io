@@ -2,6 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SvgIcon from '../components/SvgIcon.astro';
 import '../styles/home.css';
+
+const currentYear = new Date().getFullYear();
 ---
 
 <BaseLayout>
@@ -11,71 +13,54 @@ import '../styles/home.css';
         <div class="up-down">
           <SvgIcon icon="triangle" hiddenMobile width={48} stroke="#f6993f" left="10%" top="20%" />
           <SvgIcon icon="hexa" width={48} stroke="#e3342f" left="60%" top="70%" />
-          <SvgIcon icon="box" width={6} fill="#606f7b" left="60%" top="15%" />
         </div>
 
         <div class="up-down-wide">
-          <SvgIcon icon="arrowUp" hiddenMobile width={16} fill="#2779bd" left="80%" top="10%" />
           <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="90%" top="50%" />
           <SvgIcon icon="circle" width={16} fill="#606f7b" left="70%" top="90%" />
-          <SvgIcon icon="triangle" width={16} stroke="#3d4852" left="30%" top="65%" />
           <SvgIcon icon="cross" width={16} stroke="#fa7ea8" left="28%" top="15%" />
-          <SvgIcon icon="circle" width={6} fill="#3d4852" left="75%" top="10%" />
-          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#3d4852" left="45%" top="10%" />
         </div>
 
-        <SvgIcon icon="circle" hiddenMobile width={24} fill="#606f7b" left="5%" top="70%" />
-        <SvgIcon icon="circle" width={6} fill="#3d4852" left="4%" top="20%" />
-        <SvgIcon icon="circle" width={12} fill="#3d4852" left="50%" top="60%" />
-        <SvgIcon icon="upDown" width={8} fill="#3d4852" left="95%" top="90%" />
-        <SvgIcon icon="upDown" hiddenMobile width={24} fill="#606f7b" left="40%" top="80%" />
-        <SvgIcon icon="triangle" width={8} stroke="#606f7b" left="25%" top="5%" />
         <SvgIcon icon="circle" width={64} fill="#38c172" left="95%" top="5%" />
         <SvgIcon icon="box" hiddenMobile width={64} fill="#9561e2" left="5%" top="90%" />
-        <SvgIcon icon="box" width={6} fill="#3d4852" left="10%" top="10%" />
-        <SvgIcon icon="box" width={12} fill="#3d4852" left="40%" top="30%" />
         <SvgIcon icon="hexa" width={16} stroke="#606f7b" left="10%" top="50%" />
-        <SvgIcon icon="hexa" width={8} stroke="#606f7b" left="80%" top="70%" />
+        <SvgIcon icon="triangle" width={8} stroke="#606f7b" left="25%" top="5%" />
       </div>
 
       <div class="panel-content hero-content">
         <h1 class="big-title">Hello, <br /> I'm <span class="name-highlight">Ralph</span>.</h1>
         <p class="subtitle">Full-Stack Developer &amp; AI Integration Specialist building scalable, practical software.</p>
       </div>
+
+      <div class="scroll-indicator" aria-hidden="true">
+        <span class="scroll-text">Scroll</span>
+        <span class="scroll-line"></span>
+      </div>
     </section>
 
     <section class="panel projects-panel">
       <div class="decor">
         <div class="up-down">
-          <SvgIcon icon="box" width={6} fill="#ffffff" left="85%" top="75%" />
           <SvgIcon icon="upDown" width={8} fill="#4dc0b5" left="70%" top="20%" />
           <SvgIcon icon="triangle" width={8} stroke="#f6993f" left="25%" top="5%" />
-          <SvgIcon icon="circle" hiddenMobile width={24} fill="#ffffff" left="17%" top="60%" />
         </div>
 
         <div class="up-down-wide">
-          <SvgIcon icon="arrowUp" hiddenMobile width={16} fill="#38c172" left="20%" top="90%" />
           <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="90%" top="30%" />
           <SvgIcon icon="circle" width={16} fill="#ffed4a" left="70%" top="90%" />
-          <SvgIcon icon="triangle" hiddenMobile width={16} stroke="#4dc0b5" left="18%" top="75%" />
-          <SvgIcon icon="circle" width={6} fill="#ffffff" left="75%" top="10%" />
-          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#38c172" left="45%" top="10%" />
         </div>
 
-        <SvgIcon icon="circle" width={6} fill="#ffffff" left="4%" top="20%" />
         <SvgIcon icon="circle" width={12} fill="#f66d9b" left="80%" top="60%" />
-        <SvgIcon icon="box" width={6} fill="#f6993f" left="10%" top="10%" />
-        <SvgIcon icon="box" width={12} fill="#ffed4a" left="29%" top="26%" />
         <SvgIcon icon="hexa" width={16} stroke="#e3342f" left="75%" top="30%" />
-        <SvgIcon icon="hexa" width={8} stroke="#ffed4a" left="80%" top="70%" />
       </div>
 
       <div class="panel-content">
         <div class="inner">
-          <h2 class="section-title">Projects</h2>
+          <h2 class="section-title reveal">Projects</h2>
 
           <div class="featured-grid">
-            <article class="featured-card">
+            <article class="featured-card reveal" style="--accent:#38bdf8; --accent-rgb:56,189,248; --i:1">
+              <span class="card-index" aria-hidden="true">01</span>
               <h3 class="featured-card-title">Flight Rewards Search Platform</h3>
               <p class="featured-card-desc">
                 Technical lead for a UK-based SaaS platform that helps users find and compare reward flight
@@ -90,7 +75,8 @@ import '../styles/home.css';
               </div>
             </article>
 
-            <article class="featured-card">
+            <article class="featured-card reveal" style="--accent:#34d399; --accent-rgb:52,211,153; --i:2">
+              <span class="card-index" aria-hidden="true">02</span>
               <h3 class="featured-card-title">Billing &amp; Payment Platform</h3>
               <p class="featured-card-desc">
                 Built a multi-gateway payment orchestration platform that wraps local payment providers into a unified
@@ -104,7 +90,8 @@ import '../styles/home.css';
               </div>
             </article>
 
-            <article class="featured-card">
+            <article class="featured-card reveal" style="--accent:#a78bfa; --accent-rgb:167,139,250; --i:3">
+              <span class="card-index" aria-hidden="true">03</span>
               <h3 class="featured-card-title">Airline Data Aggregation Bots</h3>
               <p class="featured-card-desc">
                 Built a suite of automated scrapers that collect flight availability data from multiple airline sources
@@ -117,7 +104,8 @@ import '../styles/home.css';
               </div>
             </article>
 
-            <article class="featured-card">
+            <article class="featured-card reveal" style="--accent:#fb923c; --accent-rgb:251,146,60; --i:4">
+              <span class="card-index" aria-hidden="true">04</span>
               <h3 class="featured-card-title">Remote MCP Server</h3>
               <p class="featured-card-desc">
                 Built a Model Context Protocol server accessible via URL, enabling AI assistants to interact with
@@ -130,7 +118,8 @@ import '../styles/home.css';
               </div>
             </article>
 
-            <article class="featured-card">
+            <article class="featured-card reveal" style="--accent:#f472b6; --accent-rgb:244,114,182; --i:5">
+              <span class="card-index" aria-hidden="true">05</span>
               <h3 class="featured-card-title">Home Infrastructure Lab</h3>
               <p class="featured-card-desc">
                 Built and maintained a multi-node self-hosted services ecosystem including NAS, media streaming, photo
@@ -146,10 +135,10 @@ import '../styles/home.css';
             </article>
           </div>
 
-          <h3 class="compact-list-heading">Other Projects</h3>
+          <h3 class="compact-list-heading reveal">Other Projects</h3>
 
           <div class="compact-list">
-            <article class="compact-item">
+            <article class="compact-item reveal" style="--i:0">
               <div class="compact-item-header">
                 <h4 class="compact-item-title">Airline Route Mapping Service</h4>
                 <p class="compact-item-desc">Managing and querying airline route connections and partnerships across global flight networks.</p>
@@ -160,7 +149,7 @@ import '../styles/home.css';
               </div>
             </article>
 
-            <article class="compact-item">
+            <article class="compact-item reveal" style="--i:1">
               <div class="compact-item-header">
                 <h4 class="compact-item-title">Loyalty Points Transfer Engine</h4>
                 <p class="compact-item-desc">Complex loyalty program transfers between airline partners with bonus calculations and partner eligibility.</p>
@@ -172,7 +161,7 @@ import '../styles/home.css';
               </div>
             </article>
 
-            <article class="compact-item">
+            <article class="compact-item reveal" style="--i:2">
               <div class="compact-item-header">
                 <h4 class="compact-item-title">Subscription Service Architecture</h4>
                 <p class="compact-item-desc">Full subscription lifecycle handling plan changes, grace periods, automated dunning, and revenue recovery.</p>
@@ -185,14 +174,14 @@ import '../styles/home.css';
               </div>
             </article>
 
-            <article class="compact-item">
+            <article class="compact-item reveal" style="--i:3">
               <div class="compact-item-header">
                 <h4 class="compact-item-title">AI Development Workflow Standards</h4>
                 <p class="compact-item-desc">Coding guidelines and configuration standards for AI-assisted development across multiple projects.</p>
               </div>
             </article>
 
-            <article class="compact-item">
+            <article class="compact-item reveal" style="--i:4">
               <div class="compact-item-header">
                 <h4 class="compact-item-title">Local AI Inference Server</h4>
                 <p class="compact-item-desc">On-premise LLM inference with benchmarked performance, optimized for local development.</p>
@@ -203,7 +192,7 @@ import '../styles/home.css';
               </div>
             </article>
 
-            <article class="compact-item">
+            <article class="compact-item reveal" style="--i:5">
               <div class="compact-item-header">
                 <h4 class="compact-item-title">Accident Detection Device</h4>
                 <p class="compact-item-desc">Thesis project detecting vehicle accidents and sending SOS messages to nearby rescue teams.</p>
@@ -214,7 +203,7 @@ import '../styles/home.css';
               </div>
             </article>
 
-            <article class="compact-item">
+            <article class="compact-item reveal" style="--i:6">
               <div class="compact-item-header">
                 <h4 class="compact-item-title">Accident Detection Control Panel</h4>
                 <p class="compact-item-desc">Control panel for viewing accident locations via GPS, generating reports, and data visualizations.</p>
@@ -227,7 +216,7 @@ import '../styles/home.css';
               </div>
             </article>
 
-            <article class="compact-item">
+            <article class="compact-item reveal" style="--i:7">
               <div class="compact-item-header">
                 <h4 class="compact-item-title">Audit and Report Generator</h4>
                 <p class="compact-item-desc">Web application for generating printable monthly expense reports for a company.</p>
@@ -240,7 +229,7 @@ import '../styles/home.css';
               </div>
             </article>
 
-            <article class="compact-item">
+            <article class="compact-item reveal" style="--i:8">
               <div class="compact-item-header">
                 <h4 class="compact-item-title">Freelance Projects</h4>
                 <p class="compact-item-desc">Full-stack development and consulting work for multiple clients on Upwork.</p>
@@ -254,42 +243,42 @@ import '../styles/home.css';
     <section class="panel about-panel">
       <div class="decor">
         <div class="up-down">
-          <SvgIcon icon="box" hiddenMobile width={6} fill="#a0d8f1" left="50%" top="75%" />
-          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#3d4852" left="70%" top="20%" />
           <SvgIcon icon="triangle" width={8} stroke="#3d4852" left="25%" top="5%" />
           <SvgIcon icon="upDown" hiddenMobile width={24} fill="#f6993f" left="80%" top="80%" />
         </div>
 
         <div class="up-down-wide">
-          <SvgIcon icon="arrowUp" hiddenMobile width={16} fill="#9561e2" left="5%" top="80%" />
           <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="95%" top="50%" />
           <SvgIcon icon="circle" width={6} fill="#ffffff" left="85%" top="15%" />
-          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#3d4852" left="45%" top="10%" />
         </div>
 
         <SvgIcon icon="circle" width={6} fill="#ffffff" left="4%" top="20%" />
-        <SvgIcon icon="circle" width={12} fill="#3d4852" left="70%" top="60%" />
-        <SvgIcon icon="box" width={6} fill="#f6993f" left="10%" top="10%" />
-        <SvgIcon icon="box" width={12} fill="#3d4852" left="20%" top="30%" />
         <SvgIcon icon="hexa" width={8} stroke="#3d4852" left="80%" top="70%" />
       </div>
 
       <div class="panel-content">
         <div class="inner">
-          <h2 class="section-title">About</h2>
+          <h2 class="section-title reveal">About</h2>
 
-          <div class="about-hero">
+          <div class="about-hero reveal" style="--i:1">
             <img src="/static/avatar-ae5df907c692f3513038ff216a008c83.png" alt="Ralph" class="about-avatar" />
             <span class="about-sub">
               Full-Stack Developer &amp; AI Integration Specialist
             </span>
           </div>
 
-          <div class="about-copy">
+          <div class="about-copy reveal" style="--i:2">
             <p class="about-desc">
               Full-stack developer and AI integration specialist. I build products end-to-end and integrate AI to
               automate workflows and solve real problems.
             </p>
+          </div>
+
+          <div class="focus-areas reveal" style="--i:3">
+            <span class="focus-tag">Backend Architecture</span>
+            <span class="focus-tag">AI Integration</span>
+            <span class="focus-tag">Cloud Infrastructure</span>
+            <span class="focus-tag">Developer Tooling</span>
           </div>
         </div>
       </div>
@@ -300,49 +289,44 @@ import '../styles/home.css';
         <div class="up-down">
           <SvgIcon icon="triangle" width={8} stroke="#f6c744" left="15%" top="10%" />
           <SvgIcon icon="circle" hiddenMobile width={24} fill="#606f7b" left="85%" top="75%" />
-          <SvgIcon icon="box" width={6} fill="#3d4852" left="70%" top="15%" />
         </div>
 
         <div class="up-down-wide">
           <SvgIcon icon="arrowUp" hiddenMobile width={16} fill="#4dc0b5" left="90%" top="20%" />
-          <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="10%" top="80%" />
           <SvgIcon icon="circle" width={6} fill="#ffffff" left="50%" top="5%" />
-          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#3d4852" left="35%" top="90%" />
         </div>
 
-        <SvgIcon icon="circle" width={12} fill="#3d4852" left="30%" top="40%" />
         <SvgIcon icon="hexa" width={8} stroke="#606f7b" left="75%" top="50%" />
-        <SvgIcon icon="box" width={6} fill="#f6993f" left="5%" top="60%" />
       </div>
 
       <div class="panel-content">
         <div class="inner">
-          <h2 class="section-title">Blog</h2>
+          <h2 class="section-title reveal">Blog</h2>
 
           <div class="blog-grid">
-            <a href="https://ralphdev.bearblog.dev/secure-your-cloud-build-secrets/" class="blog-card" target="_blank" rel="noopener noreferrer">
+            <a href="https://ralphdev.bearblog.dev/secure-your-cloud-build-secrets/" class="blog-card reveal" style="--i:1" target="_blank" rel="noopener noreferrer">
               <time class="blog-date">Jan 31, 2026</time>
               <h3 class="blog-card-title">Secure your cloud build secrets</h3>
             </a>
 
-            <a href="https://ralphdev.bearblog.dev/what-is-a-tech-lead/" class="blog-card" target="_blank" rel="noopener noreferrer">
+            <a href="https://ralphdev.bearblog.dev/what-is-a-tech-lead/" class="blog-card reveal" style="--i:2" target="_blank" rel="noopener noreferrer">
               <time class="blog-date">Apr 11, 2024</time>
               <h3 class="blog-card-title">What is a Tech lead?</h3>
             </a>
 
-            <a href="https://ralphdev.bearblog.dev/discipline-over-motivation/" class="blog-card" target="_blank" rel="noopener noreferrer">
+            <a href="https://ralphdev.bearblog.dev/discipline-over-motivation/" class="blog-card reveal" style="--i:3" target="_blank" rel="noopener noreferrer">
               <time class="blog-date">Feb 14, 2023</time>
               <h3 class="blog-card-title">Discipline over Motivation</h3>
             </a>
 
-            <a href="https://ralphdev.bearblog.dev/google-cloud-developer-certification-guide/" class="blog-card" target="_blank" rel="noopener noreferrer">
+            <a href="https://ralphdev.bearblog.dev/google-cloud-developer-certification-guide/" class="blog-card reveal" style="--i:4" target="_blank" rel="noopener noreferrer">
               <time class="blog-date">Oct 9, 2022</time>
               <h3 class="blog-card-title">Google Cloud Developer Certification Guide</h3>
             </a>
           </div>
 
-          <a href="https://ralphdev.bearblog.dev/" class="blog-view-all" target="_blank" rel="noopener noreferrer">
-            View all posts &rarr;
+          <a href="https://ralphdev.bearblog.dev/" class="blog-view-all reveal" style="--i:5" target="_blank" rel="noopener noreferrer">
+            View all posts <span aria-hidden="true">&rarr;</span>
           </a>
         </div>
       </div>
@@ -365,35 +349,55 @@ import '../styles/home.css';
       </div>
 
       <div class="decor">
-        <div class="up-down">
-          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#3d4852" left="70%" top="20%" />
-          <SvgIcon icon="triangle" width={8} stroke="#3d4852" left="25%" top="5%" />
-        </div>
-
         <div class="up-down-wide">
           <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="95%" top="50%" />
           <SvgIcon icon="circle" width={6} fill="#ffffff" left="85%" top="15%" />
-          <SvgIcon icon="upDown" hiddenMobile width={8} fill="#3d4852" left="45%" top="10%" />
         </div>
 
         <SvgIcon icon="circle" width={6} fill="#ffffff" left="4%" top="20%" />
-        <SvgIcon icon="circle" width={12} fill="#3d4852" left="70%" top="60%" />
-        <SvgIcon icon="box" width={12} fill="#3d4852" left="20%" top="30%" />
         <SvgIcon icon="hexa" width={8} stroke="#3d4852" left="80%" top="70%" />
       </div>
 
       <div class="panel-content">
         <div class="inner">
-          <h2 class="section-title">Get in touch</h2>
-          <p class="contact-text">
-            Say <a href="mailto:ralphmungcal09@gmail.com">Hi</a> or connect with me on other platforms:
-            <a href="https://www.linkedin.com/in/ralphjonasmungcal">LinkedIn</a> &
-            <a href="https://www.upwork.com/o/profiles/users/_~01108375a06953763f/">Upwork</a>
+          <h2 class="section-title reveal">Get in touch</h2>
+          <p class="contact-text reveal" style="--i:1">
+            Say Hi or connect with me on other platforms.
           </p>
+          <div class="contact-links reveal" style="--i:2">
+            <a href="mailto:ralphmungcal09@gmail.com" class="contact-link">
+              <span>Email</span>
+              <span class="contact-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+            <a href="https://www.linkedin.com/in/ralphjonasmungcal" class="contact-link" target="_blank" rel="noopener noreferrer">
+              <span>LinkedIn</span>
+              <span class="contact-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+            <a href="https://www.upwork.com/o/profiles/users/_~01108375a06953763f/" class="contact-link" target="_blank" rel="noopener noreferrer">
+              <span>Upwork</span>
+              <span class="contact-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
         </div>
       </div>
 
-      <footer class="site-footer">RalphJonasMungcal &copy; 2019</footer>
+      <footer class="site-footer">Ralph Jonas Mungcal &copy; {currentYear}</footer>
     </section>
   </main>
+
+  <script>
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+  </script>
 </BaseLayout>
