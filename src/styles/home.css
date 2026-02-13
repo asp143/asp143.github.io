@@ -48,11 +48,12 @@
 /* ===== Hero ===== */
 
 .hero {
-  min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: var(--section-padding-x);
+  position: relative;
 }
 
 .hero-inner {
@@ -97,7 +98,7 @@
 
 .hero-scroll {
   position: absolute;
-  bottom: 2.5rem;
+  bottom: clamp(1.5rem, 3vw, 2.5rem);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
