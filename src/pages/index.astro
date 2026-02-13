@@ -1,471 +1,271 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SvgIcon from '../components/SvgIcon.astro';
 import '../styles/home.css';
 
 const currentYear = new Date().getFullYear();
 ---
 
 <BaseLayout>
-  <div class="scroll-progress" aria-hidden="true"></div>
-
-  <nav class="section-nav" aria-label="Page sections">
-    <a href="#hero" class="section-dot active" data-section="hero" aria-label="Hero">
-      <span class="dot-label">Home</span>
-    </a>
-    <a href="#projects" class="section-dot" data-section="projects" aria-label="Projects">
-      <span class="dot-label">Projects</span>
-    </a>
-    <a href="#about" class="section-dot" data-section="about" aria-label="About">
-      <span class="dot-label">About</span>
-    </a>
-    <a href="#blog" class="section-dot" data-section="blog" aria-label="Blog">
-      <span class="dot-label">Blog</span>
-    </a>
-    <a href="#contact" class="section-dot" data-section="contact" aria-label="Contact">
-      <span class="dot-label">Contact</span>
-    </a>
-  </nav>
-
   <main class="portfolio-page">
-    <section id="hero" class="panel hero-panel">
-      <div class="decor">
-        <div class="up-down">
-          <SvgIcon icon="triangle" hiddenMobile width={48} stroke="#f6993f" left="10%" top="20%" />
-          <SvgIcon icon="hexa" width={48} stroke="#e3342f" left="60%" top="70%" />
-        </div>
-
-        <div class="up-down-wide">
-          <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="90%" top="50%" />
-          <SvgIcon icon="circle" width={16} fill="#606f7b" left="70%" top="90%" />
-          <SvgIcon icon="cross" width={16} stroke="#fa7ea8" left="28%" top="15%" />
-        </div>
-
-        <SvgIcon icon="circle" width={64} fill="#38c172" left="95%" top="5%" />
-        <SvgIcon icon="box" hiddenMobile width={64} fill="#9561e2" left="5%" top="90%" />
-        <SvgIcon icon="hexa" width={16} stroke="#606f7b" left="10%" top="50%" />
-        <SvgIcon icon="triangle" width={8} stroke="#606f7b" left="25%" top="5%" />
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <div class="hero-inner">
+        <h1 class="hero-name" aria-label="Ralph Jonas">
+          <span class="hero-name-line">
+            {'RALPH'.split('').map(letter => (
+              <span class="hero-name-letter motion-letter">{letter}</span>
+            ))}
+          </span>
+          <span class="hero-name-line">
+            {'JONAS'.split('').map(letter => (
+              <span class="hero-name-letter motion-letter">{letter}</span>
+            ))}
+            <span class="hero-name-letter motion-letter hero-period">.</span>
+          </span>
+        </h1>
+        <p class="hero-subtitle motion-fade">
+          Full-Stack Developer &amp; AI Integration Specialist building scalable, practical software.
+        </p>
       </div>
 
-      <div class="panel-content hero-content">
-        <h1 class="big-title">Hello, <br /> I'm <span class="name-highlight">Ralph</span>.</h1>
-        <p class="subtitle">Full-Stack Developer &amp; AI Integration Specialist building scalable, practical software.</p>
-      </div>
-
-      <div class="scroll-indicator" aria-hidden="true">
-        <span class="scroll-text">Scroll</span>
-        <span class="scroll-line"></span>
+      <div class="hero-scroll motion-fade" aria-hidden="true">
+        <span class="hero-scroll-text">Scroll</span>
+        <span class="hero-scroll-line"></span>
       </div>
     </section>
 
-    <section id="projects" class="panel projects-panel">
-      <div class="decor">
-        <div class="up-down">
-          <SvgIcon icon="upDown" width={8} fill="#4dc0b5" left="70%" top="20%" />
-          <SvgIcon icon="triangle" width={8} stroke="#f6993f" left="25%" top="5%" />
-        </div>
+    <!-- 01. Projects -->
+    <section class="section" id="projects">
+      <div class="section-inner">
+        <span class="section-number motion-fade">01.</span>
+        <h2 class="section-heading motion-fade">Projects</h2>
+        <hr class="section-rule" />
 
-        <div class="up-down-wide">
-          <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="90%" top="30%" />
-          <SvgIcon icon="circle" width={16} fill="#ffed4a" left="70%" top="90%" />
-        </div>
+        <ul class="project-list">
+          <li class="project-row motion-stagger">
+            <span class="project-name">Flight Rewards Search Platform</span>
+            <span class="project-tech">Node.js · TypeScript · PostgreSQL · GCP</span>
+            <p class="project-desc">Technical lead for a UK-based SaaS platform that helps users find and compare reward flight availability across major airlines.</p>
+          </li>
+          <li class="project-row motion-stagger">
+            <span class="project-name">Billing &amp; Payment Platform</span>
+            <span class="project-tech">Node.js · TypeScript · GCP · Event-Driven</span>
+            <p class="project-desc">Multi-gateway payment orchestration platform with unified subscription billing, dunning management, and smart retry logic.</p>
+          </li>
+          <li class="project-row motion-stagger">
+            <span class="project-name">Airline Data Aggregation Bots</span>
+            <span class="project-tech">TypeScript · Puppeteer · BullMQ</span>
+            <p class="project-desc">Automated scrapers collecting flight availability data from multiple airline sources on scheduled intervals.</p>
+          </li>
+          <li class="project-row motion-stagger">
+            <span class="project-name">Remote MCP Server</span>
+            <span class="project-tech">TypeScript · Node.js · Docker</span>
+            <p class="project-desc">Model Context Protocol server accessible via URL, enabling AI assistants to interact with custom tools through SSE transport.</p>
+          </li>
+          <li class="project-row motion-stagger">
+            <span class="project-name">Home Infrastructure Lab</span>
+            <span class="project-tech">Docker · Linux · TrueNAS · Tailscale</span>
+            <p class="project-desc">Multi-node self-hosted services ecosystem including NAS, media streaming, workflow automation, and monitoring dashboards.</p>
+          </li>
+        </ul>
 
-        <SvgIcon icon="circle" width={12} fill="#f66d9b" left="80%" top="60%" />
-        <SvgIcon icon="hexa" width={16} stroke="#e3342f" left="75%" top="30%" />
-      </div>
+        <h3 class="other-heading motion-fade">Other Work</h3>
 
-      <div class="panel-content">
-        <div class="inner">
-          <h2 class="section-title reveal">Projects</h2>
-
-          <div class="featured-grid">
-            <article class="featured-card reveal" style="--accent:#38bdf8; --accent-rgb:56,189,248; --i:1">
-              <span class="card-index" aria-hidden="true">01</span>
-              <h3 class="featured-card-title">Flight Rewards Search Platform</h3>
-              <p class="featured-card-desc">
-                Technical lead for a UK-based SaaS platform that helps users find and compare reward flight
-                availability across major airlines. Responsible for backend architecture, API development, admin panel,
-                and subscription/payment systems.
-              </p>
-              <div class="tech-tags">
-                <span class="tech-tag">Node.js</span>
-                <span class="tech-tag">TypeScript</span>
-                <span class="tech-tag">PostgreSQL</span>
-                <span class="tech-tag">GCP</span>
-              </div>
-            </article>
-
-            <article class="featured-card reveal" style="--accent:#34d399; --accent-rgb:52,211,153; --i:2">
-              <span class="card-index" aria-hidden="true">02</span>
-              <h3 class="featured-card-title">Billing &amp; Payment Platform</h3>
-              <p class="featured-card-desc">
-                Built a multi-gateway payment orchestration platform that wraps local payment providers into a unified
-                subscription billing engine with dunning management, smart retry logic, and pro-rated plan changes.
-              </p>
-              <div class="tech-tags">
-                <span class="tech-tag">Node.js</span>
-                <span class="tech-tag">TypeScript</span>
-                <span class="tech-tag">GCP</span>
-                <span class="tech-tag">Event-Driven</span>
-              </div>
-            </article>
-
-            <article class="featured-card reveal" style="--accent:#a78bfa; --accent-rgb:167,139,250; --i:3">
-              <span class="card-index" aria-hidden="true">03</span>
-              <h3 class="featured-card-title">Airline Data Aggregation Bots</h3>
-              <p class="featured-card-desc">
-                Built a suite of automated scrapers that collect flight availability data from multiple airline sources
-                on scheduled intervals, feeding into a centralized data store.
-              </p>
-              <div class="tech-tags">
-                <span class="tech-tag">TypeScript</span>
-                <span class="tech-tag">Puppeteer/Playwright</span>
-                <span class="tech-tag">Bull/BullMQ</span>
-              </div>
-            </article>
-
-            <article class="featured-card reveal" style="--accent:#fb923c; --accent-rgb:251,146,60; --i:4">
-              <span class="card-index" aria-hidden="true">04</span>
-              <h3 class="featured-card-title">Remote MCP Server</h3>
-              <p class="featured-card-desc">
-                Built a Model Context Protocol server accessible via URL, enabling AI assistants to interact with
-                custom tools through SSE transport. Deployed as a containerized service.
-              </p>
-              <div class="tech-tags">
-                <span class="tech-tag">TypeScript</span>
-                <span class="tech-tag">Node.js</span>
-                <span class="tech-tag">Docker</span>
-              </div>
-            </article>
-
-            <article class="featured-card reveal" style="--accent:#f472b6; --accent-rgb:244,114,182; --i:5">
-              <span class="card-index" aria-hidden="true">05</span>
-              <h3 class="featured-card-title">Home Infrastructure Lab</h3>
-              <p class="featured-card-desc">
-                Built and maintained a multi-node self-hosted services ecosystem including NAS, media streaming, photo
-                management, workflow automation, and monitoring dashboards across distributed hardware.
-              </p>
-              <div class="tech-tags">
-                <span class="tech-tag">Docker</span>
-                <span class="tech-tag">Linux</span>
-                <span class="tech-tag">TrueNAS</span>
-                <span class="tech-tag">Tailscale</span>
-                <span class="tech-tag">Nginx</span>
-              </div>
-            </article>
-          </div>
-
-          <h3 class="compact-list-heading reveal">Other Projects</h3>
-
-          <div class="compact-list">
-            <article class="compact-item reveal" style="--i:0">
-              <div class="compact-item-header">
-                <h4 class="compact-item-title">Airline Route Mapping Service</h4>
-                <p class="compact-item-desc">Managing and querying airline route connections and partnerships across global flight networks.</p>
-              </div>
-              <div class="tech-tags">
-                <span class="tech-tag">TypeScript</span>
-                <span class="tech-tag">Node.js</span>
-              </div>
-            </article>
-
-            <article class="compact-item reveal" style="--i:1">
-              <div class="compact-item-header">
-                <h4 class="compact-item-title">Loyalty Points Transfer Engine</h4>
-                <p class="compact-item-desc">Complex loyalty program transfers between airline partners with bonus calculations and partner eligibility.</p>
-              </div>
-              <div class="tech-tags">
-                <span class="tech-tag">Node.js</span>
-                <span class="tech-tag">TypeScript</span>
-                <span class="tech-tag">React</span>
-              </div>
-            </article>
-
-            <article class="compact-item reveal" style="--i:2">
-              <div class="compact-item-header">
-                <h4 class="compact-item-title">Subscription Service Architecture</h4>
-                <p class="compact-item-desc">Full subscription lifecycle handling plan changes, grace periods, automated dunning, and revenue recovery.</p>
-              </div>
-              <div class="tech-tags">
-                <span class="tech-tag">Node.js</span>
-                <span class="tech-tag">TypeScript</span>
-                <span class="tech-tag">GCP</span>
-                <span class="tech-tag">Pub/Sub</span>
-              </div>
-            </article>
-
-            <article class="compact-item reveal" style="--i:3">
-              <div class="compact-item-header">
-                <h4 class="compact-item-title">AI Development Workflow Standards</h4>
-                <p class="compact-item-desc">Coding guidelines and configuration standards for AI-assisted development across multiple projects.</p>
-              </div>
-            </article>
-
-            <article class="compact-item reveal" style="--i:4">
-              <div class="compact-item-header">
-                <h4 class="compact-item-title">Local AI Inference Server</h4>
-                <p class="compact-item-desc">On-premise LLM inference with benchmarked performance, optimized for local development.</p>
-              </div>
-              <div class="tech-tags">
-                <span class="tech-tag">Linux</span>
-                <span class="tech-tag">AI/ML Inference</span>
-              </div>
-            </article>
-
-            <article class="compact-item reveal" style="--i:5">
-              <div class="compact-item-header">
-                <h4 class="compact-item-title">Accident Detection Device</h4>
-                <p class="compact-item-desc">Thesis project detecting vehicle accidents and sending SOS messages to nearby rescue teams.</p>
-              </div>
-              <div class="tech-tags">
-                <span class="tech-tag">Raspberry Pi</span>
-                <span class="tech-tag">Python</span>
-              </div>
-            </article>
-
-            <article class="compact-item reveal" style="--i:6">
-              <div class="compact-item-header">
-                <h4 class="compact-item-title">Accident Detection Control Panel</h4>
-                <p class="compact-item-desc">Control panel for viewing accident locations via GPS, generating reports, and data visualizations.</p>
-              </div>
-              <div class="tech-tags">
-                <span class="tech-tag">MongoDB</span>
-                <span class="tech-tag">Express.js</span>
-                <span class="tech-tag">Angular</span>
-                <span class="tech-tag">Node.js</span>
-              </div>
-            </article>
-
-            <article class="compact-item reveal" style="--i:7">
-              <div class="compact-item-header">
-                <h4 class="compact-item-title">Audit and Report Generator</h4>
-                <p class="compact-item-desc">Web application for generating printable monthly expense reports for a company.</p>
-              </div>
-              <div class="tech-tags">
-                <span class="tech-tag">Angular</span>
-                <span class="tech-tag">Node.js</span>
-                <span class="tech-tag">SQL</span>
-                <span class="tech-tag">AWS</span>
-              </div>
-            </article>
-
-            <article class="compact-item reveal" style="--i:8">
-              <div class="compact-item-header">
-                <h4 class="compact-item-title">Freelance Projects</h4>
-                <p class="compact-item-desc">Full-stack development and consulting work for multiple clients on Upwork.</p>
-              </div>
-            </article>
-          </div>
-        </div>
+        <ul class="project-list">
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">Airline Route Mapping Service</span>
+            <span class="compact-tech">TypeScript · Node.js</span>
+          </li>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">Loyalty Points Transfer Engine</span>
+            <span class="compact-tech">Node.js · TypeScript · React</span>
+          </li>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">Subscription Service Architecture</span>
+            <span class="compact-tech">Node.js · GCP · Pub/Sub</span>
+          </li>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">AI Development Workflow Standards</span>
+            <span class="compact-tech"></span>
+          </li>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">Local AI Inference Server</span>
+            <span class="compact-tech">Linux · AI/ML Inference</span>
+          </li>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">Accident Detection Device</span>
+            <span class="compact-tech">Raspberry Pi · Python</span>
+          </li>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">Accident Detection Control Panel</span>
+            <span class="compact-tech">MongoDB · Express · Angular · Node.js</span>
+          </li>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">Audit &amp; Report Generator</span>
+            <span class="compact-tech">Angular · Node.js · SQL · AWS</span>
+          </li>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">Freelance Projects</span>
+            <span class="compact-tech">Upwork</span>
+          </li>
+        </ul>
       </div>
     </section>
 
-    <section id="about" class="panel about-panel">
-      <div class="decor">
-        <div class="up-down">
-          <SvgIcon icon="triangle" width={8} stroke="#3d4852" left="25%" top="5%" />
-          <SvgIcon icon="upDown" hiddenMobile width={24} fill="#f6993f" left="80%" top="80%" />
-        </div>
+    <!-- 02. About -->
+    <section class="section" id="about">
+      <div class="section-inner">
+        <span class="section-number motion-fade">02.</span>
+        <h2 class="section-heading motion-fade">About</h2>
+        <hr class="section-rule" />
 
-        <div class="up-down-wide">
-          <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="95%" top="50%" />
-          <SvgIcon icon="circle" width={6} fill="#ffffff" left="85%" top="15%" />
-        </div>
-
-        <SvgIcon icon="circle" width={6} fill="#ffffff" left="4%" top="20%" />
-        <SvgIcon icon="hexa" width={8} stroke="#3d4852" left="80%" top="70%" />
-      </div>
-
-      <div class="panel-content">
-        <div class="inner">
-          <h2 class="section-title reveal">About</h2>
-
-          <div class="about-hero reveal" style="--i:1">
-            <img src="/static/avatar-ae5df907c692f3513038ff216a008c83.png" alt="Ralph" class="about-avatar" />
-            <span class="about-sub">
-              Full-Stack Developer &amp; AI Integration Specialist
-            </span>
-          </div>
-
-          <div class="about-copy reveal" style="--i:2">
-            <p class="about-desc">
-              Full-stack developer and AI integration specialist. I build products end-to-end and integrate AI to
-              automate workflows and solve real problems.
-            </p>
-          </div>
-
-          <div class="focus-areas reveal" style="--i:3">
-            <span class="focus-tag">Backend Architecture</span>
-            <span class="focus-tag">AI Integration</span>
-            <span class="focus-tag">Cloud Infrastructure</span>
-            <span class="focus-tag">Developer Tooling</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="blog" class="panel blog-panel">
-      <div class="decor">
-        <div class="up-down">
-          <SvgIcon icon="triangle" width={8} stroke="#f6c744" left="15%" top="10%" />
-          <SvgIcon icon="circle" hiddenMobile width={24} fill="#606f7b" left="85%" top="75%" />
-        </div>
-
-        <div class="up-down-wide">
-          <SvgIcon icon="arrowUp" hiddenMobile width={16} fill="#4dc0b5" left="90%" top="20%" />
-          <SvgIcon icon="circle" width={6} fill="#ffffff" left="50%" top="5%" />
-        </div>
-
-        <SvgIcon icon="hexa" width={8} stroke="#606f7b" left="75%" top="50%" />
-      </div>
-
-      <div class="panel-content">
-        <div class="inner">
-          <h2 class="section-title reveal">Blog</h2>
-
-          <div class="blog-grid">
-            <a href="https://ralphdev.bearblog.dev/gcp-secrets/" class="blog-card reveal" style="--i:1" target="_blank" rel="noopener noreferrer">
-              <time class="blog-date">Jan 31, 2026</time>
-              <h3 class="blog-card-title">Secure your cloud build secrets</h3>
-            </a>
-
-            <a href="https://ralphdev.bearblog.dev/what-is-a-tech-lead/" class="blog-card reveal" style="--i:2" target="_blank" rel="noopener noreferrer">
-              <time class="blog-date">Apr 11, 2024</time>
-              <h3 class="blog-card-title">What is a Tech lead?</h3>
-            </a>
-
-            <a href="https://ralphdev.bearblog.dev/discipline-over-motivation/" class="blog-card reveal" style="--i:3" target="_blank" rel="noopener noreferrer">
-              <time class="blog-date">Feb 14, 2023</time>
-              <h3 class="blog-card-title">Discipline over Motivation</h3>
-            </a>
-
-            <a href="https://ralphdev.bearblog.dev/google-cloud-developer-certification-guide/" class="blog-card reveal" style="--i:4" target="_blank" rel="noopener noreferrer">
-              <time class="blog-date">Oct 9, 2022</time>
-              <h3 class="blog-card-title">Google Cloud Developer Certification Guide</h3>
-            </a>
-          </div>
-
-          <a href="https://ralphdev.bearblog.dev/" class="blog-view-all reveal" style="--i:5" target="_blank" rel="noopener noreferrer">
-            View all posts <span aria-hidden="true">&rarr;</span>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact" class="panel contact-panel">
-      <div class="contact-wave">
-        <div class="contact-wave-inner">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 338.05" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-            <path>
-              <animate
-                attributeName="d"
-                values="M 0 100 Q 250 50 400 200 Q 550 350 800 300 L 800 0 L 0 0 L 0 100 Z;M 0 100 Q 200 150 400 200 Q 600 250 800 300 L 800 0 L 0 0 L 0 100 Z;M 0 100 Q 150 350 400 200 Q 650 50 800 300 L 800 0 L 0 0 L 0 100 Z"
-                repeatCount="indefinite"
-                dur="30s"
-              />
-            </path>
-          </svg>
-        </div>
-      </div>
-
-      <div class="decor">
-        <div class="up-down-wide">
-          <SvgIcon icon="triangle" width={12} stroke="#ffffff" left="95%" top="50%" />
-          <SvgIcon icon="circle" width={6} fill="#ffffff" left="85%" top="15%" />
-        </div>
-
-        <SvgIcon icon="circle" width={6} fill="#ffffff" left="4%" top="20%" />
-        <SvgIcon icon="hexa" width={8} stroke="#3d4852" left="80%" top="70%" />
-      </div>
-
-      <div class="panel-content">
-        <div class="inner">
-          <h2 class="section-title reveal">Get in touch</h2>
-          <p class="contact-text reveal" style="--i:1">
-            Say Hi or connect with me on other platforms.
+        <div class="about-grid">
+          <img
+            src="/static/avatar-ae5df907c692f3513038ff216a008c83.png"
+            alt="Ralph Jonas Mungcal"
+            class="about-avatar motion-fade"
+          />
+          <p class="about-bio motion-fade">
+            Full-stack developer and AI integration specialist. I build products end-to-end and integrate AI to automate workflows and solve real problems.
           </p>
-          <div class="contact-links reveal" style="--i:2">
-            <a href="mailto:ralphmungcal09@gmail.com" class="contact-link">
-              <span>Email</span>
-              <span class="contact-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-            <a href="https://www.linkedin.com/in/ralphjonasmungcal" class="contact-link" target="_blank" rel="noopener noreferrer">
-              <span>LinkedIn</span>
-              <span class="contact-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-            <a href="https://www.upwork.com/o/profiles/users/_~01108375a06953763f/" class="contact-link" target="_blank" rel="noopener noreferrer">
-              <span>Upwork</span>
-              <span class="contact-arrow" aria-hidden="true">&rarr;</span>
-            </a>
+
+          <div class="focus-list">
+            <span class="focus-item motion-stagger">Backend Architecture</span>
+            <span class="focus-item motion-stagger">AI Integration</span>
+            <span class="focus-item motion-stagger">Cloud Infrastructure</span>
+            <span class="focus-item motion-stagger">Developer Tooling</span>
           </div>
         </div>
       </div>
+    </section>
 
-      <footer class="site-footer">Ralph Jonas Mungcal &copy; {currentYear}</footer>
+    <!-- 03. Writing -->
+    <section class="section" id="writing">
+      <div class="section-inner">
+        <span class="section-number motion-fade">03.</span>
+        <h2 class="section-heading motion-fade">Writing</h2>
+        <hr class="section-rule" />
+
+        <ul class="writing-list">
+          <li>
+            <a href="https://ralphdev.bearblog.dev/gcp-secrets/" class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
+              <time class="writing-date">2026.01</time>
+              <span class="writing-title">Secure your cloud build secrets</span>
+              <span class="writing-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://ralphdev.bearblog.dev/what-is-a-tech-lead/" class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
+              <time class="writing-date">2024.04</time>
+              <span class="writing-title">What is a Tech lead?</span>
+              <span class="writing-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://ralphdev.bearblog.dev/discipline-over-motivation/" class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
+              <time class="writing-date">2023.02</time>
+              <span class="writing-title">Discipline over Motivation</span>
+              <span class="writing-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://ralphdev.bearblog.dev/google-cloud-developer-certification-guide/" class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
+              <time class="writing-date">2022.10</time>
+              <span class="writing-title">Google Cloud Developer Certification Guide</span>
+              <span class="writing-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </li>
+        </ul>
+
+        <a href="https://ralphdev.bearblog.dev/" class="writing-view-all motion-fade" target="_blank" rel="noopener noreferrer">
+          View all posts <span aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 04. Contact -->
+    <section class="section" id="contact">
+      <div class="section-inner">
+        <span class="section-number motion-fade">04.</span>
+        <h2 class="contact-cta motion-fade">
+          Let's work<br />together<span class="contact-period">.</span>
+        </h2>
+        <hr class="section-rule" />
+
+        <div class="contact-links">
+          <a href="mailto:ralphmungcal09@gmail.com" class="contact-link motion-stagger">Email</a>
+          <a href="https://www.linkedin.com/in/ralphjonasmungcal" class="contact-link motion-stagger" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a href="https://www.upwork.com/o/profiles/users/_~01108375a06953763f/" class="contact-link motion-stagger" target="_blank" rel="noopener noreferrer">Upwork</a>
+        </div>
+      </div>
+
+      <footer class="site-footer">
+        Ralph Jonas Mungcal &copy; {currentYear}
+      </footer>
     </section>
   </main>
 
   <script>
-    // Reveal on scroll
-    const revealObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('in-view');
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
-    );
-    document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+    import { animate, inView, stagger } from "https://cdn.jsdelivr.net/npm/motion@12/+esm";
 
-    // Scroll progress bar
-    const progressBar = document.querySelector('.scroll-progress') as HTMLElement;
-    const scrollIndicator = document.querySelector('.scroll-indicator') as HTMLElement;
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    function updateProgress() {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
-      progressBar.style.transform = `scaleX(${progress})`;
+    if (!prefersReducedMotion) {
+      // Hero: Stagger letters in
+      const heroLetters = document.querySelectorAll('.hero-name-letter');
+      animate(
+        heroLetters,
+        { opacity: [0, 1], transform: ['translateY(100%)', 'translateY(0)'] },
+        { duration: 0.6, delay: stagger(0.05), easing: [0.16, 1, 0.3, 1] }
+      );
 
-      // Fade out hero scroll indicator as user scrolls
+      // Hero subtitle + scroll indicator fade in after name
+      const heroFades = document.querySelectorAll('.hero .motion-fade');
+      animate(
+        heroFades,
+        { opacity: [0, 1], transform: ['translateY(20px)', 'translateY(0)'] },
+        { duration: 0.8, delay: stagger(0.15, { start: 0.8 }), easing: [0.16, 1, 0.3, 1] }
+      );
+
+      // Fade out scroll indicator on scroll
+      const scrollIndicator = document.querySelector('.hero-scroll');
       if (scrollIndicator) {
-        const fade = Math.max(1 - scrollTop / (window.innerHeight * 0.3), 0);
-        scrollIndicator.style.opacity = String(fade);
+        window.addEventListener('scroll', () => {
+          const fade = Math.max(1 - window.scrollY / (window.innerHeight * 0.3), 0);
+          (scrollIndicator as HTMLElement).style.opacity = String(fade);
+        }, { passive: true });
       }
-    }
 
-    // Section nav dot tracking
-    const sections = document.querySelectorAll<HTMLElement>('.panel[id]');
-    const dots = document.querySelectorAll<HTMLElement>('.section-dot');
-
-    const sectionObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = entry.target.id;
-            dots.forEach((dot) => {
-              dot.classList.toggle('active', dot.dataset.section === id);
-            });
-          }
-        });
-      },
-      { threshold: 0, rootMargin: '-50% 0px -50% 0px' }
-    );
-    sections.forEach((section) => sectionObserver.observe(section));
-
-    // Smooth scroll for dot navigation
-    dots.forEach((dot) => {
-      dot.addEventListener('click', (e) => {
-        e.preventDefault();
-        const target = document.getElementById(dot.dataset.section || '');
-        target?.scrollIntoView({ behavior: 'smooth' });
+      // Section headers: fade in on scroll
+      document.querySelectorAll('.section').forEach((section) => {
+        inView(section, () => {
+          const fades = section.querySelectorAll('.motion-fade');
+          animate(
+            fades,
+            { opacity: [0, 1], transform: ['translateY(20px)', 'translateY(0)'] },
+            { duration: 0.6, delay: stagger(0.1), easing: [0.16, 1, 0.3, 1] }
+          );
+        }, { amount: 0.1 });
       });
-    });
 
-    window.addEventListener('scroll', updateProgress, { passive: true });
-    updateProgress();
+      // Staggered list items: project rows, writing rows, focus items, contact links
+      document.querySelectorAll('.section').forEach((section) => {
+        inView(section, () => {
+          const items = section.querySelectorAll('.motion-stagger');
+          animate(
+            items,
+            { opacity: [0, 1], transform: ['translateY(16px)', 'translateY(0)'] },
+            { duration: 0.5, delay: stagger(0.06), easing: [0.16, 1, 0.3, 1] }
+          );
+        }, { amount: 0.05 });
+      });
+    } else {
+      // Reduced motion: just show everything
+      document.querySelectorAll('.motion-fade, .motion-letter, .motion-stagger').forEach((el) => {
+        (el as HTMLElement).style.opacity = '1';
+        (el as HTMLElement).style.transform = 'none';
+      });
+    }
   </script>
 </BaseLayout>
