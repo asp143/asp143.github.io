@@ -30,6 +30,7 @@ const currentYear = new Date().getFullYear();
 
       <div class="hero-scroll motion-fade" aria-hidden="true">
         <span class="hero-scroll-text">Scroll</span>
+        <span class="hero-scroll-arrow">&#8595;</span>
         <span class="hero-scroll-line"></span>
       </div>
     </section>
@@ -86,7 +87,7 @@ const currentYear = new Date().getFullYear();
           </li>
           <li class="compact-row motion-stagger">
             <span class="compact-name">AI Development Workflow Standards</span>
-            <span class="compact-tech"></span>
+            <span class="compact-tech">Claude · OpenAI</span>
           </li>
           <li class="compact-row motion-stagger">
             <span class="compact-name">Local AI Inference Server</span>
@@ -120,20 +121,46 @@ const currentYear = new Date().getFullYear();
         <hr class="section-rule" />
 
         <div class="about-grid">
-          <img
-            src="/static/avatar-ae5df907c692f3513038ff216a008c83.png"
-            alt="Ralph Jonas Mungcal"
-            class="about-avatar motion-fade"
-          />
-          <p class="about-bio motion-fade">
-            Full-stack developer and AI integration specialist. I build products end-to-end and integrate AI to automate workflows and solve real problems.
-          </p>
+          <div class="about-col-left">
+            <span class="about-name motion-fade" aria-label="Ralph Jonas Mungcal">Ralph Jonas</span>
+            <p class="about-bio motion-fade">
+              Full-stack developer and AI integration specialist based in the Philippines. I build products end-to-end — from backend architecture and cloud infrastructure to developer tooling and AI-powered workflows.
+            </p>
+            <p class="about-bio motion-fade">
+              I focus on writing clean, maintainable systems that solve real problems. Whether it's orchestrating payments across multiple gateways, building data aggregation pipelines, or setting up self-hosted infrastructure — I care about getting the details right.
+            </p>
+          </div>
 
-          <div class="focus-list">
-            <span class="focus-item motion-stagger">Backend Architecture</span>
-            <span class="focus-item motion-stagger">AI Integration</span>
-            <span class="focus-item motion-stagger">Cloud Infrastructure</span>
-            <span class="focus-item motion-stagger">Developer Tooling</span>
+          <div class="about-col-right">
+            <div class="about-stats">
+              <div class="about-stat motion-stagger">
+                <span class="about-stat-number">5+</span>
+                <span class="about-stat-label">Years Building Software</span>
+              </div>
+              <div class="about-stat motion-stagger">
+                <span class="about-stat-number">10+</span>
+                <span class="about-stat-label">Projects Shipped</span>
+              </div>
+            </div>
+
+            <div class="focus-list">
+              <span class="focus-item motion-stagger">Backend Architecture</span>
+              <span class="focus-item motion-stagger">AI Integration</span>
+              <span class="focus-item motion-stagger">Cloud Infrastructure</span>
+              <span class="focus-item motion-stagger">Developer Tooling</span>
+            </div>
+
+            <div class="about-stack">
+              <span class="about-stack-label motion-fade">Daily drivers</span>
+              <div class="about-stack-items">
+                <span class="about-stack-item motion-stagger">TypeScript</span>
+                <span class="about-stack-item motion-stagger">Node.js</span>
+                <span class="about-stack-item motion-stagger">GCP</span>
+                <span class="about-stack-item motion-stagger">Docker</span>
+                <span class="about-stack-item motion-stagger">PostgreSQL</span>
+                <span class="about-stack-item motion-stagger">Linux</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
