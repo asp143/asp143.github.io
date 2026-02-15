@@ -448,20 +448,21 @@ const currentYear = new Date().getFullYear();
 
             // === DETACHED: wait for next section ===
             else if (state === 'detached') {
+              const prevIndex = currentIndex;
               const nextIndex = currentIndex + 1;
 
               if (nextIndex < sections.length && activeIndex >= nextIndex) {
                 startFall(nextIndex);
-              }
-
-              // Re-attach if scrolled back up
-              const heading = getHeading(currentIndex);
-              if (heading) {
-                const headingY = heading.getBoundingClientRect().top + heading.getBoundingClientRect().height / 2;
-                if (headingY >= DETACH_THRESHOLD) {
-                  state = 'resting';
-                  clearStateClasses();
-                  scrollDot.style.top = `${headingY}px`;
+              } else {
+                // Only check re-attach if we did NOT start a fall
+                const heading = getHeading(prevIndex);
+                if (heading) {
+                  const headingY = heading.getBoundingClientRect().top + heading.getBoundingClientRect().height / 2;
+                  if (headingY >= DETACH_THRESHOLD) {
+                    state = 'resting';
+                    clearStateClasses();
+                    scrollDot.style.top = `${headingY}px`;
+                  }
                 }
               }
             }
