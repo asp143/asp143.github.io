@@ -466,6 +466,14 @@ const currentYear = new Date().getFullYear();
               }
             }
 
+            // === RESTING (rolled): handle scroll-back from contact ===
+            else if (state === 'resting' && isRolled) {
+              if (activeIndex < currentIndex) {
+                resetRolling();
+                startFall(activeIndex);
+              }
+            }
+
             // === DETACHED: wait for next section ===
             else if (state === 'detached') {
               const prevIndex = currentIndex;
