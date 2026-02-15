@@ -272,6 +272,8 @@ const currentYear = new Date().getFullYear();
         let currentIndex = -1;
         let ticking = false;
         let isRolled = false;
+        let rollTimeoutA: ReturnType<typeof setTimeout> | null = null;
+        let rollTimeoutB: ReturnType<typeof setTimeout> | null = null;
 
         const DETACH_THRESHOLD = 60;
         const TRIGGER_RATIO = 0.4;
@@ -319,6 +321,8 @@ const currentYear = new Date().getFullYear();
         }
 
         function resetRolling() {
+          if (rollTimeoutA) { clearTimeout(rollTimeoutA); rollTimeoutA = null; }
+          if (rollTimeoutB) { clearTimeout(rollTimeoutB); rollTimeoutB = null; }
           if (isRolled) {
             isRolled = false;
             scrollDot.classList.remove('scroll-dot--rolling', 'scroll-dot--settled');
@@ -359,7 +363,7 @@ const currentYear = new Date().getFullYear();
           // Contact section: schedule roll to period after bounce
           const isLastSection = currentIndex === sections.length - 1;
           if (isLastSection && contactPeriod) {
-            setTimeout(() => {
+            rollTimeoutA = setTimeout(() => {
               const periodRect = contactPeriod.getBoundingClientRect();
               const periodCenterX = periodRect.left + periodRect.width / 2;
               const periodCenterY = periodRect.top + periodRect.height / 2;
@@ -369,7 +373,7 @@ const currentYear = new Date().getFullYear();
               scrollDot.style.top = `${periodCenterY}px`;
               scrollDot.style.transform = 'translate(-50%, -50%)';
 
-              setTimeout(() => {
+              rollTimeoutB = setTimeout(() => {
                 scrollDot.classList.add('scroll-dot--settled');
                 scrollDot.style.opacity = '0';
                 if (contactPeriod) contactPeriod.style.opacity = '1';
@@ -472,7 +476,7 @@ const currentYear = new Date().getFullYear();
                 }
               }
 
-              if (activeIndex < currentIndex) {
+              if (state === 'resting' && activeIndex < currentIndex) {
                 startFall(activeIndex);
               }
             }
@@ -514,7 +518,9 @@ const currentYear = new Date().getFullYear();
               if (activeIndex !== currentIndex) {
                 currentIndex = activeIndex;
                 const targetY = getHeadingY(activeIndex);
+                const targetX = getHeadingX(activeIndex);
                 scrollDot.style.top = `${targetY}px`;
+                scrollDot.style.left = `${targetX}px`;
               }
             }
 
