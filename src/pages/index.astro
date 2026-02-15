@@ -267,7 +267,7 @@ const currentYear = new Date().getFullYear();
 
       if (scrollDot && hero && sections.length) {
         // === State Machine ===
-        type DotState = 'hidden' | 'falling' | 'resting' | 'detached';
+        type DotState = 'hidden' | 'falling' | 'bouncing' | 'resting' | 'detached';
         let state: DotState = 'hidden';
         let currentIndex = -1;
         let ticking = false;
@@ -340,6 +340,7 @@ const currentYear = new Date().getFullYear();
         scrollDot.addEventListener('transitionend', (e) => {
           if (e.propertyName !== 'top' || state !== 'falling') return;
 
+          state = 'bouncing';
           scrollDot.classList.remove('scroll-dot--falling');
           scrollDot.classList.add('scroll-dot--bouncing');
 
