@@ -285,10 +285,19 @@ const currentYear = new Date().getFullYear();
           const heading = getHeading(index);
           if (heading) {
             const rect = heading.getBoundingClientRect();
-            return rect.top + rect.height / 2;
+            return rect.top + rect.height / 2 - 5;
           }
           const section = sections[index] as HTMLElement;
           return section.offsetTop - window.scrollY + 32;
+        }
+
+        function getHeadingX(index: number): number {
+          const heading = getHeading(index);
+          if (heading) {
+            const rect = heading.getBoundingClientRect();
+            return rect.left;
+          }
+          return 0;
         }
 
         function getActiveIndex(): number {
@@ -313,8 +322,8 @@ const currentYear = new Date().getFullYear();
           if (isRolled) {
             isRolled = false;
             scrollDot.classList.remove('scroll-dot--rolling', 'scroll-dot--settled');
-            scrollDot.style.left = '50%';
-            scrollDot.style.transform = 'translateX(-50%)';
+            scrollDot.style.left = '';
+            scrollDot.style.transform = 'translateX(-5px)';
             scrollDot.style.opacity = '';
             if (contactPeriod) contactPeriod.style.opacity = '';
           }
@@ -333,7 +342,10 @@ const currentYear = new Date().getFullYear();
           void scrollDot.offsetHeight;
 
           const targetY = getHeadingY(targetIndex);
+          const targetX = getHeadingX(targetIndex);
           scrollDot.style.top = `${targetY}px`;
+          scrollDot.style.left = `${targetX}px`;
+          scrollDot.style.transform = 'translateX(-5px)';
         }
 
         // Fall complete → bounce
@@ -401,8 +413,8 @@ const currentYear = new Date().getFullYear();
                 currentIndex = -1;
                 clearStateClasses();
                 scrollDot.classList.remove('scroll-dot--visible');
-                scrollDot.style.left = '50%';
-                scrollDot.style.transform = 'translateX(-50%)';
+                scrollDot.style.left = '';
+                scrollDot.style.transform = '';
                 scrollDot.style.top = '60px';
                 if (heroPeriod) heroPeriod.style.opacity = '';
                 if (contactPeriod) contactPeriod.style.opacity = '';
@@ -421,6 +433,9 @@ const currentYear = new Date().getFullYear();
             // === HIDDEN → first fall ===
             if (state === 'hidden') {
               scrollDot.style.top = `${DETACH_THRESHOLD}px`;
+              const targetX = getHeadingX(activeIndex);
+              scrollDot.style.left = `${targetX}px`;
+              scrollDot.style.transform = 'translateX(-5px)';
               void scrollDot.offsetHeight;
               startFall(activeIndex);
               ticking = false;
@@ -431,8 +446,12 @@ const currentYear = new Date().getFullYear();
             if (state === 'resting' && !isRolled) {
               const heading = getHeading(currentIndex);
               if (heading) {
-                const headingY = heading.getBoundingClientRect().top + heading.getBoundingClientRect().height / 2;
+                const rect = heading.getBoundingClientRect();
+                const headingY = rect.top + rect.height / 2 - 5;
+                const headingX = rect.left;
                 scrollDot.style.top = `${headingY}px`;
+                scrollDot.style.left = `${headingX}px`;
+                scrollDot.style.transform = 'translateX(-5px)';
 
                 if (headingY < DETACH_THRESHOLD) {
                   state = 'detached';
@@ -458,11 +477,14 @@ const currentYear = new Date().getFullYear();
                 // Only check re-attach if we did NOT start a fall
                 const heading = getHeading(prevIndex);
                 if (heading) {
-                  const headingY = heading.getBoundingClientRect().top + heading.getBoundingClientRect().height / 2;
+                  const rect = heading.getBoundingClientRect();
+                  const headingY = rect.top + rect.height / 2 - 5;
                   if (headingY >= DETACH_THRESHOLD) {
                     state = 'resting';
                     clearStateClasses();
                     scrollDot.style.top = `${headingY}px`;
+                    scrollDot.style.left = `${rect.left}px`;
+                    scrollDot.style.transform = 'translateX(-5px)';
                   }
                 }
               }
