@@ -6,6 +6,8 @@ const currentYear = new Date().getFullYear();
 ---
 
 <BaseLayout>
+  <div class="scroll-dot" aria-hidden="true"></div>
+
   <main class="portfolio-page">
     <!-- Hero -->
     <section class="hero" id="hero">
@@ -233,7 +235,7 @@ const currentYear = new Date().getFullYear();
   </main>
 
   <script>
-    import { animate, inView, stagger } from "https://cdn.jsdelivr.net/npm/motion@12/+esm";
+    import { animate, inView, stagger, spring } from "https://cdn.jsdelivr.net/npm/motion@12/+esm";
 
     // Check for reduced motion preference
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -255,12 +257,234 @@ const currentYear = new Date().getFullYear();
         { duration: 0.8, delay: stagger(0.15, { start: 0.8 }), easing: [0.16, 1, 0.3, 1] }
       );
 
-      // Fade out scroll indicator on scroll
-      const scrollIndicator = document.querySelector('.hero-scroll');
-      if (scrollIndicator) {
+      // Fade out scroll indicator on scroll + scroll dot animation
+      const scrollIndicator = document.querySelector('.hero-scroll') as HTMLElement | null;
+      const scrollDot = document.querySelector('.scroll-dot') as HTMLElement | null;
+      const heroPeriod = document.querySelector('.hero-period') as HTMLElement | null;
+      const contactPeriod = document.querySelector('.contact-period') as HTMLElement | null;
+      const hero = document.querySelector('.hero') as HTMLElement | null;
+      const sections = document.querySelectorAll('.section');
+
+      if (scrollDot && hero && sections.length) {
+        // === State Machine ===
+        type DotState = 'hidden' | 'falling' | 'resting' | 'detached';
+        let state: DotState = 'hidden';
+        let currentIndex = -1;
+        let ticking = false;
+        let isRolled = false;
+
+        const DETACH_THRESHOLD = 60;
+        const TRIGGER_RATIO = 0.4;
+
+        function getHeading(index: number): HTMLElement | null {
+          const section = sections[index] as HTMLElement;
+          return section?.querySelector('.section-heading, .contact-cta') as HTMLElement | null;
+        }
+
+        function getHeadingY(index: number): number {
+          const heading = getHeading(index);
+          if (heading) {
+            const rect = heading.getBoundingClientRect();
+            return rect.top + rect.height / 2;
+          }
+          const section = sections[index] as HTMLElement;
+          return section.offsetTop - window.scrollY + 32;
+        }
+
+        function getActiveIndex(): number {
+          const triggerY = window.scrollY + window.innerHeight * TRIGGER_RATIO;
+          let active = 0;
+          sections.forEach((section, i) => {
+            if (triggerY >= (section as HTMLElement).offsetTop) {
+              active = i;
+            }
+          });
+          return Math.min(active, sections.length - 1);
+        }
+
+        function clearStateClasses() {
+          scrollDot.classList.remove(
+            'scroll-dot--falling', 'scroll-dot--detached',
+            'scroll-dot--bouncing', 'scroll-dot--rolling', 'scroll-dot--settled'
+          );
+        }
+
+        function resetRolling() {
+          if (isRolled) {
+            isRolled = false;
+            scrollDot.classList.remove('scroll-dot--rolling', 'scroll-dot--settled');
+            scrollDot.style.left = '50%';
+            scrollDot.style.transform = 'translateX(-50%)';
+            scrollDot.style.opacity = '';
+            if (contactPeriod) contactPeriod.style.opacity = '';
+          }
+        }
+
+        function startFall(targetIndex: number) {
+          state = 'falling';
+          currentIndex = targetIndex;
+
+          if (targetIndex < sections.length - 1) resetRolling();
+
+          clearStateClasses();
+          scrollDot.classList.add('scroll-dot--falling');
+
+          // Force reflow so transition triggers from current position
+          void scrollDot.offsetHeight;
+
+          const targetY = getHeadingY(targetIndex);
+          scrollDot.style.top = `${targetY}px`;
+        }
+
+        // Fall complete → bounce
+        scrollDot.addEventListener('transitionend', (e) => {
+          if (e.propertyName !== 'top' || state !== 'falling') return;
+
+          scrollDot.classList.remove('scroll-dot--falling');
+          scrollDot.classList.add('scroll-dot--bouncing');
+
+          // Contact section: schedule roll to period after bounce
+          const isLastSection = currentIndex === sections.length - 1;
+          if (isLastSection && contactPeriod) {
+            setTimeout(() => {
+              const periodRect = contactPeriod.getBoundingClientRect();
+              const periodCenterX = periodRect.left + periodRect.width / 2;
+              const periodCenterY = periodRect.top + periodRect.height / 2;
+
+              scrollDot.classList.add('scroll-dot--rolling');
+              scrollDot.style.left = `${periodCenterX}px`;
+              scrollDot.style.top = `${periodCenterY}px`;
+              scrollDot.style.transform = 'translate(-50%, -50%)';
+
+              setTimeout(() => {
+                scrollDot.classList.add('scroll-dot--settled');
+                scrollDot.style.opacity = '0';
+                if (contactPeriod) contactPeriod.style.opacity = '1';
+                isRolled = true;
+                state = 'resting';
+              }, 550);
+            }, 650);
+          }
+        });
+
+        // Bounce complete → resting
+        scrollDot.addEventListener('animationend', (e) => {
+          if ((e as AnimationEvent).animationName !== 'ball-bounce') return;
+          scrollDot.classList.remove('scroll-dot--bouncing');
+
+          // Don't override contact roll sequence
+          if (currentIndex === sections.length - 1 && contactPeriod) return;
+
+          state = 'resting';
+          clearStateClasses();
+        });
+
+        const onScroll = () => {
+          if (ticking) return;
+          ticking = true;
+
+          requestAnimationFrame(() => {
+            const scrollY = window.scrollY;
+            const heroBottom = hero.offsetHeight * 0.7;
+
+            // Fade scroll indicator
+            if (scrollIndicator) {
+              const fade = Math.max(1 - scrollY / (window.innerHeight * 0.3), 0);
+              scrollIndicator.style.opacity = String(fade);
+            }
+
+            // === HIDDEN: in hero area ===
+            if (scrollY <= heroBottom) {
+              if (state !== 'hidden') {
+                state = 'hidden';
+                currentIndex = -1;
+                clearStateClasses();
+                scrollDot.classList.remove('scroll-dot--visible');
+                scrollDot.style.left = '50%';
+                scrollDot.style.transform = 'translateX(-50%)';
+                scrollDot.style.top = '60px';
+                if (heroPeriod) heroPeriod.style.opacity = '';
+                if (contactPeriod) contactPeriod.style.opacity = '';
+                resetRolling();
+              }
+              ticking = false;
+              return;
+            }
+
+            // Past hero — show dot
+            scrollDot.classList.add('scroll-dot--visible');
+            if (heroPeriod) heroPeriod.style.opacity = '0';
+
+            const activeIndex = getActiveIndex();
+
+            // === HIDDEN → first fall ===
+            if (state === 'hidden') {
+              scrollDot.style.top = `${DETACH_THRESHOLD}px`;
+              void scrollDot.offsetHeight;
+              startFall(activeIndex);
+              ticking = false;
+              return;
+            }
+
+            // === RESTING: track heading ===
+            if (state === 'resting' && !isRolled) {
+              const heading = getHeading(currentIndex);
+              if (heading) {
+                const headingY = heading.getBoundingClientRect().top + heading.getBoundingClientRect().height / 2;
+                scrollDot.style.top = `${headingY}px`;
+
+                if (headingY < DETACH_THRESHOLD) {
+                  state = 'detached';
+                  scrollDot.style.top = `${DETACH_THRESHOLD}px`;
+                  clearStateClasses();
+                  scrollDot.classList.add('scroll-dot--detached');
+                }
+              }
+
+              if (activeIndex < currentIndex) {
+                startFall(activeIndex);
+              }
+            }
+
+            // === DETACHED: wait for next section ===
+            else if (state === 'detached') {
+              const nextIndex = currentIndex + 1;
+
+              if (nextIndex < sections.length && activeIndex >= nextIndex) {
+                startFall(nextIndex);
+              }
+
+              // Re-attach if scrolled back up
+              const heading = getHeading(currentIndex);
+              if (heading) {
+                const headingY = heading.getBoundingClientRect().top + heading.getBoundingClientRect().height / 2;
+                if (headingY >= DETACH_THRESHOLD) {
+                  state = 'resting';
+                  clearStateClasses();
+                  scrollDot.style.top = `${headingY}px`;
+                }
+              }
+            }
+
+            // === FALLING: redirect if section changed mid-fall ===
+            else if (state === 'falling') {
+              if (activeIndex !== currentIndex) {
+                currentIndex = activeIndex;
+                const targetY = getHeadingY(activeIndex);
+                scrollDot.style.top = `${targetY}px`;
+              }
+            }
+
+            ticking = false;
+          });
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+      } else if (scrollIndicator) {
+        // Fallback: just fade the scroll indicator
         window.addEventListener('scroll', () => {
           const fade = Math.max(1 - window.scrollY / (window.innerHeight * 0.3), 0);
-          (scrollIndicator as HTMLElement).style.opacity = String(fade);
+          scrollIndicator.style.opacity = String(fade);
         }, { passive: true });
       }
 
