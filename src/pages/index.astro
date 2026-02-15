@@ -430,14 +430,25 @@ const currentYear = new Date().getFullYear();
 
             const activeIndex = getActiveIndex();
 
-            // === HIDDEN → first fall ===
+            // === HIDDEN → first fall (with delay for visibility) ===
             if (state === 'hidden') {
               scrollDot.style.top = `${DETACH_THRESHOLD}px`;
               const targetX = getHeadingX(activeIndex);
               scrollDot.style.left = `${targetX}px`;
               scrollDot.style.transform = 'translateX(-5px)';
               void scrollDot.offsetHeight;
-              startFall(activeIndex);
+
+              // Brief delay so dot is visible before falling
+              state = 'detached';
+              currentIndex = 0;
+              clearStateClasses();
+              scrollDot.classList.add('scroll-dot--detached');
+
+              requestAnimationFrame(() => {
+                if (state === 'detached') {
+                  startFall(activeIndex);
+                }
+              });
               ticking = false;
               return;
             }
