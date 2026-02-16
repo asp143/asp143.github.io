@@ -41,7 +41,7 @@ const currentYear = new Date().getFullYear();
     <section class="section" id="projects">
       <div class="section-inner">
         <span class="section-number motion-fade">01.</span>
-        <h2 class="section-heading motion-fade">Projects</h2>
+        <h2 class="section-heading motion-fade">Projects<span class="dot-target" aria-hidden="true">.</span></h2>
         <hr class="section-rule" />
 
         <ul class="project-list">
@@ -119,7 +119,7 @@ const currentYear = new Date().getFullYear();
     <section class="section" id="about">
       <div class="section-inner">
         <span class="section-number motion-fade">02.</span>
-        <h2 class="section-heading motion-fade">About</h2>
+        <h2 class="section-heading motion-fade">About<span class="dot-target" aria-hidden="true">.</span></h2>
         <hr class="section-rule" />
 
         <div class="about-grid">
@@ -172,7 +172,7 @@ const currentYear = new Date().getFullYear();
     <section class="section" id="writing">
       <div class="section-inner">
         <span class="section-number motion-fade">03.</span>
-        <h2 class="section-heading motion-fade">Writing</h2>
+        <h2 class="section-heading motion-fade">Writing<span class="dot-target" aria-hidden="true">.</span></h2>
         <hr class="section-rule" />
 
         <ul class="writing-list">
@@ -217,7 +217,7 @@ const currentYear = new Date().getFullYear();
       <div class="section-inner">
         <span class="section-number motion-fade">04.</span>
         <h2 class="contact-cta motion-fade">
-          Let's work<br />together<span class="contact-period">.</span>
+          Let's work<br />together<span class="dot-target" aria-hidden="true">&#8203;</span><span class="contact-period">.</span>
         </h2>
         <hr class="section-rule" />
 
@@ -274,32 +274,35 @@ const currentYear = new Date().getFullYear();
         let isRolled = false;
         let rollTimeoutA: ReturnType<typeof setTimeout> | null = null;
         let rollTimeoutB: ReturnType<typeof setTimeout> | null = null;
+        let heroReturnTimeout: ReturnType<typeof setTimeout> | null = null;
 
         const DETACH_THRESHOLD = 60;
         const TRIGGER_RATIO = 0.4;
+        const DOT_SIZE = 10;
+        const DOT_RADIUS = DOT_SIZE / 2;
+        const DOT_SIDE_GAP = 12;
 
-        function getHeading(index: number): HTMLElement | null {
+        function getDotTarget(index: number): { x: number, y: number } {
           const section = sections[index] as HTMLElement;
-          return section?.querySelector('.section-heading, .contact-cta') as HTMLElement | null;
-        }
-
-        function getHeadingY(index: number): number {
-          const heading = getHeading(index);
-          if (heading) {
-            const rect = heading.getBoundingClientRect();
-            return rect.top + rect.height / 2 - 5;
+          const marker = section?.querySelector('.dot-target') as HTMLElement | null;
+          if (marker) {
+            const rect = marker.getBoundingClientRect();
+            // Compensate for any in-flight motion-fade transform on the heading
+            const heading = marker.closest('.section-heading, .contact-cta') as HTMLElement | null;
+            let transformY = 0;
+            if (heading) {
+              const t = getComputedStyle(heading).transform;
+              if (t && t !== 'none') {
+                transformY = new DOMMatrix(t).m42;
+              }
+            }
+            return {
+              x: rect.right + DOT_SIDE_GAP + DOT_RADIUS,
+              y: rect.top - transformY + rect.height * 0.5 - DOT_RADIUS
+            };
           }
-          const section = sections[index] as HTMLElement;
-          return section.offsetTop - window.scrollY + 32;
-        }
-
-        function getHeadingX(index: number): number {
-          const heading = getHeading(index);
-          if (heading) {
-            const rect = heading.getBoundingClientRect();
-            return rect.left;
-          }
-          return 0;
+          const dotRect = scrollDot.getBoundingClientRect();
+          return { x: dotRect.left + dotRect.width / 2, y: dotRect.top };
         }
 
         function getActiveIndex(): number {
@@ -316,7 +319,7 @@ const currentYear = new Date().getFullYear();
         function clearStateClasses() {
           scrollDot.classList.remove(
             'scroll-dot--falling', 'scroll-dot--detached',
-            'scroll-dot--bouncing', 'scroll-dot--rolling', 'scroll-dot--settled'
+            'scroll-dot--rolling', 'scroll-dot--settled'
           );
         }
 
@@ -327,9 +330,16 @@ const currentYear = new Date().getFullYear();
             isRolled = false;
             scrollDot.classList.remove('scroll-dot--rolling', 'scroll-dot--settled');
             scrollDot.style.left = '';
-            scrollDot.style.transform = 'translateX(-5px)';
+            scrollDot.style.transform = 'translateX(-50%)';
             scrollDot.style.opacity = '';
             if (contactPeriod) contactPeriod.style.opacity = '';
+          }
+        }
+
+        function clearHeroReturnTimeout() {
+          if (heroReturnTimeout) {
+            clearTimeout(heroReturnTimeout);
+            heroReturnTimeout = null;
           }
         }
 
@@ -345,24 +355,31 @@ const currentYear = new Date().getFullYear();
           // Force reflow so transition triggers from current position
           void scrollDot.offsetHeight;
 
-          const targetY = getHeadingY(targetIndex);
-          const targetX = getHeadingX(targetIndex);
-          scrollDot.style.top = `${targetY}px`;
-          scrollDot.style.left = `${targetX}px`;
-          scrollDot.style.transform = 'translateX(-5px)';
+          const target = getDotTarget(targetIndex);
+          const currentTop = scrollDot.getBoundingClientRect().top;
+          const fallDistance = Math.abs(target.y - currentTop);
+          const fallDurationMs = Math.min(500, Math.max(220, 160 + fallDistance * 0.65));
+          scrollDot.style.setProperty('--dot-fall-duration', `${fallDurationMs}ms`);
+
+          scrollDot.style.top = `${target.y}px`;
+          scrollDot.style.left = `${target.x}px`;
+          scrollDot.style.transform = 'translateX(-50%)';
         }
 
-        // Fall complete → bounce
+        // Fall complete → snap to precise landing point
         scrollDot.addEventListener('transitionend', (e) => {
           if (e.propertyName !== 'top' || state !== 'falling') return;
 
-          state = 'bouncing';
+          const landedTarget = getDotTarget(currentIndex);
           scrollDot.classList.remove('scroll-dot--falling');
-          scrollDot.classList.add('scroll-dot--bouncing');
+          scrollDot.style.top = `${landedTarget.y}px`;
+          scrollDot.style.left = `${landedTarget.x}px`;
+          scrollDot.style.transform = 'translateX(-50%)';
 
-          // Contact section: schedule roll to period after bounce
+          // Contact section: roll into period after a short settle
           const isLastSection = currentIndex === sections.length - 1;
           if (isLastSection && contactPeriod) {
+            state = 'bouncing';
             rollTimeoutA = setTimeout(() => {
               const periodRect = contactPeriod.getBoundingClientRect();
               const periodCenterX = periodRect.left + periodRect.width / 2;
@@ -380,17 +397,9 @@ const currentYear = new Date().getFullYear();
                 isRolled = true;
                 state = 'resting';
               }, 550);
-            }, 650);
+            }, 120);
+            return;
           }
-        });
-
-        // Bounce complete → resting
-        scrollDot.addEventListener('animationend', (e) => {
-          if ((e as AnimationEvent).animationName !== 'ball-bounce') return;
-          scrollDot.classList.remove('scroll-dot--bouncing');
-
-          // Don't override contact roll sequence
-          if (currentIndex === sections.length - 1 && contactPeriod) return;
 
           state = 'resting';
           clearStateClasses();
@@ -413,22 +422,48 @@ const currentYear = new Date().getFullYear();
             // === HIDDEN: in hero area ===
             if (scrollY <= heroBottom) {
               if (state !== 'hidden') {
+                clearHeroReturnTimeout();
+                resetRolling();
+                clearStateClasses();
+
+                if (heroPeriod) {
+                  const heroRect = heroPeriod.getBoundingClientRect();
+                  const heroCenterX = heroRect.left + heroRect.width / 2;
+                  const heroCenterY = heroRect.top + heroRect.height / 2;
+
+                  heroPeriod.style.opacity = '0';
+                  scrollDot.classList.add('scroll-dot--visible', 'scroll-dot--rolling');
+                  scrollDot.style.left = `${heroCenterX}px`;
+                  scrollDot.style.top = `${heroCenterY}px`;
+                  scrollDot.style.transform = 'translate(-50%, -50%)';
+                  scrollDot.style.opacity = '1';
+
+                  heroReturnTimeout = setTimeout(() => {
+                    scrollDot.classList.remove('scroll-dot--visible', 'scroll-dot--rolling');
+                    scrollDot.style.opacity = '';
+                    scrollDot.style.left = '';
+                    scrollDot.style.transform = '';
+                    scrollDot.style.top = '60px';
+                    heroPeriod.style.opacity = '1';
+                    heroReturnTimeout = null;
+                  }, 360);
+                } else {
+                  scrollDot.classList.remove('scroll-dot--visible');
+                  scrollDot.style.left = '';
+                  scrollDot.style.transform = '';
+                  scrollDot.style.top = '60px';
+                }
+
                 state = 'hidden';
                 currentIndex = -1;
-                clearStateClasses();
-                scrollDot.classList.remove('scroll-dot--visible');
-                scrollDot.style.left = '';
-                scrollDot.style.transform = '';
-                scrollDot.style.top = '60px';
-                if (heroPeriod) heroPeriod.style.opacity = '';
                 if (contactPeriod) contactPeriod.style.opacity = '';
-                resetRolling();
               }
               ticking = false;
               return;
             }
 
             // Past hero — show dot
+            clearHeroReturnTimeout();
             scrollDot.classList.add('scroll-dot--visible');
             if (heroPeriod) heroPeriod.style.opacity = '0';
 
@@ -437,14 +472,14 @@ const currentYear = new Date().getFullYear();
             // === HIDDEN → first fall (with delay for visibility) ===
             if (state === 'hidden') {
               scrollDot.style.top = `${DETACH_THRESHOLD}px`;
-              const targetX = getHeadingX(activeIndex);
-              scrollDot.style.left = `${targetX}px`;
-              scrollDot.style.transform = 'translateX(-5px)';
+              const initTarget = getDotTarget(activeIndex);
+              scrollDot.style.left = `${initTarget.x}px`;
+              scrollDot.style.transform = 'translateX(-50%)';
               void scrollDot.offsetHeight;
 
               // Brief delay so dot is visible before falling
               state = 'detached';
-              currentIndex = 0;
+              currentIndex = activeIndex;
               clearStateClasses();
               scrollDot.classList.add('scroll-dot--detached');
 
@@ -457,26 +492,19 @@ const currentYear = new Date().getFullYear();
               return;
             }
 
-            // === RESTING: track heading ===
+            // === RESTING: non-sticky, only detach/fall checks ===
             if (state === 'resting' && !isRolled) {
-              const heading = getHeading(currentIndex);
-              if (heading) {
-                const rect = heading.getBoundingClientRect();
-                const headingY = rect.top + rect.height / 2 - 5;
-                const headingX = rect.left;
-                scrollDot.style.top = `${headingY}px`;
-                scrollDot.style.left = `${headingX}px`;
-                scrollDot.style.transform = 'translateX(-5px)';
+              const target = getDotTarget(currentIndex);
 
-                if (headingY < DETACH_THRESHOLD) {
-                  state = 'detached';
-                  scrollDot.style.top = `${DETACH_THRESHOLD}px`;
-                  clearStateClasses();
-                  scrollDot.classList.add('scroll-dot--detached');
-                }
+              if (target.y < DETACH_THRESHOLD) {
+                state = 'detached';
+                clearStateClasses();
+                scrollDot.classList.add('scroll-dot--detached');
+                void scrollDot.offsetHeight;
+                scrollDot.style.top = `${DETACH_THRESHOLD}px`;
               }
 
-              if (state === 'resting' && activeIndex < currentIndex) {
+              if (state === 'resting' && activeIndex !== currentIndex) {
                 startFall(activeIndex);
               }
             }
@@ -498,17 +526,13 @@ const currentYear = new Date().getFullYear();
                 startFall(nextIndex);
               } else {
                 // Only check re-attach if we did NOT start a fall
-                const heading = getHeading(prevIndex);
-                if (heading) {
-                  const rect = heading.getBoundingClientRect();
-                  const headingY = rect.top + rect.height / 2 - 5;
-                  if (headingY >= DETACH_THRESHOLD) {
-                    state = 'resting';
-                    clearStateClasses();
-                    scrollDot.style.top = `${headingY}px`;
-                    scrollDot.style.left = `${rect.left}px`;
-                    scrollDot.style.transform = 'translateX(-5px)';
-                  }
+                const reattachTarget = getDotTarget(prevIndex);
+                if (reattachTarget.y >= DETACH_THRESHOLD) {
+                  state = 'resting';
+                  clearStateClasses();
+                  scrollDot.style.top = `${reattachTarget.y}px`;
+                  scrollDot.style.left = `${reattachTarget.x}px`;
+                  scrollDot.style.transform = 'translateX(-50%)';
                 }
               }
             }
@@ -516,11 +540,7 @@ const currentYear = new Date().getFullYear();
             // === FALLING: redirect if section changed mid-fall ===
             else if (state === 'falling') {
               if (activeIndex !== currentIndex) {
-                currentIndex = activeIndex;
-                const targetY = getHeadingY(activeIndex);
-                const targetX = getHeadingX(activeIndex);
-                scrollDot.style.top = `${targetY}px`;
-                scrollDot.style.left = `${targetX}px`;
+                startFall(activeIndex);
               }
             }
 
