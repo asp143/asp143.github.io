@@ -277,7 +277,6 @@ const currentYear = new Date().getFullYear();
         let heroReturnTimeout: ReturnType<typeof setTimeout> | null = null;
 
         const DETACH_THRESHOLD = 60;
-        const TRIGGER_RATIO = 0.4;
         const DOT_SIZE = 10;
         const DOT_RADIUS = DOT_SIZE / 2;
         const DOT_SIDE_GAP = 12;
@@ -306,11 +305,17 @@ const currentYear = new Date().getFullYear();
         }
 
         function getActiveIndex(): number {
-          const triggerY = window.scrollY + window.innerHeight * TRIGGER_RATIO;
           let active = 0;
           sections.forEach((section, i) => {
-            if (triggerY >= (section as HTMLElement).offsetTop) {
-              active = i;
+            const heading = (section as HTMLElement).querySelector('.dot-target') as HTMLElement | null;
+            if (heading) {
+              if (heading.getBoundingClientRect().top <= window.innerHeight) {
+                active = i;
+              }
+            } else {
+              if (window.scrollY + window.innerHeight >= (section as HTMLElement).offsetTop) {
+                active = i;
+              }
             }
           });
           return Math.min(active, sections.length - 1);
