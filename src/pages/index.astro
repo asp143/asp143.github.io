@@ -313,6 +313,8 @@ const currentYear = new Date().getFullYear();
                 active = i;
               }
             } else {
+              // Fallback for sections without a .dot-target marker: triggers on section top edge.
+              // NOTE: fires slightly earlier than the .dot-target path above.
               if (window.scrollY + window.innerHeight >= (section as HTMLElement).offsetTop) {
                 active = i;
               }
