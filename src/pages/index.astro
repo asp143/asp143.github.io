@@ -6,6 +6,8 @@ const currentYear = new Date().getFullYear();
 ---
 
 <BaseLayout>
+  <div class="scroll-dot" aria-hidden="true"></div>
+
   <main class="portfolio-page">
     <!-- Hero -->
     <section class="hero" id="hero">
@@ -39,7 +41,7 @@ const currentYear = new Date().getFullYear();
     <section class="section" id="projects">
       <div class="section-inner">
         <span class="section-number motion-fade">01.</span>
-        <h2 class="section-heading motion-fade">Projects</h2>
+        <h2 class="section-heading motion-fade">Projects<span class="dot-target" aria-hidden="true">.</span></h2>
         <hr class="section-rule" />
 
         <ul class="project-list">
@@ -117,7 +119,7 @@ const currentYear = new Date().getFullYear();
     <section class="section" id="about">
       <div class="section-inner">
         <span class="section-number motion-fade">02.</span>
-        <h2 class="section-heading motion-fade">About</h2>
+        <h2 class="section-heading motion-fade">About<span class="dot-target" aria-hidden="true">.</span></h2>
         <hr class="section-rule" />
 
         <div class="about-grid">
@@ -170,7 +172,7 @@ const currentYear = new Date().getFullYear();
     <section class="section" id="writing">
       <div class="section-inner">
         <span class="section-number motion-fade">03.</span>
-        <h2 class="section-heading motion-fade">Writing</h2>
+        <h2 class="section-heading motion-fade">Writing<span class="dot-target" aria-hidden="true">.</span></h2>
         <hr class="section-rule" />
 
         <ul class="writing-list">
@@ -215,7 +217,7 @@ const currentYear = new Date().getFullYear();
       <div class="section-inner">
         <span class="section-number motion-fade">04.</span>
         <h2 class="contact-cta motion-fade">
-          Let's work<br />together<span class="contact-period">.</span>
+          Let's work<br />together<span class="dot-target" aria-hidden="true">&#8203;</span><span class="contact-period">.</span>
         </h2>
         <hr class="section-rule" />
 
@@ -233,7 +235,7 @@ const currentYear = new Date().getFullYear();
   </main>
 
   <script>
-    import { animate, inView, stagger } from "https://cdn.jsdelivr.net/npm/motion@12/+esm";
+    import { animate, inView, stagger, spring } from "https://cdn.jsdelivr.net/npm/motion@12/+esm";
 
     // Check for reduced motion preference
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -255,12 +257,277 @@ const currentYear = new Date().getFullYear();
         { duration: 0.8, delay: stagger(0.15, { start: 0.8 }), easing: [0.16, 1, 0.3, 1] }
       );
 
-      // Fade out scroll indicator on scroll
-      const scrollIndicator = document.querySelector('.hero-scroll');
-      if (scrollIndicator) {
+      // Fade out scroll indicator on scroll + scroll dot animation
+      const scrollIndicator = document.querySelector('.hero-scroll') as HTMLElement | null;
+      const scrollDot = document.querySelector('.scroll-dot') as HTMLElement | null;
+      const heroPeriod = document.querySelector('.hero-period') as HTMLElement | null;
+      const contactPeriod = document.querySelector('.contact-period') as HTMLElement | null;
+      const hero = document.querySelector('.hero') as HTMLElement | null;
+      const sections = document.querySelectorAll('.section');
+
+      if (scrollDot && hero && sections.length) {
+        // === State Machine ===
+        type DotState = 'hidden' | 'homing' | 'resting' | 'rolled';
+        let state: DotState = 'hidden';
+        let currentIndex = -1;
+        let ticking = false;
+        let pulseAnimation: ReturnType<typeof animate> | null = null;
+        let rollTimeoutA: ReturnType<typeof setTimeout> | null = null;
+        let rollTimeoutB: ReturnType<typeof setTimeout> | null = null;
+        let homingRAF: number | null = null;
+        let returnRAF: number | null = null;
+
+        // Interpolated position (always tracks where the dot actually is)
+        let dotX = 0;
+        let dotY = 0;
+
+        const DOT_SIZE = 10;
+        const DOT_RADIUS = DOT_SIZE / 2;
+        const DOT_SIDE_GAP = 12;
+        const HOMING_SPEED = 0.13;
+        const SNAP_THRESHOLD = 0.5;
+
+        // --- Helpers ---
+
+        function getDotTarget(index: number): { x: number; y: number } {
+          const section = sections[index] as HTMLElement;
+          const marker = section?.querySelector('.dot-target') as HTMLElement | null;
+          if (marker) {
+            const rect = marker.getBoundingClientRect();
+            return {
+              x: rect.right + DOT_SIDE_GAP,
+              y: rect.top + rect.height * 0.5 - DOT_RADIUS,
+            };
+          }
+          return { x: window.innerWidth / 2, y: 60 };
+        }
+
+        function getActiveIndex(): number {
+          let active = 0;
+          sections.forEach((section, i) => {
+            const heading = (section as HTMLElement).querySelector('.dot-target') as HTMLElement | null;
+            if (heading) {
+              // Move to heading once it enters the upper 75% of viewport
+              if (heading.getBoundingClientRect().top <= window.innerHeight * 0.75) {
+                active = i;
+              }
+            } else {
+              if (window.scrollY + window.innerHeight >= (section as HTMLElement).offsetTop) {
+                active = i;
+              }
+            }
+          });
+          return Math.min(active, sections.length - 1);
+        }
+
+        function cancelHoming() {
+          if (homingRAF) { cancelAnimationFrame(homingRAF); homingRAF = null; }
+          if (pulseAnimation) { pulseAnimation.stop(); pulseAnimation = null; }
+        }
+
+        function cancelReturn() {
+          if (returnRAF) { cancelAnimationFrame(returnRAF); returnRAF = null; }
+        }
+
+        function clearRollTimeouts() {
+          if (rollTimeoutA) { clearTimeout(rollTimeoutA); rollTimeoutA = null; }
+          if (rollTimeoutB) { clearTimeout(rollTimeoutB); rollTimeoutB = null; }
+        }
+
+        function resetRolling() {
+          clearRollTimeouts();
+          if (state === 'rolled') {
+            scrollDot.classList.remove('scroll-dot--rolling', 'scroll-dot--settled');
+            scrollDot.style.opacity = '';
+            if (contactPeriod) contactPeriod.style.opacity = '';
+          }
+        }
+
+        function positionDotAt(x: number, y: number) {
+          scrollDot.style.left = `${x}px`;
+          scrollDot.style.top = `${y}px`;
+        }
+
+        // --- Homing: rAF loop that continuously tracks the target heading ---
+
+        function startHoming(targetIndex: number) {
+          cancelHoming();
+          cancelReturn();
+          clearRollTimeouts();
+          if (targetIndex < sections.length - 1) resetRolling();
+
+          state = 'homing';
+          currentIndex = targetIndex;
+
+          function tick() {
+            const target = getDotTarget(currentIndex);
+
+            dotX += (target.x - dotX) * HOMING_SPEED;
+            dotY += (target.y - dotY) * HOMING_SPEED;
+
+            positionDotAt(dotX, dotY);
+
+            const dx = Math.abs(target.x - dotX);
+            const dy = Math.abs(target.y - dotY);
+
+            if (dx < SNAP_THRESHOLD && dy < SNAP_THRESHOLD) {
+              // Landed — snap to exact position
+              dotX = target.x;
+              dotY = target.y;
+              positionDotAt(dotX, dotY);
+              homingRAF = null;
+
+              // Scale pulse on landing
+              pulseAnimation = animate(scrollDot, { transform: ['scale(1)', 'scale(1.2)', 'scale(1)'] }, { duration: 0.3 });
+
+              // Contact section: roll into period
+              if (currentIndex === sections.length - 1 && contactPeriod) {
+                rollTimeoutA = setTimeout(() => {
+                  const periodRect = contactPeriod.getBoundingClientRect();
+                  const periodCenterX = periodRect.left + periodRect.width / 2;
+                  const periodCenterY = periodRect.top + periodRect.height / 2;
+
+                  scrollDot.classList.add('scroll-dot--rolling');
+                  positionDotAt(periodCenterX, periodCenterY);
+
+                  rollTimeoutB = setTimeout(() => {
+                    scrollDot.classList.add('scroll-dot--settled');
+                    scrollDot.style.opacity = '0';
+                    if (contactPeriod) contactPeriod.style.opacity = '1';
+                    state = 'rolled';
+                  }, 550);
+                }, 200);
+                return;
+              }
+
+              state = 'resting';
+              return;
+            }
+
+            homingRAF = requestAnimationFrame(tick);
+          }
+
+          homingRAF = requestAnimationFrame(tick);
+        }
+
+        // --- Scroll handler ---
+
+        const onScroll = () => {
+          if (ticking) return;
+          ticking = true;
+
+          requestAnimationFrame(() => {
+            const scrollY = window.scrollY;
+            const heroBottom = hero.offsetHeight * 0.7;
+
+            // Fade scroll indicator
+            if (scrollIndicator) {
+              const fade = Math.max(1 - scrollY / (window.innerHeight * 0.3), 0);
+              scrollIndicator.style.opacity = String(fade);
+            }
+
+            // === In hero area ===
+            if (scrollY <= heroBottom) {
+              if (state !== 'hidden') {
+                cancelHoming();
+                clearRollTimeouts();
+                resetRolling();
+
+                if (heroPeriod) {
+                  heroPeriod.style.opacity = '0';
+                  cancelReturn();
+
+                  function returnTick() {
+                    const heroRect = heroPeriod!.getBoundingClientRect();
+                    const tx = heroRect.left + heroRect.width / 2;
+                    const ty = heroRect.top + heroRect.height / 2;
+
+                    dotX += (tx - dotX) * 0.2;
+                    dotY += (ty - dotY) * 0.2;
+                    positionDotAt(dotX, dotY);
+
+                    if (Math.abs(tx - dotX) < 0.5 && Math.abs(ty - dotY) < 0.5) {
+                      scrollDot.classList.remove('scroll-dot--visible');
+                      heroPeriod!.style.opacity = '1';
+                      returnRAF = null;
+                      return;
+                    }
+
+                    returnRAF = requestAnimationFrame(returnTick);
+                  }
+
+                  returnRAF = requestAnimationFrame(returnTick);
+                } else {
+                  scrollDot.classList.remove('scroll-dot--visible');
+                }
+
+                state = 'hidden';
+                currentIndex = -1;
+                if (contactPeriod) contactPeriod.style.opacity = '';
+              }
+              ticking = false;
+              return;
+            }
+
+            // Past hero — show dot
+            scrollDot.classList.add('scroll-dot--visible');
+            cancelReturn();
+            if (heroPeriod) heroPeriod.style.opacity = '0';
+
+            const activeIndex = getActiveIndex();
+
+            // === HIDDEN → first appearance: drop from hero period ===
+            if (state === 'hidden') {
+              if (heroPeriod) {
+                const heroRect = heroPeriod.getBoundingClientRect();
+                dotX = heroRect.left + heroRect.width / 2;
+                dotY = heroRect.top + heroRect.height / 2;
+              } else {
+                const target = getDotTarget(activeIndex);
+                dotX = target.x;
+                dotY = target.y - 100;
+              }
+              positionDotAt(dotX, dotY);
+              startHoming(activeIndex);
+              ticking = false;
+              return;
+            }
+
+            // === RESTING: track heading position + check for section change ===
+            if (state === 'resting') {
+              // Keep dot locked to current heading (accounts for scroll movement)
+              const target = getDotTarget(currentIndex);
+              dotX = target.x;
+              dotY = target.y;
+              positionDotAt(dotX, dotY);
+
+              if (activeIndex !== currentIndex) {
+                startHoming(activeIndex);
+              }
+            }
+
+            // === ROLLED: scroll back from contact ===
+            else if (state === 'rolled' && activeIndex < currentIndex) {
+              resetRolling();
+              scrollDot.classList.add('scroll-dot--visible');
+              startHoming(activeIndex);
+            }
+
+            // === HOMING: target changed mid-flight → redirect ===
+            else if (state === 'homing' && activeIndex !== currentIndex) {
+              startHoming(activeIndex);
+            }
+
+            ticking = false;
+          });
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+      } else if (scrollIndicator) {
+        // Fallback: just fade the scroll indicator
         window.addEventListener('scroll', () => {
           const fade = Math.max(1 - window.scrollY / (window.innerHeight * 0.3), 0);
-          (scrollIndicator as HTMLElement).style.opacity = String(fade);
+          scrollIndicator.style.opacity = String(fade);
         }, { passive: true });
       }
 

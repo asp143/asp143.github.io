@@ -37,6 +37,12 @@
   margin-bottom: 1rem;
 }
 
+.dot-target {
+  color: transparent;
+  pointer-events: none;
+  user-select: none;
+}
+
 .section-rule {
   width: 100%;
   height: 1px;
@@ -84,6 +90,7 @@
 
 .hero-period {
   color: var(--color-accent);
+  transition: opacity 0.4s ease;
 }
 
 .hero-subtitle {
@@ -574,6 +581,8 @@
 
 .contact-period {
   color: var(--color-accent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 .contact-links {
@@ -624,6 +633,34 @@
   margin: 0 auto;
 }
 
+/* ===== Scroll Dot ===== */
+
+.scroll-dot {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  box-shadow: 0 0 12px rgba(255, 51, 51, 0.4);
+  transition: opacity 0.4s ease;
+}
+
+.scroll-dot--visible {
+  opacity: 1;
+}
+
+.scroll-dot--rolling {
+  transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1), top 0.3s ease, opacity 0.4s ease;
+}
+
+.scroll-dot--settled {
+  transition: opacity 0.3s ease;
+}
+
 /* ===== Motion Initial States ===== */
 /* These get animated by Motion JS. Set initial hidden state. */
 
@@ -659,5 +696,9 @@
   .motion-stagger {
     opacity: 1;
     transform: none;
+  }
+
+  .scroll-dot {
+    display: none;
   }
 }
