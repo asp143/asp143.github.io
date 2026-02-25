@@ -267,19 +267,25 @@ const currentYear = new Date().getFullYear();
 
       if (scrollDot && hero && sections.length) {
         // === State Machine ===
-        type DotState = 'hidden' | 'animating' | 'resting' | 'rolled';
+        type DotState = 'hidden' | 'homing' | 'resting' | 'rolled';
         let state: DotState = 'hidden';
         let currentIndex = -1;
         let ticking = false;
-        let currentAnimation: ReturnType<typeof animate> | null = null;
         let pulseAnimation: ReturnType<typeof animate> | null = null;
         let rollTimeoutA: ReturnType<typeof setTimeout> | null = null;
         let rollTimeoutB: ReturnType<typeof setTimeout> | null = null;
+        let homingRAF: number | null = null;
+        let returnRAF: number | null = null;
+
+        // Interpolated position (always tracks where the dot actually is)
+        let dotX = 0;
+        let dotY = 0;
 
         const DOT_SIZE = 10;
         const DOT_RADIUS = DOT_SIZE / 2;
         const DOT_SIDE_GAP = 12;
-        const TRIGGER_FRACTION = 0.35; // heading must be in top 35% of viewport
+        const HOMING_SPEED = 0.13;
+        const SNAP_THRESHOLD = 0.5;
 
         // --- Helpers ---
 
@@ -288,29 +294,21 @@ const currentYear = new Date().getFullYear();
           const marker = section?.querySelector('.dot-target') as HTMLElement | null;
           if (marker) {
             const rect = marker.getBoundingClientRect();
-            const heading = marker.closest('.section-heading, .contact-cta') as HTMLElement | null;
-            let transformY = 0;
-            if (heading) {
-              const t = getComputedStyle(heading).transform;
-              if (t && t !== 'none') {
-                transformY = new DOMMatrix(t).m42;
-              }
-            }
             return {
-              x: rect.right + DOT_SIDE_GAP + DOT_RADIUS,
-              y: rect.top - transformY + rect.height * 0.5 - DOT_RADIUS,
+              x: rect.right + DOT_SIDE_GAP,
+              y: rect.top + rect.height * 0.5 - DOT_RADIUS,
             };
           }
           return { x: window.innerWidth / 2, y: 60 };
         }
 
         function getActiveIndex(): number {
-          const threshold = window.innerHeight * TRIGGER_FRACTION;
           let active = 0;
           sections.forEach((section, i) => {
             const heading = (section as HTMLElement).querySelector('.dot-target') as HTMLElement | null;
             if (heading) {
-              if (heading.getBoundingClientRect().top <= threshold) {
+              // Move to heading once it enters the upper 75% of viewport
+              if (heading.getBoundingClientRect().top <= window.innerHeight * 0.75) {
                 active = i;
               }
             } else {
@@ -322,15 +320,13 @@ const currentYear = new Date().getFullYear();
           return Math.min(active, sections.length - 1);
         }
 
-        function cancelAnimation() {
-          if (currentAnimation) {
-            currentAnimation.stop();
-            currentAnimation = null;
-          }
-          if (pulseAnimation) {
-            pulseAnimation.stop();
-            pulseAnimation = null;
-          }
+        function cancelHoming() {
+          if (homingRAF) { cancelAnimationFrame(homingRAF); homingRAF = null; }
+          if (pulseAnimation) { pulseAnimation.stop(); pulseAnimation = null; }
+        }
+
+        function cancelReturn() {
+          if (returnRAF) { cancelAnimationFrame(returnRAF); returnRAF = null; }
         }
 
         function clearRollTimeouts() {
@@ -352,65 +348,66 @@ const currentYear = new Date().getFullYear();
           scrollDot.style.top = `${y}px`;
         }
 
-        // --- Core: animate dot to a target heading ---
+        // --- Homing: rAF loop that continuously tracks the target heading ---
 
-        function animateToHeading(targetIndex: number) {
-          cancelAnimation();
-          state = 'animating';
-          currentIndex = targetIndex;
-
+        function startHoming(targetIndex: number) {
+          cancelHoming();
+          cancelReturn();
+          clearRollTimeouts();
           if (targetIndex < sections.length - 1) resetRolling();
 
-          const target = getDotTarget(targetIndex);
-          const currentLeft = parseFloat(scrollDot.style.left) || window.innerWidth / 2;
-          const currentTop = parseFloat(scrollDot.style.top) || 60;
-          const distance = Math.abs(target.y - currentTop);
-          const duration = Math.min(0.5, Math.max(0.22, 0.16 + distance * 0.00065));
+          state = 'homing';
+          currentIndex = targetIndex;
 
-          currentAnimation = animate(
-            scrollDot,
-            {
-              left: [`${currentLeft}px`, `${target.x}px`],
-              top: [`${currentTop}px`, `${target.y}px`],
-            },
-            { duration, easing: [0.45, 0, 0.55, 1] }
-          );
+          function tick() {
+            const target = getDotTarget(currentIndex);
 
-          currentAnimation.finished.then(() => {
-            currentAnimation = null;
+            dotX += (target.x - dotX) * HOMING_SPEED;
+            dotY += (target.y - dotY) * HOMING_SPEED;
 
-            // Snap to precise position
-            const landed = getDotTarget(currentIndex);
-            positionDotAt(landed.x, landed.y);
+            positionDotAt(dotX, dotY);
 
-            // Scale pulse on landing
-            pulseAnimation = animate(scrollDot, { scale: [1, 1.2, 1] }, { duration: 0.3 });
+            const dx = Math.abs(target.x - dotX);
+            const dy = Math.abs(target.y - dotY);
 
-            // Contact section: roll into period
-            const isLastSection = currentIndex === sections.length - 1;
-            if (isLastSection && contactPeriod) {
-              rollTimeoutA = setTimeout(() => {
-                const periodRect = contactPeriod.getBoundingClientRect();
-                const periodCenterX = periodRect.left + periodRect.width / 2;
-                const periodCenterY = periodRect.top + periodRect.height / 2;
+            if (dx < SNAP_THRESHOLD && dy < SNAP_THRESHOLD) {
+              // Landed — snap to exact position
+              dotX = target.x;
+              dotY = target.y;
+              positionDotAt(dotX, dotY);
+              homingRAF = null;
 
-                scrollDot.classList.add('scroll-dot--rolling');
-                positionDotAt(periodCenterX, periodCenterY);
+              // Scale pulse on landing
+              pulseAnimation = animate(scrollDot, { transform: ['scale(1)', 'scale(1.2)', 'scale(1)'] }, { duration: 0.3 });
 
-                rollTimeoutB = setTimeout(() => {
-                  scrollDot.classList.add('scroll-dot--settled');
-                  scrollDot.style.opacity = '0';
-                  if (contactPeriod) contactPeriod.style.opacity = '1';
-                  state = 'rolled';
-                }, 550);
-              }, 200);
+              // Contact section: roll into period
+              if (currentIndex === sections.length - 1 && contactPeriod) {
+                rollTimeoutA = setTimeout(() => {
+                  const periodRect = contactPeriod.getBoundingClientRect();
+                  const periodCenterX = periodRect.left + periodRect.width / 2;
+                  const periodCenterY = periodRect.top + periodRect.height / 2;
+
+                  scrollDot.classList.add('scroll-dot--rolling');
+                  positionDotAt(periodCenterX, periodCenterY);
+
+                  rollTimeoutB = setTimeout(() => {
+                    scrollDot.classList.add('scroll-dot--settled');
+                    scrollDot.style.opacity = '0';
+                    if (contactPeriod) contactPeriod.style.opacity = '1';
+                    state = 'rolled';
+                  }, 550);
+                }, 200);
+                return;
+              }
+
+              state = 'resting';
               return;
             }
 
-            state = 'resting';
-          }).catch(() => {
-            // Animation was cancelled — no-op, a new animation took over
-          });
+            homingRAF = requestAnimationFrame(tick);
+          }
+
+          homingRAF = requestAnimationFrame(tick);
         }
 
         // --- Scroll handler ---
@@ -429,40 +426,37 @@ const currentYear = new Date().getFullYear();
               scrollIndicator.style.opacity = String(fade);
             }
 
-            // === HIDDEN: in hero area ===
+            // === In hero area ===
             if (scrollY <= heroBottom) {
               if (state !== 'hidden') {
-                cancelAnimation();
+                cancelHoming();
                 clearRollTimeouts();
                 resetRolling();
 
                 if (heroPeriod) {
-                  // Animate dot back to hero period, then swap
-                  const heroRect = heroPeriod.getBoundingClientRect();
-                  const heroCenterX = heroRect.left + heroRect.width / 2;
-                  const heroCenterY = heroRect.top + heroRect.height / 2;
-
-                  const currentLeft = parseFloat(scrollDot.style.left) || heroCenterX;
-                  const currentTop = parseFloat(scrollDot.style.top) || heroCenterY;
-                  const dist = Math.abs(heroCenterY - currentTop);
-                  const dur = Math.min(0.35, Math.max(0.15, dist * 0.0005));
-
                   heroPeriod.style.opacity = '0';
+                  cancelReturn();
 
-                  currentAnimation = animate(
-                    scrollDot,
-                    {
-                      left: [`${currentLeft}px`, `${heroCenterX}px`],
-                      top: [`${currentTop}px`, `${heroCenterY}px`],
-                    },
-                    { duration: dur, easing: [0.45, 0, 0.55, 1] }
-                  );
+                  function returnTick() {
+                    const heroRect = heroPeriod!.getBoundingClientRect();
+                    const tx = heroRect.left + heroRect.width / 2;
+                    const ty = heroRect.top + heroRect.height / 2;
 
-                  currentAnimation.finished.then(() => {
-                    currentAnimation = null;
-                    scrollDot.classList.remove('scroll-dot--visible');
-                    heroPeriod.style.opacity = '1';
-                  }).catch(() => {});
+                    dotX += (tx - dotX) * 0.2;
+                    dotY += (ty - dotY) * 0.2;
+                    positionDotAt(dotX, dotY);
+
+                    if (Math.abs(tx - dotX) < 0.5 && Math.abs(ty - dotY) < 0.5) {
+                      scrollDot.classList.remove('scroll-dot--visible');
+                      heroPeriod!.style.opacity = '1';
+                      returnRAF = null;
+                      return;
+                    }
+
+                    returnRAF = requestAnimationFrame(returnTick);
+                  }
+
+                  returnRAF = requestAnimationFrame(returnTick);
                 } else {
                   scrollDot.classList.remove('scroll-dot--visible');
                 }
@@ -477,35 +471,51 @@ const currentYear = new Date().getFullYear();
 
             // Past hero — show dot
             scrollDot.classList.add('scroll-dot--visible');
+            cancelReturn();
             if (heroPeriod) heroPeriod.style.opacity = '0';
 
             const activeIndex = getActiveIndex();
 
-            // === HIDDEN → first appearance ===
+            // === HIDDEN → first appearance: drop from hero period ===
             if (state === 'hidden') {
-              const target = getDotTarget(activeIndex);
-              positionDotAt(target.x, target.y);
-              currentIndex = activeIndex;
-              state = 'resting';
+              if (heroPeriod) {
+                const heroRect = heroPeriod.getBoundingClientRect();
+                dotX = heroRect.left + heroRect.width / 2;
+                dotY = heroRect.top + heroRect.height / 2;
+              } else {
+                const target = getDotTarget(activeIndex);
+                dotX = target.x;
+                dotY = target.y - 100;
+              }
+              positionDotAt(dotX, dotY);
+              startHoming(activeIndex);
               ticking = false;
               return;
             }
 
-            // === RESTING: active section changed → animate ===
-            if (state === 'resting' && activeIndex !== currentIndex) {
-              animateToHeading(activeIndex);
+            // === RESTING: track heading position + check for section change ===
+            if (state === 'resting') {
+              // Keep dot locked to current heading (accounts for scroll movement)
+              const target = getDotTarget(currentIndex);
+              dotX = target.x;
+              dotY = target.y;
+              positionDotAt(dotX, dotY);
+
+              if (activeIndex !== currentIndex) {
+                startHoming(activeIndex);
+              }
             }
 
             // === ROLLED: scroll back from contact ===
             else if (state === 'rolled' && activeIndex < currentIndex) {
               resetRolling();
               scrollDot.classList.add('scroll-dot--visible');
-              animateToHeading(activeIndex);
+              startHoming(activeIndex);
             }
 
-            // === ANIMATING: target changed mid-flight → redirect ===
-            else if (state === 'animating' && activeIndex !== currentIndex) {
-              animateToHeading(activeIndex);
+            // === HOMING: target changed mid-flight → redirect ===
+            else if (state === 'homing' && activeIndex !== currentIndex) {
+              startHoming(activeIndex);
             }
 
             ticking = false;
