@@ -554,6 +554,22 @@ const currentYear = new Date().getFullYear();
           );
         }, { amount: 0.05 });
       });
+
+      // Contact links: sequential hover highlight after fade-in
+      let contactHighlighted = false;
+      inView('#contact', () => {
+        if (contactHighlighted) return;
+        contactHighlighted = true;
+        const links = document.querySelectorAll('.contact-link');
+        const FADE_IN = 500;
+        const ON = 400;
+        const GAP = 150;
+        links.forEach((link, i) => {
+          const start = FADE_IN + i * (ON + GAP);
+          setTimeout(() => link.classList.add('is-highlighted'), start);
+          setTimeout(() => link.classList.remove('is-highlighted'), start + ON);
+        });
+      }, { amount: 0.05 });
     } else {
       // Reduced motion: just show everything
       document.querySelectorAll('.motion-fade, .motion-letter, .motion-stagger').forEach((el) => {
