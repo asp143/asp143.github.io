@@ -613,11 +613,13 @@
   transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.contact-link:hover {
+.contact-link:hover,
+.contact-link.is-highlighted {
   color: var(--color-accent);
 }
 
-.contact-link:hover::after {
+.contact-link:hover::after,
+.contact-link.is-highlighted::after {
   width: 100%;
 }
 
