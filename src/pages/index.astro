@@ -272,6 +272,7 @@ const currentYear = new Date().getFullYear();
         let currentIndex = -1;
         let ticking = false;
         let currentAnimation: ReturnType<typeof animate> | null = null;
+        let pulseAnimation: ReturnType<typeof animate> | null = null;
         let rollTimeoutA: ReturnType<typeof setTimeout> | null = null;
         let rollTimeoutB: ReturnType<typeof setTimeout> | null = null;
 
@@ -326,6 +327,10 @@ const currentYear = new Date().getFullYear();
             currentAnimation.stop();
             currentAnimation = null;
           }
+          if (pulseAnimation) {
+            pulseAnimation.stop();
+            pulseAnimation = null;
+          }
         }
 
         function clearRollTimeouts() {
@@ -379,7 +384,7 @@ const currentYear = new Date().getFullYear();
             positionDotAt(landed.x, landed.y);
 
             // Scale pulse on landing
-            animate(scrollDot, { scale: [1, 1.2, 1] }, { duration: 0.3 });
+            pulseAnimation = animate(scrollDot, { scale: [1, 1.2, 1] }, { duration: 0.3 });
 
             // Contact section: roll into period
             const isLastSection = currentIndex === sections.length - 1;
