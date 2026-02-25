@@ -395,6 +395,7 @@ const currentYear = new Date().getFullYear();
                     scrollDot.style.opacity = '0';
                     if (contactPeriod) contactPeriod.style.opacity = '1';
                     state = 'rolled';
+                    highlightContactLinks();
                   }, 550);
                 }, 200);
                 return;
@@ -555,21 +556,20 @@ const currentYear = new Date().getFullYear();
         }, { amount: 0.05 });
       });
 
-      // Contact links: sequential hover highlight after fade-in
+      // Contact links: sequential hover highlight (triggered after ball settles)
       let contactHighlighted = false;
-      inView('#contact', () => {
+      function highlightContactLinks() {
         if (contactHighlighted) return;
         contactHighlighted = true;
         const links = document.querySelectorAll('.contact-link');
-        const FADE_IN = 500;
         const ON = 400;
         const GAP = 150;
         links.forEach((link, i) => {
-          const start = FADE_IN + i * (ON + GAP);
+          const start = i * (ON + GAP);
           setTimeout(() => link.classList.add('is-highlighted'), start);
           setTimeout(() => link.classList.remove('is-highlighted'), start + ON);
         });
-      }, { amount: 0.05 });
+      }
     } else {
       // Reduced motion: just show everything
       document.querySelectorAll('.motion-fade, .motion-letter, .motion-stagger').forEach((el) => {
