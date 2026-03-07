@@ -136,11 +136,11 @@ const currentYear = new Date().getFullYear();
           <div class="about-col-right">
             <div class="about-stats">
               <div class="about-stat motion-stagger">
-                <span class="about-stat-number">5+</span>
+                <span class="about-stat-number" data-count={new Date().getFullYear() - 2018}>0+</span>
                 <span class="about-stat-label">Years Building Software</span>
               </div>
               <div class="about-stat motion-stagger">
-                <span class="about-stat-number">10+</span>
+                <span class="about-stat-number" data-count="10">0+</span>
                 <span class="about-stat-label">Projects Shipped</span>
               </div>
             </div>
@@ -555,6 +555,27 @@ const currentYear = new Date().getFullYear();
         }, { amount: 0.05 });
       });
 
+      // Count-up animation for stat numbers
+      let statsCounted = false;
+      inView('#about', () => {
+        if (statsCounted) return;
+        statsCounted = true;
+        document.querySelectorAll('.about-stat-number[data-count]').forEach((el) => {
+          const target = parseInt(el.getAttribute('data-count')!, 10);
+          const duration = 1200;
+          const start = performance.now();
+          const step = (now: number) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.round(eased * target);
+            el.textContent = current + '+';
+            if (progress < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        });
+      }, { amount: 0.2 });
+
       // Contact links: sequential hover highlight after fade-in
       let contactHighlighted = false;
       inView('#contact', () => {
@@ -575,6 +596,9 @@ const currentYear = new Date().getFullYear();
       document.querySelectorAll('.motion-fade, .motion-letter, .motion-stagger').forEach((el) => {
         (el as HTMLElement).style.opacity = '1';
         (el as HTMLElement).style.transform = 'none';
+      });
+      document.querySelectorAll('.about-stat-number[data-count]').forEach((el) => {
+        el.textContent = el.getAttribute('data-count') + '+';
       });
     }
   </script>
