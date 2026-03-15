@@ -3,6 +3,44 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/home.css';
 
 const currentYear = new Date().getFullYear();
+
+// Fetch blog posts from Bear Blog Atom feed at build time
+const BLOG_FEED_URL = 'https://ralphdev.bearblog.dev/feed/';
+const MAX_POSTS = 5;
+
+interface BlogPost {
+  title: string;
+  date: string;
+  url: string;
+}
+
+let blogPosts: BlogPost[] = [];
+
+try {
+  const response = await fetch(BLOG_FEED_URL);
+  const xml = await response.text();
+
+  // Parse Atom feed entries
+  const entries = xml.match(/<entry>[\s\S]*?<\/entry>/g) || [];
+
+  blogPosts = entries.slice(0, MAX_POSTS).map((entry) => {
+    const title = entry.match(/<title[^>]*>([\s\S]*?)<\/title>/)?.[1]?.trim() ?? '';
+    const link = entry.match(/<link[^>]*href="([^"]*)"[^>]*\/>/)?.[1]
+      ?? entry.match(/<link[^>]*href="([^"]*)"[^>]*>/)?.[1]
+      ?? '';
+    const published = entry.match(/<published>([\s\S]*?)<\/published>/)?.[1]
+      ?? entry.match(/<updated>([\s\S]*?)<\/updated>/)?.[1]
+      ?? '';
+
+    const dateObj = new Date(published);
+    const formattedDate = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+
+    return { title, date: formattedDate, url: link };
+  });
+} catch (e) {
+  // Build won't break if Bear Blog is down — section renders empty gracefully
+  console.warn('Failed to fetch blog feed:', e);
+}
 ---
 
 <BaseLayout>
@@ -176,34 +214,21 @@ const currentYear = new Date().getFullYear();
         <hr class="section-rule" />
 
         <ul class="writing-list">
-          <li>
-            <a href="https://ralphdev.bearblog.dev/gcp-secrets/" class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
-              <time class="writing-date">2026.01</time>
-              <span class="writing-title">Secure your cloud build secrets</span>
-              <span class="writing-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
-          <li>
-            <a href="https://ralphdev.bearblog.dev/what-is-a-tech-lead/" class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
-              <time class="writing-date">2024.04</time>
-              <span class="writing-title">What is a Tech lead?</span>
-              <span class="writing-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
-          <li>
-            <a href="https://ralphdev.bearblog.dev/discipline-over-motivation/" class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
-              <time class="writing-date">2023.02</time>
-              <span class="writing-title">Discipline over Motivation</span>
-              <span class="writing-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
-          <li>
-            <a href="https://ralphdev.bearblog.dev/google-cloud-developer-certification-guide/" class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
-              <time class="writing-date">2022.10</time>
-              <span class="writing-title">Google Cloud Developer Certification Guide</span>
-              <span class="writing-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
+          {blogPosts.length > 0 ? (
+            blogPosts.map((post) => (
+              <li>
+                <a href={post.url} class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
+                  <time class="writing-date">{post.date}</time>
+                  <span class="writing-title">{post.title}</span>
+                  <span class="writing-arrow" aria-hidden="true">&rarr;</span>
+                </a>
+              </li>
+            ))
+          ) : (
+            <li>
+              <p class="writing-empty">Posts are taking a coffee break. Visit the blog directly.</p>
+            </li>
+          )}
         </ul>
 
         <a href="https://ralphdev.bearblog.dev/" class="writing-view-all motion-fade" target="_blank" rel="noopener noreferrer">
