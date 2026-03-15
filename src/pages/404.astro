@@ -9,4 +9,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <p style="font-size:1.25rem;color:#b8c2cc;margin:0;">Page not found.</p>
     </div>
   </main>
+
+  <script>
+    const ph = (window as any).posthog;
+    if (ph) {
+      ph.capture('404_hit', { path: window.location.pathname });
+    }
+  </script>
 </BaseLayout>
