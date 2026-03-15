@@ -640,5 +640,75 @@ const currentYear = new Date().getFullYear();
         el.textContent = el.getAttribute('data-count') + '+';
       });
     }
+
+    // --- PostHog Custom Events ---
+    const ph = (window as any).posthog;
+    if (ph) {
+      // Section view tracking (for funnels: hero → projects → about → writing → side-projects → contact)
+      const sectionIds = ['hero', 'projects', 'about', 'writing', 'side-projects', 'contact'];
+      const viewedSections = new Set<string>();
+
+      const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            if (!viewedSections.has(id)) {
+              viewedSections.add(id);
+              ph.capture('section_viewed', { section: id });
+            }
+          }
+        });
+      }, { threshold: 0.3 });
+
+      sectionIds.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) sectionObserver.observe(el);
+      });
+
+      // Scroll depth tracking (25%, 50%, 75%, 100%)
+      const depthMarks = new Set<number>();
+
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (docHeight <= 0) return;
+        const pct = Math.round((scrollTop / docHeight) * 100);
+
+        [25, 50, 75, 100].forEach((mark) => {
+          if (pct >= mark && !depthMarks.has(mark)) {
+            depthMarks.add(mark);
+            ph.capture('scroll_depth', { percent: mark });
+          }
+        });
+      }, { passive: true });
+
+      // Outbound click tracking
+      document.addEventListener('click', (e) => {
+        const link = (e.target as HTMLElement).closest('a[href]') as HTMLAnchorElement | null;
+        if (!link) return;
+        const href = link.href;
+
+        // Contact links
+        if (link.closest('#contact')) {
+          const label = link.textContent?.trim() || href;
+          ph.capture('contact_clicked', { method: label.toLowerCase(), href });
+          return;
+        }
+
+        // Writing links
+        if (link.closest('#writing')) {
+          const title = link.querySelector('.writing-title')?.textContent?.trim() || href;
+          ph.capture('writing_clicked', { title, href });
+          return;
+        }
+
+        // Side project links
+        if (link.closest('#side-projects')) {
+          const name = link.querySelector('.side-project-name')?.textContent?.trim() || href;
+          ph.capture('side_project_clicked', { name, href });
+          return;
+        }
+      });
+    }
   </script>
 </BaseLayout>
