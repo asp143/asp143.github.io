@@ -140,6 +140,32 @@
   background: linear-gradient(to bottom, var(--color-accent), transparent);
 }
 
+/* ===== Shared Row Hover Pattern ===== */
+
+.hover-row {
+  position: relative;
+  transition: padding-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: var(--color-accent);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-row:hover::before {
+  width: 3px;
+}
+
+.hover-row:hover {
+  padding-left: 1.25rem;
+}
+
 /* ===== Project List ===== */
 
 .project-list {
@@ -153,8 +179,6 @@
   padding: clamp(1rem, 2vw, 1.5rem) 0;
   border-bottom: 1px solid var(--color-border);
   cursor: default;
-  position: relative;
-  transition: padding-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (min-width: 768px) {
@@ -164,25 +188,6 @@
     justify-content: space-between;
     gap: 2rem;
   }
-}
-
-.project-row::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  background: var(--color-accent);
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.project-row:hover::before {
-  width: 3px;
-}
-
-.project-row:hover {
-  padding-left: 1.25rem;
 }
 
 .project-name {
@@ -254,8 +259,10 @@
   gap: 0.25rem;
   padding: clamp(0.75rem, 1.5vw, 1rem) 0;
   border-bottom: 1px solid var(--color-border);
-  transition: padding-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
+}
+
+.compact-row::before {
+  width: 2px;
 }
 
 @media (min-width: 768px) {
@@ -265,25 +272,6 @@
     justify-content: space-between;
     gap: 2rem;
   }
-}
-
-.compact-row::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  background: var(--color-accent);
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.compact-row:hover::before {
-  width: 2px;
-}
-
-.compact-row:hover {
-  padding-left: 1rem;
 }
 
 .compact-name {
@@ -474,8 +462,6 @@
   border-bottom: 1px solid var(--color-border);
   text-decoration: none;
   color: inherit;
-  transition: padding-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
 }
 
 @media (min-width: 768px) {
@@ -484,25 +470,6 @@
     align-items: baseline;
     gap: 2rem;
   }
-}
-
-.writing-row::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  background: var(--color-accent);
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.writing-row:hover::before {
-  width: 3px;
-}
-
-.writing-row:hover {
-  padding-left: 1.25rem;
 }
 
 .writing-date {
@@ -581,27 +548,6 @@
   border-bottom: 1px solid var(--color-border);
   text-decoration: none;
   color: inherit;
-  position: relative;
-  transition: padding-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.side-project-row::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  background: var(--color-accent);
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.side-project-row:hover::before {
-  width: 3px;
-}
-
-.side-project-row:hover {
-  padding-left: 1.25rem;
 }
 
 .side-project-info {
