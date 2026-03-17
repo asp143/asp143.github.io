@@ -75,10 +75,63 @@ try {
       </div>
     </section>
 
-    <!-- 01. Projects -->
-    <section class="section" id="projects">
+    <!-- 01. About -->
+    <section class="section" id="about">
       <div class="section-inner">
         <span class="section-number motion-fade">01.</span>
+        <h2 class="section-heading motion-fade">About<span class="dot-target" aria-hidden="true">.</span></h2>
+        <hr class="section-rule" />
+
+        <div class="about-grid">
+          <div class="about-col-left">
+            <span class="about-name motion-fade" aria-label="Ralph Jonas Mungcal">Ralph Jonas</span>
+            <p class="about-bio motion-fade">
+              Full-stack developer and AI integration specialist based in the Philippines. I build products end-to-end — from backend architecture and cloud infrastructure to developer tooling and AI-powered workflows.
+            </p>
+            <p class="about-bio motion-fade">
+              I focus on writing clean, maintainable systems that solve real problems. Whether it's orchestrating payments across multiple gateways, building data aggregation pipelines, or setting up self-hosted infrastructure — I care about getting the details right.
+            </p>
+          </div>
+
+          <div class="about-col-right">
+            <div class="about-stats">
+              <div class="about-stat motion-stagger">
+                <span class="about-stat-number" data-count={new Date().getFullYear() - 2018}>0+</span>
+                <span class="about-stat-label">Years Building Software</span>
+              </div>
+              <div class="about-stat motion-stagger">
+                <span class="about-stat-number" data-count="10">0+</span>
+                <span class="about-stat-label">Projects Shipped</span>
+              </div>
+            </div>
+
+            <div class="focus-list">
+              <span class="focus-item motion-stagger">Backend Architecture</span>
+              <span class="focus-item motion-stagger">AI Integration</span>
+              <span class="focus-item motion-stagger">Cloud Infrastructure</span>
+              <span class="focus-item motion-stagger">Developer Tooling</span>
+            </div>
+
+            <div class="about-stack">
+              <span class="about-stack-label motion-fade">Daily drivers</span>
+              <div class="about-stack-items">
+                <span class="about-stack-item motion-stagger">TypeScript</span>
+                <span class="about-stack-item motion-stagger">Node.js</span>
+                <span class="about-stack-item motion-stagger">GCP</span>
+                <span class="about-stack-item motion-stagger">Docker</span>
+                <span class="about-stack-item motion-stagger">PostgreSQL</span>
+                <span class="about-stack-item motion-stagger">Linux</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02. Projects -->
+    <section class="section" id="projects">
+      <div class="section-inner">
+        <span class="section-number motion-fade">02.</span>
         <h2 class="section-heading motion-fade">Projects<span class="dot-target" aria-hidden="true">.</span></h2>
         <hr class="section-rule" />
 
@@ -153,94 +206,10 @@ try {
       </div>
     </section>
 
-    <!-- 02. About -->
-    <section class="section" id="about">
-      <div class="section-inner">
-        <span class="section-number motion-fade">02.</span>
-        <h2 class="section-heading motion-fade">About<span class="dot-target" aria-hidden="true">.</span></h2>
-        <hr class="section-rule" />
-
-        <div class="about-grid">
-          <div class="about-col-left">
-            <span class="about-name motion-fade" aria-label="Ralph Jonas Mungcal">Ralph Jonas</span>
-            <p class="about-bio motion-fade">
-              Full-stack developer and AI integration specialist based in the Philippines. I build products end-to-end — from backend architecture and cloud infrastructure to developer tooling and AI-powered workflows.
-            </p>
-            <p class="about-bio motion-fade">
-              I focus on writing clean, maintainable systems that solve real problems. Whether it's orchestrating payments across multiple gateways, building data aggregation pipelines, or setting up self-hosted infrastructure — I care about getting the details right.
-            </p>
-          </div>
-
-          <div class="about-col-right">
-            <div class="about-stats">
-              <div class="about-stat motion-stagger">
-                <span class="about-stat-number" data-count={new Date().getFullYear() - 2018}>0+</span>
-                <span class="about-stat-label">Years Building Software</span>
-              </div>
-              <div class="about-stat motion-stagger">
-                <span class="about-stat-number" data-count="10">0+</span>
-                <span class="about-stat-label">Projects Shipped</span>
-              </div>
-            </div>
-
-            <div class="focus-list">
-              <span class="focus-item motion-stagger">Backend Architecture</span>
-              <span class="focus-item motion-stagger">AI Integration</span>
-              <span class="focus-item motion-stagger">Cloud Infrastructure</span>
-              <span class="focus-item motion-stagger">Developer Tooling</span>
-            </div>
-
-            <div class="about-stack">
-              <span class="about-stack-label motion-fade">Daily drivers</span>
-              <div class="about-stack-items">
-                <span class="about-stack-item motion-stagger">TypeScript</span>
-                <span class="about-stack-item motion-stagger">Node.js</span>
-                <span class="about-stack-item motion-stagger">GCP</span>
-                <span class="about-stack-item motion-stagger">Docker</span>
-                <span class="about-stack-item motion-stagger">PostgreSQL</span>
-                <span class="about-stack-item motion-stagger">Linux</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 03. Writing -->
-    <section class="section" id="writing">
-      <div class="section-inner">
-        <span class="section-number motion-fade">03.</span>
-        <h2 class="section-heading motion-fade">Writing<span class="dot-target" aria-hidden="true">.</span></h2>
-        <hr class="section-rule" />
-
-        <ul class="writing-list">
-          {blogPosts.length > 0 ? (
-            blogPosts.map((post) => (
-              <li>
-                <a href={post.url} class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
-                  <time class="writing-date">{post.date}</time>
-                  <span class="writing-title">{post.title}</span>
-                  <span class="writing-arrow" aria-hidden="true">&rarr;</span>
-                </a>
-              </li>
-            ))
-          ) : (
-            <li>
-              <p class="writing-empty">Posts are taking a coffee break. Visit the blog directly.</p>
-            </li>
-          )}
-        </ul>
-
-        <a href="https://ralphdev.bearblog.dev/" class="writing-view-all motion-fade" target="_blank" rel="noopener noreferrer">
-          View all posts <span aria-hidden="true">&rarr;</span>
-        </a>
-      </div>
-    </section>
-
-    <!-- 04. Side Projects -->
+    <!-- 03. Side Projects -->
     <section class="section" id="side-projects">
       <div class="section-inner">
-        <span class="section-number motion-fade">04.</span>
+        <span class="section-number motion-fade">03.</span>
         <h2 class="section-heading motion-fade">Side Projects<span class="dot-target" aria-hidden="true">.</span></h2>
         <hr class="section-rule" />
 
@@ -273,6 +242,37 @@ try {
             </a>
           </li>
         </ul>
+      </div>
+    </section>
+
+    <!-- 04. Writing -->
+    <section class="section" id="writing">
+      <div class="section-inner">
+        <span class="section-number motion-fade">04.</span>
+        <h2 class="section-heading motion-fade">Writing<span class="dot-target" aria-hidden="true">.</span></h2>
+        <hr class="section-rule" />
+
+        <ul class="writing-list">
+          {blogPosts.length > 0 ? (
+            blogPosts.map((post) => (
+              <li>
+                <a href={post.url} class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
+                  <time class="writing-date">{post.date}</time>
+                  <span class="writing-title">{post.title}</span>
+                  <span class="writing-arrow" aria-hidden="true">&rarr;</span>
+                </a>
+              </li>
+            ))
+          ) : (
+            <li>
+              <p class="writing-empty">Posts are taking a coffee break. Visit the blog directly.</p>
+            </li>
+          )}
+        </ul>
+
+        <a href="https://ralphdev.bearblog.dev/" class="writing-view-all motion-fade" target="_blank" rel="noopener noreferrer">
+          View all posts <span aria-hidden="true">&rarr;</span>
+        </a>
       </div>
     </section>
 
@@ -670,7 +670,7 @@ try {
     const ph = (window as any).posthog;
     if (ph) {
       // Section view tracking (for funnels: hero → projects → about → writing → side-projects → contact)
-      const sectionIds = ['hero', 'projects', 'about', 'writing', 'side-projects', 'contact'];
+      const sectionIds = ['hero', 'about', 'projects', 'side-projects', 'writing', 'contact'];
       const viewedSections = new Set<string>();
 
       const sectionObserver = new IntersectionObserver((entries) => {
