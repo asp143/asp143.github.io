@@ -11,6 +11,7 @@ const MAX_POSTS = 5;
 interface BlogPost {
   title: string;
   date: string;
+  datetime: string;
   url: string;
 }
 
@@ -34,8 +35,9 @@ try {
 
     const dateObj = new Date(published);
     const formattedDate = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+    const isoDate = dateObj.toISOString().split('T')[0];
 
-    return { title, date: formattedDate, url: link };
+    return { title, date: formattedDate, datetime: isoDate, url: link };
   });
 } catch (e) {
   // Build won't break if Bear Blog is down — section renders empty gracefully
@@ -80,7 +82,7 @@ try {
       <div class="section-inner">
         <span class="section-number motion-fade">01.</span>
         <h2 class="section-heading motion-fade">About<span class="dot-target" aria-hidden="true">.</span></h2>
-        <hr class="section-rule" />
+        <hr class="section-rule" role="presentation" />
 
         <div class="about-grid">
           <div class="about-col-left">
@@ -133,9 +135,9 @@ try {
       <div class="section-inner">
         <span class="section-number motion-fade">02.</span>
         <h2 class="section-heading motion-fade">Projects<span class="dot-target" aria-hidden="true">.</span></h2>
-        <hr class="section-rule" />
+        <hr class="section-rule" role="presentation" />
 
-        <ul class="project-list">
+        <ul class="project-list" role="list">
           <li class="project-row hover-row motion-stagger">
             <span class="project-name">Flight Rewards Search Platform</span>
             <span class="project-tech">Node.js · TypeScript · PostgreSQL · GCP</span>
@@ -165,7 +167,7 @@ try {
 
         <h3 class="other-heading motion-fade">Other Work</h3>
 
-        <ul class="project-list">
+        <ul class="project-list" role="list">
           <li class="compact-row hover-row motion-stagger">
             <span class="compact-name">Airline Route Mapping Service</span>
             <span class="compact-tech">TypeScript · Node.js</span>
@@ -211,9 +213,9 @@ try {
       <div class="section-inner">
         <span class="section-number motion-fade">03.</span>
         <h2 class="section-heading motion-fade">Side Projects<span class="dot-target" aria-hidden="true">.</span></h2>
-        <hr class="section-rule" />
+        <hr class="section-rule" role="presentation" />
 
-        <ul class="side-project-list">
+        <ul class="side-project-list" role="list">
           <li>
             <a href="https://subconsciousapp.co" class="side-project-row hover-row motion-stagger" target="_blank" rel="noopener noreferrer">
               <div class="side-project-info">
@@ -250,14 +252,14 @@ try {
       <div class="section-inner">
         <span class="section-number motion-fade">04.</span>
         <h2 class="section-heading motion-fade">Writing<span class="dot-target" aria-hidden="true">.</span></h2>
-        <hr class="section-rule" />
+        <hr class="section-rule" role="presentation" />
 
-        <ul class="writing-list">
+        <ul class="writing-list" role="list">
           {blogPosts.length > 0 ? (
             blogPosts.map((post) => (
               <li>
                 <a href={post.url} class="writing-row hover-row motion-stagger" target="_blank" rel="noopener noreferrer">
-                  <time class="writing-date">{post.date}</time>
+                  <time class="writing-date" datetime={post.datetime}>{post.date}</time>
                   <span class="writing-title">{post.title}</span>
                   <span class="writing-arrow" aria-hidden="true">&rarr;</span>
                 </a>
@@ -283,7 +285,7 @@ try {
         <h2 class="contact-cta motion-fade">
           Let's work<br />together<span class="dot-target" aria-hidden="true">&#8203;</span><span class="contact-period">.</span>
         </h2>
-        <hr class="section-rule" />
+        <hr class="section-rule" role="presentation" />
 
         <div class="contact-links">
           <a href="mailto:ralphmungcal09@gmail.com" class="contact-link motion-stagger">Email</a>
