@@ -445,7 +445,7 @@
 
 .about-stack-item:hover {
   border-color: var(--color-accent);
-  background: rgba(255, 51, 51, 0.08);
+  background: var(--color-accent-subtle);
 }
 
 /* ===== Writing (Blog) ===== */
@@ -500,18 +500,27 @@
   color: var(--color-text-muted);
   transition: transform 0.3s ease, color 0.3s ease;
   margin-left: auto;
-  display: none;
+  flex-shrink: 0;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 767px) {
   .writing-arrow {
-    display: block;
+    font-size: 1rem;
+    align-self: flex-end;
   }
 }
 
 .writing-row:hover .writing-arrow {
   transform: translateX(6px);
   color: var(--color-accent);
+}
+
+.writing-empty {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  padding: clamp(1rem, 2vw, 1.25rem) 0;
 }
 
 .writing-view-all {
@@ -652,7 +661,7 @@
   padding: clamp(2rem, 4vw, 3rem) var(--section-padding-x);
   font-family: var(--font-body);
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--color-text-faint);
   letter-spacing: 0.03em;
   max-width: var(--max-width);
   margin: 0 auto;
@@ -670,7 +679,7 @@
   opacity: 0;
   pointer-events: none;
   will-change: transform, opacity;
-  box-shadow: 0 0 12px rgba(255, 51, 51, 0.4);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 40%, transparent);
   transition: opacity 0.4s ease;
 }
 
@@ -684,6 +693,39 @@
 
 .scroll-dot--settled {
   transition: opacity 0.3s ease;
+}
+
+/* ===== Focus Styles ===== */
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.hover-row:focus-visible {
+  padding-left: 1.25rem;
+}
+
+.hover-row:focus-visible::before {
+  width: 3px;
+}
+
+.compact-row:focus-visible::before {
+  width: 2px;
+}
+
+.focus-item:focus-visible,
+.about-stack-item:focus-visible {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.contact-link:focus-visible {
+  color: var(--color-accent);
+}
+
+.contact-link:focus-visible::after {
+  width: 100%;
 }
 
 /* ===== Motion Initial States ===== */
