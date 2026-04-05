@@ -98,8 +98,8 @@ const breadcrumb = {
     <meta name="theme-color" content="#0a0a0a" />
     <link rel="manifest" href="/manifest.webmanifest" crossorigin="anonymous" />
 
-    <script type="application/ld+json" set:html={JSON.stringify(schemaOrgWebPage)}></script>
-    <script type="application/ld+json" set:html={JSON.stringify(breadcrumb)}></script>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaOrgWebPage)}></script>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumb)}></script>
 
     {posthogKey && (
       <script is:inline define:vars={{ posthogKey }}>
