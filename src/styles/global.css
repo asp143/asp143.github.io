@@ -1,20 +1,31 @@
-/* ===== CSS Custom Properties ===== */
+/* ===== Design Tokens — Terminal Brutalism ===== */
 :root {
-  --color-bg: #0a0a0a;
-  --color-text: #fafafa;
-  --color-text-muted: #666666;
-  --color-accent: #ff3333;
-  --color-border: #1a1a1a;
-  --color-surface: #111111;
-  --color-accent-subtle: rgba(255, 51, 51, 0.08);
-  --color-text-faint: rgba(255, 255, 255, 0.2);
+  --color-bg: #fdfbf0;
+  --color-bg-alt: #f5f1dc;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #3a3a3a;
+  --color-ink-muted: #6b6b66;
+  --color-border: #0a0a0a;
+  --color-accent: #ff6a1a;
+  --color-accent-soft: #ffd9b8;
+  --color-cursor: #ff6a1a;
+  --color-surface: #fffdf3;
 
-  --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --shadow-hard: 4px 4px 0 0 var(--color-border);
+  --shadow-hard-lg: 6px 6px 0 0 var(--color-border);
+  --shadow-hard-sm: 2px 2px 0 0 var(--color-border);
 
-  --max-width: 1200px;
-  --section-padding-y: clamp(80px, 12vh, 160px);
-  --section-padding-x: clamp(1.5rem, 5vw, 6rem);
+  --border-w: 2px;
+
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Geist Mono', ui-monospace,
+    SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
+
+  --max-width: 1180px;
+  --section-padding-y: clamp(3.5rem, 9vh, 7rem);
+  --section-padding-x: clamp(1.25rem, 5vw, 5rem);
+
+  color-scheme: light;
 }
 
 /* ===== Reset ===== */
@@ -33,6 +44,12 @@ html {
   overflow-x: hidden;
   scroll-behavior: smooth;
   background-color: var(--color-bg);
+  /* Subtle scanline/grid texture */
+  background-image:
+    linear-gradient(var(--color-bg-alt) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-bg-alt) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: -1px -1px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -48,14 +65,16 @@ body {
 }
 
 body {
-  font-family: var(--font-body);
-  color: var(--color-text);
-  background-color: var(--color-bg);
-  line-height: 1.6;
+  font-family: var(--font-mono);
+  color: var(--color-ink);
+  background-color: transparent;
+  line-height: 1.55;
+  font-size: 15px;
+  letter-spacing: 0;
 }
 
 a {
-  color: var(--color-text);
+  color: var(--color-ink);
   text-decoration: none;
 }
 
@@ -65,7 +84,18 @@ img {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  font-weight: 500;
-  line-height: 1.1;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--color-ink);
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+:focus-visible {
+  outline: var(--border-w) solid var(--color-accent);
+  outline-offset: 3px;
 }
