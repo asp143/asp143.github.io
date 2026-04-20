@@ -8,55 +8,90 @@ const currentYear = new Date().getFullYear();
 const BLOG_FEED_URL = 'https://ralphdev.bearblog.dev/feed/';
 const MAX_POSTS = 5;
 const blogPosts = await getBlogPosts(BLOG_FEED_URL, MAX_POSTS);
+
+const HERO_SUBTITLE = 'full-stack developer & ai integration specialist. i build scalable, practical software — backend architecture, cloud infra, dev tooling, ai-powered workflows.';
 ---
 
 <BaseLayout>
   <div class="scroll-dot" aria-hidden="true"></div>
 
   <main class="portfolio-page">
+    <!-- Shell Bar -->
+    <div class="shell-bar" role="banner">
+      <div class="shell-bar-dots" aria-hidden="true">
+        <span class="shell-bar-dot shell-bar-dot--live"></span>
+        <span class="shell-bar-dot"></span>
+        <span class="shell-bar-dot"></span>
+      </div>
+      <span class="shell-bar-path">ralph@jonas:~ — portfolio.sh</span>
+      <span class="shell-bar-hint">
+        press <kbd>g</kbd> then <kbd>a</kbd>/<kbd>p</kbd>/<kbd>s</kbd>/<kbd>w</kbd>/<kbd>c</kbd>
+      </span>
+    </div>
+
     <!-- Hero -->
     <section class="hero" id="hero">
       <div class="hero-inner">
+        <div class="hero-whoami" aria-hidden="true">
+          <span class="hero-whoami-prompt">$</span>
+          <span>whoami</span>
+          <span style="color: var(--color-ink-muted);">--verbose</span>
+        </div>
+
         <h1 class="hero-name" aria-label="Ralph Jonas">
           <span class="hero-name-line">
-            {'RALPH'.split('').map(letter => (
+            {'ralph'.split('').map(letter => (
               <span class="hero-name-letter motion-letter">{letter}</span>
             ))}
           </span>
           <span class="hero-name-line">
-            {'JONAS'.split('').map(letter => (
+            {'jonas'.split('').map(letter => (
               <span class="hero-name-letter motion-letter">{letter}</span>
             ))}
-            <span class="hero-name-letter motion-letter hero-period">.</span>
+            <span class="hero-name-letter motion-letter hero-period">_</span>
           </span>
         </h1>
-        <p class="hero-subtitle motion-fade">
-          Full-Stack Developer &amp; AI Integration Specialist building scalable, practical software.
-        </p>
-      </div>
 
-      <div class="hero-scroll motion-fade" aria-hidden="true">
-        <span class="hero-scroll-text">Scroll</span>
-        <span class="hero-scroll-arrow">&#8595;</span>
-        <span class="hero-scroll-line"></span>
+        <p class="hero-subtitle motion-fade" data-typewriter={HERO_SUBTITLE}>
+          <span class="hero-subtitle-text">{HERO_SUBTITLE}</span>
+          <span class="hero-cursor" aria-hidden="true"></span>
+        </p>
+
+        <div class="hero-tags motion-fade" aria-hidden="true">
+          <span class="hero-tag">#typescript</span>
+          <span class="hero-tag">#node</span>
+          <span class="hero-tag">#gcp</span>
+          <span class="hero-tag">#ai</span>
+          <span class="hero-tag">#linux</span>
+        </div>
+
+        <div class="hero-scroll motion-fade">
+          <span class="hero-scroll-text">scroll</span>
+          <span class="hero-scroll-arrow">&#8595;</span>
+        </div>
       </div>
     </section>
 
     <!-- 01. About -->
     <section class="section" id="about">
       <div class="section-inner">
-        <span class="section-number motion-fade">01.</span>
-        <h2 class="section-heading motion-fade">About<span class="dot-target" aria-hidden="true">.</span></h2>
+        <div class="section-header">
+          <span class="section-prompt">$</span>
+          <span class="section-cmd">cat about.md</span>
+          <span class="section-cmd-flag">--format=plain</span>
+          <span class="section-number">01<span class="dot-target" aria-hidden="true">.</span></span>
+        </div>
+        <h2 class="section-heading" style="position:absolute;left:-9999px;">about</h2>
         <hr class="section-rule" role="presentation" />
 
         <div class="about-grid">
           <div class="about-col-left">
-            <span class="about-name motion-fade" aria-label="Ralph Jonas Mungcal">Ralph Jonas</span>
+            <span class="about-name motion-fade" aria-label="Ralph Jonas Mungcal">ralph jonas</span>
             <p class="about-bio motion-fade">
-              Full-stack developer and AI integration specialist based in the Philippines. I build products end-to-end — from backend architecture and cloud infrastructure to developer tooling and AI-powered workflows.
+              full-stack developer and ai integration specialist based in the philippines. i build products end-to-end — from backend architecture and cloud infra to dev tooling and ai-powered workflows.
             </p>
             <p class="about-bio motion-fade">
-              I focus on writing clean, maintainable systems that solve real problems. Whether it's orchestrating payments across multiple gateways, building data aggregation pipelines, or setting up self-hosted infrastructure — I care about getting the details right.
+              i focus on writing clean, maintainable systems that solve real problems. whether it's orchestrating payments across multiple gateways, building data aggregation pipelines, or self-hosting infra — details matter.
             </p>
           </div>
 
@@ -64,30 +99,30 @@ const blogPosts = await getBlogPosts(BLOG_FEED_URL, MAX_POSTS);
             <div class="about-stats">
               <div class="about-stat motion-stagger">
                 <span class="about-stat-number" data-count={currentYear - 2018}>0+</span>
-                <span class="about-stat-label">Years Building Software</span>
+                <span class="about-stat-label">years shipping</span>
               </div>
               <div class="about-stat motion-stagger">
                 <span class="about-stat-number" data-count="10">0+</span>
-                <span class="about-stat-label">Projects Shipped</span>
+                <span class="about-stat-label">projects shipped</span>
               </div>
             </div>
 
             <div class="focus-list">
-              <span class="focus-item motion-stagger">Backend Architecture</span>
-              <span class="focus-item motion-stagger">AI Integration</span>
-              <span class="focus-item motion-stagger">Cloud Infrastructure</span>
-              <span class="focus-item motion-stagger">Developer Tooling</span>
+              <span class="focus-item motion-stagger">backend-arch</span>
+              <span class="focus-item motion-stagger">ai-integration</span>
+              <span class="focus-item motion-stagger">cloud-infra</span>
+              <span class="focus-item motion-stagger">dev-tooling</span>
             </div>
 
             <div class="about-stack">
-              <span class="about-stack-label motion-fade">Daily drivers</span>
+              <span class="about-stack-label motion-fade">daily-drivers</span>
               <div class="about-stack-items">
-                <span class="about-stack-item motion-stagger">TypeScript</span>
-                <span class="about-stack-item motion-stagger">Node.js</span>
-                <span class="about-stack-item motion-stagger">GCP</span>
-                <span class="about-stack-item motion-stagger">Docker</span>
-                <span class="about-stack-item motion-stagger">PostgreSQL</span>
-                <span class="about-stack-item motion-stagger">Linux</span>
+                <span class="about-stack-item motion-stagger">typescript</span>
+                <span class="about-stack-item motion-stagger">node.js</span>
+                <span class="about-stack-item motion-stagger">gcp</span>
+                <span class="about-stack-item motion-stagger">docker</span>
+                <span class="about-stack-item motion-stagger">postgres</span>
+                <span class="about-stack-item motion-stagger">linux</span>
               </div>
             </div>
           </div>
@@ -98,76 +133,81 @@ const blogPosts = await getBlogPosts(BLOG_FEED_URL, MAX_POSTS);
     <!-- 02. Projects -->
     <section class="section" id="projects">
       <div class="section-inner">
-        <span class="section-number motion-fade">02.</span>
-        <h2 class="section-heading motion-fade">Projects<span class="dot-target" aria-hidden="true">.</span></h2>
+        <div class="section-header">
+          <span class="section-prompt">$</span>
+          <span class="section-cmd">ls ./projects/</span>
+          <span class="section-cmd-flag">-la</span>
+          <span class="section-number">02<span class="dot-target" aria-hidden="true">.</span></span>
+        </div>
+        <h2 class="section-heading" style="position:absolute;left:-9999px;">projects</h2>
         <hr class="section-rule" role="presentation" />
 
         <ul class="project-list" role="list">
-          <li class="project-row hover-row motion-stagger">
-            <span class="project-name">Flight Rewards Search Platform</span>
-            <span class="project-tech">Node.js · TypeScript · PostgreSQL · GCP</span>
-            <p class="project-desc">Technical lead for a UK-based SaaS platform that helps users find and compare reward flight availability across major airlines.</p>
+          <li class="project-row motion-stagger">
+            <span class="project-name">flight-rewards-search</span>
+            <span class="project-tech">node · ts · postgres · gcp</span>
+            <p class="project-desc">technical lead for a uk-based saas — reward flight availability search across major airlines.</p>
           </li>
-          <li class="project-row hover-row motion-stagger">
-            <span class="project-name">Billing &amp; Payment Platform</span>
-            <span class="project-tech">Node.js · TypeScript · GCP · Event-Driven</span>
-            <p class="project-desc">Multi-gateway payment orchestration platform with unified subscription billing, dunning management, and smart retry logic.</p>
+          <li class="project-row motion-stagger">
+            <span class="project-name">billing-payment-platform</span>
+            <span class="project-tech">node · ts · gcp · event-driven</span>
+            <p class="project-desc">multi-gateway payment orchestration with unified subscription billing, dunning, smart retry.</p>
           </li>
-          <li class="project-row hover-row motion-stagger">
-            <span class="project-name">Airline Data Aggregation Bots</span>
-            <span class="project-tech">TypeScript · Puppeteer · BullMQ</span>
-            <p class="project-desc">Automated scrapers collecting flight availability data from multiple airline sources on scheduled intervals.</p>
+          <li class="project-row motion-stagger">
+            <span class="project-name">airline-data-bots</span>
+            <span class="project-tech">ts · puppeteer · bullmq</span>
+            <p class="project-desc">automated scrapers collecting flight availability data from multiple airline sources on schedule.</p>
           </li>
-          <li class="project-row hover-row motion-stagger">
-            <span class="project-name">Remote MCP Server</span>
-            <span class="project-tech">TypeScript · Node.js · Docker</span>
-            <p class="project-desc">Model Context Protocol server accessible via URL, enabling AI assistants to interact with custom tools through SSE transport.</p>
+          <li class="project-row motion-stagger">
+            <span class="project-name">remote-mcp-server</span>
+            <span class="project-tech">ts · node · docker</span>
+            <p class="project-desc">model context protocol server over url — ai assistants hit custom tools via sse transport.</p>
           </li>
-          <li class="project-row hover-row motion-stagger">
-            <span class="project-name">Home Infrastructure Lab</span>
-            <span class="project-tech">Docker · Linux · TrueNAS · Tailscale</span>
-            <p class="project-desc">Multi-node self-hosted services ecosystem including NAS, media streaming, workflow automation, and monitoring dashboards.</p>
+          <li class="project-row motion-stagger">
+            <span class="project-name">home-infra-lab</span>
+            <span class="project-tech">docker · linux · truenas · tailscale</span>
+            <p class="project-desc">multi-node self-hosted services — nas, media, workflow automation, monitoring dashboards.</p>
           </li>
         </ul>
 
-        <h3 class="other-heading motion-fade">Other Work</h3>
+        <h3 class="other-heading motion-fade">other-work</h3>
 
-        <ul class="project-list" role="list">
-          <li class="compact-row hover-row motion-stagger">
-            <span class="compact-name">Airline Route Mapping Service</span>
-            <span class="compact-tech">TypeScript · Node.js</span>
+        <ul class="project-list" role="list" style="grid-template-columns: 1fr;">
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">airline-route-mapping</span>
+            <span class="compact-tech">ts · node</span>
           </li>
-          <li class="compact-row hover-row motion-stagger">
-            <span class="compact-name">Loyalty Points Transfer Engine</span>
-            <span class="compact-tech">Node.js · TypeScript · React</span>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">loyalty-points-transfer</span>
+            <span class="compact-tech">node · ts · react</span>
           </li>
-          <li class="compact-row hover-row motion-stagger">
-            <span class="compact-name">Subscription Service Architecture</span>
-            <span class="compact-tech">Node.js · GCP · Pub/Sub</span>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">subscription-architecture</span>
+            <span class="compact-tech">node · gcp · pub/sub</span>
           </li>
-          <li class="compact-row hover-row motion-stagger">
-            <span class="compact-name">AI Development Workflow Standards</span>
-            <span class="compact-tech">Claude · OpenAI</span>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">ai-dev-workflow-standards</span>
+            <span class="compact-tech">claude · openai</span>
           </li>
-          <li class="compact-row hover-row motion-stagger">
-            <span class="compact-name">Local AI Inference Server</span>
-            <span class="compact-tech">Linux · AI/ML Inference</span>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">local-ai-inference-server</span>
+            <span class="compact-tech">linux · ml-inference</span>
           </li>
-          <li class="compact-row hover-row motion-stagger">
-            <span class="compact-name">Accident Detection Device</span>
-            <span class="compact-tech">Raspberry Pi · Python</span>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">accident-detection-device</span>
+            <span class="compact-tech">rpi · python</span>
           </li>
-          <li class="compact-row hover-row motion-stagger">
-            <span class="compact-name">Accident Detection Control Panel</span>
-            <span class="compact-tech">MongoDB · Express · Angular · Node.js</span>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">accident-detection-panel</span>
+            <span class="compact-tech">mongo · express · angular · node</span>
           </li>
-          <li class="compact-row hover-row motion-stagger">
-            <span class="compact-name">Audit &amp; Report Generator</span>
-            <span class="compact-tech">Angular · Node.js · SQL · AWS</span>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">audit-report-generator</span>
+            <span class="compact-tech">angular · node · sql · aws</span>
           </li>
-          <li class="compact-row hover-row motion-stagger">
-            <span class="compact-name">Freelance Projects</span>
-            <span class="compact-tech">Upwork</span>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">freelance-projects</span>
+            <span class="compact-tech">upwork</span>
           </li>
         </ul>
       </div>
@@ -176,34 +216,39 @@ const blogPosts = await getBlogPosts(BLOG_FEED_URL, MAX_POSTS);
     <!-- 03. Side Projects -->
     <section class="section" id="side-projects">
       <div class="section-inner">
-        <span class="section-number motion-fade">03.</span>
-        <h2 class="section-heading motion-fade">Side Projects<span class="dot-target" aria-hidden="true">.</span></h2>
+        <div class="section-header">
+          <span class="section-prompt">$</span>
+          <span class="section-cmd">cd ~/side-projects/</span>
+          <span class="section-cmd-flag">&amp;&amp; ls</span>
+          <span class="section-number">03<span class="dot-target" aria-hidden="true">.</span></span>
+        </div>
+        <h2 class="section-heading" style="position:absolute;left:-9999px;">side projects</h2>
         <hr class="section-rule" role="presentation" />
 
         <ul class="side-project-list" role="list">
           <li>
-            <a href="https://subconsciousapp.co" class="side-project-row hover-row motion-stagger" target="_blank" rel="noopener noreferrer">
+            <a href="https://subconsciousapp.co" class="side-project-row motion-stagger" target="_blank" rel="noopener noreferrer">
               <div class="side-project-info">
-                <span class="side-project-name">Subconscious</span>
-                <p class="side-project-desc">Subscription tracking app — take control of your recurring expenses.</p>
+                <span class="side-project-name">subconscious</span>
+                <p class="side-project-desc">subscription tracking — take control of recurring expenses.</p>
               </div>
               <span class="side-project-arrow" aria-hidden="true">&rarr;</span>
             </a>
           </li>
           <li>
-            <a href="https://spotthesynth.com" class="side-project-row hover-row motion-stagger" target="_blank" rel="noopener noreferrer">
+            <a href="https://spotthesynth.com" class="side-project-row motion-stagger" target="_blank" rel="noopener noreferrer">
               <div class="side-project-info">
-                <span class="side-project-name">Spot the Synth</span>
-                <p class="side-project-desc">Community-driven AI photo spotting and discussion.</p>
+                <span class="side-project-name">spot-the-synth</span>
+                <p class="side-project-desc">community-driven ai photo spotting and discussion.</p>
               </div>
               <span class="side-project-arrow" aria-hidden="true">&rarr;</span>
             </a>
           </li>
           <li>
-            <a href="https://theleonfiles.com" class="side-project-row hover-row motion-stagger" target="_blank" rel="noopener noreferrer">
+            <a href="https://theleonfiles.com" class="side-project-row motion-stagger" target="_blank" rel="noopener noreferrer">
               <div class="side-project-info">
-                <span class="side-project-name">The Leon Files</span>
-                <p class="side-project-desc">A fan site dedicated to Leon Kennedy of Resident Evil.</p>
+                <span class="side-project-name">the-leon-files</span>
+                <p class="side-project-desc">fan site — leon kennedy, resident evil.</p>
               </div>
               <span class="side-project-arrow" aria-hidden="true">&rarr;</span>
             </a>
@@ -215,15 +260,20 @@ const blogPosts = await getBlogPosts(BLOG_FEED_URL, MAX_POSTS);
     <!-- 04. Writing -->
     <section class="section" id="writing">
       <div class="section-inner">
-        <span class="section-number motion-fade">04.</span>
-        <h2 class="section-heading motion-fade">Writing<span class="dot-target" aria-hidden="true">.</span></h2>
+        <div class="section-header">
+          <span class="section-prompt">$</span>
+          <span class="section-cmd">git log ./writing/</span>
+          <span class="section-cmd-flag">--oneline -5</span>
+          <span class="section-number">04<span class="dot-target" aria-hidden="true">.</span></span>
+        </div>
+        <h2 class="section-heading" style="position:absolute;left:-9999px;">writing</h2>
         <hr class="section-rule" role="presentation" />
 
         <ul class="writing-list" role="list">
           {blogPosts.length > 0 ? (
             blogPosts.map((post) => (
               <li>
-                <a href={post.url} class="writing-row hover-row motion-stagger" target="_blank" rel="noopener noreferrer">
+                <a href={post.url} class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
                   <time class="writing-date" datetime={post.datetime}>{post.date}</time>
                   <span class="writing-title">{post.title}</span>
                   <span class="writing-arrow" aria-hidden="true">&rarr;</span>
@@ -232,13 +282,13 @@ const blogPosts = await getBlogPosts(BLOG_FEED_URL, MAX_POSTS);
             ))
           ) : (
             <li>
-              <p class="writing-empty">Posts are taking a coffee break. Visit the blog directly.</p>
+              <p class="writing-empty">posts taking a coffee break. visit the blog directly.</p>
             </li>
           )}
         </ul>
 
         <a href="https://ralphdev.bearblog.dev/" class="writing-view-all motion-fade" target="_blank" rel="noopener noreferrer">
-          View all posts <span aria-hidden="true">&rarr;</span>
+          view all posts <span aria-hidden="true">&rarr;</span>
         </a>
       </div>
     </section>
@@ -246,23 +296,36 @@ const blogPosts = await getBlogPosts(BLOG_FEED_URL, MAX_POSTS);
     <!-- 05. Contact -->
     <section class="section" id="contact">
       <div class="section-inner">
-        <span class="section-number motion-fade">05.</span>
+        <div class="section-header">
+          <span class="section-prompt">$</span>
+          <span class="section-cmd">echo "let's build"</span>
+          <span class="section-cmd-flag">| mail -s hi</span>
+          <span class="section-number">05<span class="dot-target" aria-hidden="true">.</span></span>
+        </div>
         <h2 class="contact-cta motion-fade">
-          Let's work<br />together<span class="dot-target" aria-hidden="true">&#8203;</span><span class="contact-period">.</span>
+          let's work<br />together<span class="contact-period">_</span>
         </h2>
         <hr class="section-rule" role="presentation" />
 
         <div class="contact-links">
-          <a href="mailto:ralphmungcal09@gmail.com" class="contact-link motion-stagger">Email</a>
-          <a href="https://www.linkedin.com/in/ralphjonasmungcal" class="contact-link motion-stagger" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-          <a href="https://www.upwork.com/o/profiles/users/_~01108375a06953763f/" class="contact-link motion-stagger" target="_blank" rel="noopener noreferrer">Upwork</a>
+          <a href="mailto:ralphmungcal09@gmail.com" class="contact-link motion-stagger">email</a>
+          <a href="https://www.linkedin.com/in/ralphjonasmungcal" class="contact-link motion-stagger" target="_blank" rel="noopener noreferrer">linkedin</a>
+          <a href="https://www.upwork.com/o/profiles/users/_~01108375a06953763f/" class="contact-link motion-stagger" target="_blank" rel="noopener noreferrer">upwork</a>
         </div>
       </div>
 
       <footer class="site-footer">
-        Ralph Jonas Mungcal &copy; {currentYear}
+        <span>process exited — ralph jonas mungcal &copy; {currentYear}</span>
+        <span aria-hidden="true">[ctrl+c to detach]</span>
       </footer>
     </section>
+
+    <!-- Keyboard Nav Toast -->
+    <div class="kbd-toast" id="kbd-toast" aria-live="polite">
+      <span class="kbd-toast-hint">g</span>
+      <span>then</span>
+      <kbd>h</kbd><kbd>a</kbd><kbd>p</kbd><kbd>s</kbd><kbd>w</kbd><kbd>c</kbd>
+    </div>
   </main>
 
   <script>
