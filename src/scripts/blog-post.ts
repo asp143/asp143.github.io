@@ -87,6 +87,11 @@ if (posthog && main) {
       return;
     }
 
+    if (link.matches('.post-follow-cta')) {
+      posthog.capture('blog_follow_x_clicked', { slug, href });
+      return;
+    }
+
     if (link.matches('.related-posts-link')) {
       posthog.capture('blog_related_clicked', {
         from_slug: slug,
