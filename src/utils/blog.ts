@@ -24,3 +24,26 @@ export function formatPubDateLong(date: Date): string {
 export function toIsoDate(date: Date): string {
   return date.toISOString().split('T')[0];
 }
+
+export function getRelatedPosts(
+  current: BlogEntry,
+  all: BlogEntry[],
+  limit = 3
+): BlogEntry[] {
+  const currentTags = new Set(current.data.tags);
+  if (currentTags.size === 0) return [];
+
+  const scored = all
+    .filter((p) => p.id !== current.id)
+    .map((p) => {
+      const shared = p.data.tags.filter((t) => currentTags.has(t)).length;
+      return { post: p, shared };
+    })
+    .filter((entry) => entry.shared > 0)
+    .sort((a, b) => {
+      if (b.shared !== a.shared) return b.shared - a.shared;
+      return b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf();
+    });
+
+  return scored.slice(0, limit).map((entry) => entry.post);
+}
