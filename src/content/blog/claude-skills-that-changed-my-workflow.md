@@ -1,6 +1,6 @@
 ---
 title: Claude Skills That Changed My Workflow
-description: Skills turn Claude from a general chatbot into a domain-specific tool. The document, engineering, data, and productivity skills I actually use daily — and why they pay off.
+description: The Claude skills I actually use daily — document, engineering, data, and productivity — and why they cut the prompting tax.
 pubDate: 2026-04-22
 tags:
   - ai
@@ -96,6 +96,23 @@ It turns Claude from "helpful stranger" into "coworker who's been here a while."
 You can build custom skills — define the instructions, test them with evals, and optimize the triggering. If you have a repeating workflow that Claude handles but needs specific prompting every time, you package it as a skill once and never think about it again.
 
 I've used this to create project-specific skills that encode our team's conventions, coding standards, and documentation formats.
+
+A skill is just a markdown file with frontmatter describing when to trigger it:
+
+```markdown
+---
+name: pr-review
+description: Use when reviewing pull requests — enforces our team's checklist for security, tests, and migration safety.
+---
+
+When reviewing a PR, check in order:
+1. Does the change include tests? If no, flag it.
+2. Any raw SQL? Check for parameterization.
+3. Schema migrations? Verify they're reversible.
+4. Secrets or env vars in the diff? Reject immediately.
+```
+
+That's the whole thing. Claude picks it up, follows it, and you stop re-typing the same checklist every review.
 
 ---
 
