@@ -58,7 +58,13 @@ const breadcrumb = {
     {post.data.canonical && <link rel="canonical" href={post.data.canonical} />}
   </Fragment>
 
-  <main class="post-page">
+  <main
+    class="post-page"
+    data-slug={post.id}
+    data-title={post.data.title}
+    data-tags={post.data.tags.join(',')}
+    data-pub-date={post.data.pubDate.toISOString()}
+  >
     <div class="blog-shell-bar" role="banner">
       <div class="blog-shell-bar-dots" aria-hidden="true">
         <span class="blog-shell-bar-dot blog-shell-bar-dot--live"></span>
@@ -149,4 +155,8 @@ const breadcrumb = {
       )}
     </nav>
   </main>
+
+  <script>
+    import '../../scripts/blog-post';
+  </script>
 </BaseLayout>
