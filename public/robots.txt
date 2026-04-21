@@ -1,4 +1,4 @@
 User-agent: *
-Disallow:
+Allow: /
 
-sitemap: https://ralphjonas.com/sitemap.xml
+Sitemap: https://ralphjonas.com/sitemap-index.xml
