@@ -1,60 +1,71 @@
 ---
 import '../styles/global.css';
 
+const SITE_URL = 'https://ralphjonas.com';
+
 const {
-  title = 'Ralph Jonas Mungcal',
+  title = 'Ralph Jonas Mungcal — Full-Stack Developer & AI Integration Specialist',
   description = 'Full-Stack Developer & AI Integration Specialist building scalable platforms, automation systems, and AI-enabled products.'
 } = Astro.props;
 
+const canonicalURL = new URL(Astro.url.pathname, SITE_URL).toString();
+const currentYear = new Date().getFullYear();
 const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
 
-const schemaOrgWebPage = {
-  '@context': 'http://schema.org',
-  '@type': 'WebPage',
-  url: 'https://ralphjonas.com',
-  headline: 'Creating Amazing things to improve the quality of life',
-  inLanguage: 'en',
-  mainEntityOfPage: 'https://ralphjonas.com',
+const person = {
+  '@type': 'Person',
+  '@id': `${SITE_URL}/#person`,
+  name: 'Ralph Jonas Mungcal',
+  alternateName: 'Ralph Jonas',
+  url: SITE_URL,
+  image: `${SITE_URL}/logo.png`,
+  jobTitle: 'Full-Stack Developer & AI Integration Specialist',
   description,
+  nationality: { '@type': 'Country', name: 'Philippines' },
+  knowsAbout: [
+    'Full-Stack Development',
+    'AI Integration',
+    'Backend Architecture',
+    'Cloud Infrastructure',
+    'TypeScript',
+    'Node.js',
+    'Google Cloud Platform'
+  ],
+  sameAs: [
+    'https://www.linkedin.com/in/ralphjonasmungcal',
+    'https://www.upwork.com/o/profiles/users/_~01108375a06953763f/',
+    'https://ralphdev.bearblog.dev/',
+    'https://twitter.com/ItsRalphSenpai'
+  ]
+};
+
+const profilePage = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  '@id': `${canonicalURL}#profilepage`,
+  url: canonicalURL,
   name: title,
-  author: {
-    '@type': 'Person',
-    name: 'Ralph Jonas Mungcal'
-  },
-  copyrightHolder: {
-    '@type': 'Person',
-    name: 'Ralph Jonas Mungcal'
-  },
-  copyrightYear: '2019',
-  creator: {
-    '@type': 'Person',
-    name: 'Ralph Jonas Mungcal'
-  },
-  publisher: {
-    '@type': 'Person',
-    name: 'Ralph Jonas Mungcal'
-  },
-  datePublished: '2019-01-17',
-  dateModified: new Date().toISOString().split('T')[0],
-  image: {
-    '@type': 'ImageObject',
-    url: 'https://ralphjonas.com/logo.png'
-  }
+  description,
+  inLanguage: 'en',
+  dateCreated: '2019-01-17',
+  dateModified: new Date().toISOString(),
+  mainEntity: person,
+  about: person,
+  copyrightYear: currentYear,
+  copyrightHolder: person,
+  publisher: person,
+  image: { '@type': 'ImageObject', url: `${SITE_URL}/logo.png` }
 };
 
 const breadcrumb = {
-  '@context': 'http://schema.org',
+  '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
-  description: 'Breadcrumbs list',
-  name: 'Breadcrumbs',
   itemListElement: [
     {
       '@type': 'ListItem',
-      item: {
-        '@id': 'https://ralphjonas.com',
-        name: 'Homepage'
-      },
-      position: 1
+      position: 1,
+      name: 'Home',
+      item: SITE_URL
     }
   ]
 };
@@ -75,30 +86,42 @@ const breadcrumb = {
     <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
 
+    <link rel="canonical" href={canonicalURL} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Ralph Jonas — Writing"
+      href="https://ralphdev.bearblog.dev/feed/"
+    />
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+
     <meta name="msapplication-TileColor" content="#a0d8f1" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="description" content={description} />
-    <meta name="image" content="https://ralphjonas.com/logo.png" />
+    <meta name="author" content="Ralph Jonas Mungcal" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
 
     <meta property="og:locale" content="en_US" />
-    <meta property="og:site_name" content="ralphmungcal" />
+    <meta property="og:site_name" content="Ralph Jonas Mungcal" />
     <meta property="og:title" content={title} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="https://ralphjonas.com/logo.png" />
+    <meta property="og:image" content={`${SITE_URL}/logo.png`} />
     <meta property="og:image:alt" content={description} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@ItsRalphSenpai" />
+    <meta name="twitter:site" content="@ItsRalphSenpai" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content="https://ralphjonas.com/logo.png" />
+    <meta name="twitter:image" content={`${SITE_URL}/logo.png`} />
     <meta name="twitter:image:alt" content={description} />
 
     <meta name="theme-color" content="#fdfbf0" />
     <link rel="manifest" href="/manifest.webmanifest" crossorigin="anonymous" />
 
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaOrgWebPage)}></script>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(profilePage)}></script>
     <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumb)}></script>
 
     {posthogKey && (
