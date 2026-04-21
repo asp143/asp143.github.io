@@ -40,7 +40,7 @@ const nowItemList = {
     '@type': 'ListItem',
     position: index + 1,
     item: {
-      '@type': 'WebSite',
+      '@type': 'CreativeWork',
       name: project.name,
       url: project.url,
       description: project.update,
@@ -56,9 +56,13 @@ const formattedUpdated = new Date(`${NOW_UPDATED}T00:00:00Z`).toLocaleDateString
 });
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalURL={canonicalURL}
+  breadcrumb={breadcrumb}
+>
   <Fragment slot="head">
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumb)}></script>
     <script is:inline type="application/ld+json" set:html={JSON.stringify(nowItemList)}></script>
   </Fragment>
 

@@ -7,10 +7,27 @@ const posts = await getPublishedPosts();
 
 const title = 'Writing — Ralph Jonas Mungcal';
 const description = 'Notes on software engineering, AI integration, career, and craft by Ralph Jonas Mungcal.';
+const canonicalURL = 'https://ralphjonas.com/blog/';
+
+const breadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ralphjonas.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Writing', item: canonicalURL }
+  ]
+};
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalURL={canonicalURL}
+  breadcrumb={breadcrumb}
+>
   <main class="blog-page">
+    <h1 class="visually-hidden">Writing by Ralph Jonas Mungcal</h1>
+
     <div class="blog-shell-bar" role="banner">
       <div class="blog-shell-bar-dots" aria-hidden="true">
         <span class="blog-shell-bar-dot blog-shell-bar-dot--live"></span>
@@ -37,13 +54,15 @@ const description = 'Notes on software engineering, AI integration, career, and 
       <ul class="blog-list" role="list">
         {posts.map((post) => (
           <li class="blog-list-item">
-            <a href={`/blog/${post.id}/`} class="blog-list-link">
-              <time class="blog-list-date" datetime={post.data.pubDate.toISOString()}>
-                {formatPubDate(post.data.pubDate)}
-              </time>
-              <span class="blog-list-title">{post.data.title}</span>
-              <span class="blog-list-arrow" aria-hidden="true">&rarr;</span>
-            </a>
+            <article>
+              <a href={`/blog/${post.id}/`} class="blog-list-link">
+                <time class="blog-list-date" datetime={post.data.pubDate.toISOString()}>
+                  {formatPubDate(post.data.pubDate)}
+                </time>
+                <span class="blog-list-title">{post.data.title}</span>
+                <span class="blog-list-arrow" aria-hidden="true">&rarr;</span>
+              </a>
+            </article>
           </li>
         ))}
       </ul>
