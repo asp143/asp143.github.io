@@ -25,6 +25,23 @@ export function toIsoDate(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
+export function getWordCount(body: string | undefined): number {
+  if (!body) return 0;
+  const text = body
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/[#>*_~\-]+/g, ' ')
+    .replace(/<[^>]+>/g, ' ');
+  const words = text.match(/\b[\w'-]+\b/g);
+  return words ? words.length : 0;
+}
+
+export function getReadingTimeMinutes(wordCount: number): number {
+  return Math.max(1, Math.round(wordCount / 225));
+}
+
 export function getRelatedPosts(
   current: BlogEntry,
   all: BlogEntry[],

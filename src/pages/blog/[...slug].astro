@@ -1,7 +1,13 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getPublishedPosts, formatPubDateLong, getRelatedPosts } from '../../utils/blog';
+import {
+  getPublishedPosts,
+  formatPubDateLong,
+  getRelatedPosts,
+  getWordCount,
+  getReadingTimeMinutes
+} from '../../utils/blog';
 import '../../styles/blog.css';
 
 export async function getStaticPaths() {
@@ -24,6 +30,9 @@ const relatedPosts = getRelatedPosts(post, allPosts, 3);
 const canonicalURL = post.data.canonical
   ?? `https://ralphjonas.com/blog/${post.id}/`;
 
+const wordCount = getWordCount(post.body);
+const readingTime = getReadingTimeMinutes(wordCount);
+
 const blogPosting = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -37,7 +46,9 @@ const blogPosting = {
   publisher: { '@id': 'https://ralphjonas.com/#person' },
   mainEntityOfPage: canonicalURL,
   image: 'https://ralphjonas.com/og.png',
-  inLanguage: 'en'
+  inLanguage: 'en',
+  wordCount,
+  timeRequired: `PT${readingTime}M`
 };
 
 const breadcrumb = {
@@ -51,11 +62,15 @@ const breadcrumb = {
 };
 ---
 
-<BaseLayout title={`${post.data.title} — Ralph Jonas Mungcal`} description={post.data.description}>
+<BaseLayout
+  title={`${post.data.title} — Ralph Jonas Mungcal`}
+  description={post.data.description}
+  canonicalURL={canonicalURL}
+  ogType="article"
+  breadcrumb={breadcrumb}
+>
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(blogPosting)}></script>
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumb)}></script>
-    {post.data.canonical && <link rel="canonical" href={post.data.canonical} />}
   </Fragment>
 
   <main
@@ -89,6 +104,9 @@ const breadcrumb = {
         {formatPubDateLong(post.data.pubDate)}
         {post.data.updatedDate && (
           <> &middot; updated {formatPubDateLong(post.data.updatedDate)}</>
+        )}
+        {readingTime > 0 && (
+          <> &middot; {readingTime} min read</>
         )}
       </time>
 

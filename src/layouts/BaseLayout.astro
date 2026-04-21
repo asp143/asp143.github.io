@@ -8,13 +8,21 @@ import '../styles/global.css';
 
 const SITE_URL = 'https://ralphjonas.com';
 const OG_IMAGE = `${SITE_URL}/og.png`;
+const DEFAULT_OG_ALT = 'Ralph Jonas Mungcal — terminal-styled portfolio cover with name set in monospace type.';
 
 const {
   title = 'Ralph Jonas Mungcal — Full-Stack Developer & AI Integration Specialist',
-  description = 'Full-Stack Developer & AI Integration Specialist building scalable platforms, automation systems, and AI-enabled products.'
+  description = 'Full-Stack Developer & AI Integration Specialist building scalable platforms, automation systems, and AI-enabled products.',
+  canonicalURL: canonicalOverride,
+  ogImage = OG_IMAGE,
+  ogImageAlt = DEFAULT_OG_ALT,
+  ogType = 'website',
+  pageType = 'page',
+  breadcrumb,
+  suppressDefaultBreadcrumb = false
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, SITE_URL).toString();
+const canonicalURL = canonicalOverride ?? new URL(Astro.url.pathname, SITE_URL).toString();
 const currentYear = new Date().getFullYear();
 const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
 
@@ -41,29 +49,43 @@ const person = {
     'https://www.linkedin.com/in/ralphjonasmungcal',
     'https://www.upwork.com/o/profiles/users/_~01108375a06953763f/',
     'https://ralphdev.bearblog.dev/',
-    'https://twitter.com/ItsRalphSenpai'
+    'https://x.com/ralphsenpaidev'
   ]
 };
 
-const profilePage = {
-  '@context': 'https://schema.org',
-  '@type': 'ProfilePage',
-  '@id': `${canonicalURL}#profilepage`,
-  url: canonicalURL,
-  name: title,
-  description,
-  inLanguage: 'en',
-  dateCreated: '2019-01-17',
-  dateModified: new Date().toISOString(),
-  mainEntity: person,
-  about: person,
-  copyrightYear: currentYear,
-  copyrightHolder: person,
-  publisher: person,
-  image: { '@type': 'ImageObject', url: OG_IMAGE, width: 1200, height: 630 }
-};
+const profilePage = pageType === 'profile'
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'ProfilePage',
+      '@id': `${canonicalURL}#profilepage`,
+      url: canonicalURL,
+      name: title,
+      description,
+      inLanguage: 'en',
+      dateCreated: '2019-01-17',
+      dateModified: new Date().toISOString(),
+      mainEntity: person,
+      about: person,
+      copyrightYear: currentYear,
+      copyrightHolder: person,
+      publisher: person,
+      image: { '@type': 'ImageObject', url: OG_IMAGE, width: 1200, height: 630 }
+    }
+  : {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      '@id': `${canonicalURL}#webpage`,
+      url: canonicalURL,
+      name: title,
+      description,
+      inLanguage: 'en',
+      isPartOf: { '@id': `${SITE_URL}/#website` },
+      author: person,
+      publisher: person,
+      primaryImageOfPage: { '@type': 'ImageObject', url: ogImage }
+    };
 
-const breadcrumb = {
+const defaultBreadcrumb = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
@@ -75,6 +97,8 @@ const breadcrumb = {
     }
   ]
 };
+
+const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : defaultBreadcrumb);
 ---
 <!doctype html>
 <html lang="en">
@@ -109,28 +133,30 @@ const breadcrumb = {
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="Ralph Jonas Mungcal" />
     <meta property="og:title" content={title} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={OG_IMAGE} />
-    <meta property="og:image:alt" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:type" content="image/png" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:creator" content="@ItsRalphSenpai" />
-    <meta name="twitter:site" content="@ItsRalphSenpai" />
+    <meta name="twitter:creator" content="@ralphsenpaidev" />
+    <meta name="twitter:site" content="@ralphsenpaidev" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={OG_IMAGE} />
-    <meta name="twitter:image:alt" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
     <meta name="theme-color" content="#fdfbf0" />
     <link rel="manifest" href="/manifest.webmanifest" crossorigin="anonymous" />
 
     <script is:inline type="application/ld+json" set:html={JSON.stringify(profilePage)}></script>
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumb)}></script>
+    {resolvedBreadcrumb && (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(resolvedBreadcrumb)}></script>
+    )}
 
     <slot name="head" />
 

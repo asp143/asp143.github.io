@@ -56,7 +56,7 @@ const sideProjectItemList = {
     '@type': 'ListItem',
     position: index + 1,
     item: {
-      '@type': 'WebSite',
+      '@type': 'CreativeWork',
       name: project.name,
       url: project.url,
       description: project.description,
@@ -66,7 +66,7 @@ const sideProjectItemList = {
 };
 ---
 
-<BaseLayout>
+<BaseLayout pageType="profile">
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(projectItemList)}></script>
     <script is:inline type="application/ld+json" set:html={JSON.stringify(sideProjectItemList)}></script>
@@ -97,13 +97,14 @@ const sideProjectItemList = {
           <span style="color: var(--color-ink-muted);">--verbose</span>
         </div>
 
-        <h1 class="hero-name" aria-label="Ralph Jonas">
-          <span class="hero-name-line">
+        <h1 class="hero-name">
+          <span class="visually-hidden">Ralph Jonas Mungcal — Full-Stack Developer & AI Integration Specialist</span>
+          <span class="hero-name-line" aria-hidden="true">
             {'Ralph'.split('').map(letter => (
               <span class="hero-name-letter motion-letter">{letter}</span>
             ))}
           </span>
-          <span class="hero-name-line">
+          <span class="hero-name-line" aria-hidden="true">
             {'Jonas'.split('').map(letter => (
               <span class="hero-name-letter motion-letter">{letter}</span>
             ))}
