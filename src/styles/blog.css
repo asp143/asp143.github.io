@@ -345,6 +345,33 @@
   margin: 1.5rem 0;
 }
 
+.post-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  text-decoration: none;
+  background: var(--color-surface);
+  border: var(--border-w) solid var(--color-border);
+  box-shadow: var(--shadow-hard-sm);
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.post-back:hover,
+.post-back:focus-visible {
+  transform: translate(-2px, -2px);
+  background: var(--color-accent);
+  outline: none;
+}
+
+.post-back-arrow {
+  font-weight: 800;
+}
+
 .related-posts {
   margin-top: 3.5rem;
   padding-top: 1.5rem;
