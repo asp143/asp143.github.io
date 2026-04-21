@@ -345,6 +345,96 @@
   margin: 1.5rem 0;
 }
 
+.related-posts {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: var(--border-w) solid var(--color-border);
+}
+
+.related-posts-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.related-posts-prompt {
+  color: var(--color-accent);
+  font-weight: 800;
+}
+
+.related-posts-cmd {
+  font-weight: 700;
+  color: var(--color-ink-soft);
+}
+
+.related-posts-title {
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  font-weight: 800;
+  margin: 0 0 1rem;
+  color: var(--color-ink);
+}
+
+.related-posts-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.related-posts-item {
+  margin: 0;
+}
+
+.related-posts-link {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  border: var(--border-w) solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-hard-sm);
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.related-posts-link:hover,
+.related-posts-link:focus-visible {
+  transform: translate(-2px, -2px);
+  background: var(--color-accent);
+  outline: none;
+}
+
+.related-posts-link-title {
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.related-posts-link-desc {
+  font-size: 0.88rem;
+  color: var(--color-ink-soft);
+  line-height: 1.45;
+}
+
+.related-posts-link:hover .related-posts-link-desc,
+.related-posts-link:focus-visible .related-posts-link-desc {
+  color: var(--color-ink);
+}
+
+.related-posts-link-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--color-ink-soft);
+}
+
+.related-posts-link-tag {
+  font-weight: 700;
+}
+
 .post-nav {
   display: flex;
   justify-content: space-between;

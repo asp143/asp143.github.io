@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getPublishedPosts, formatPubDateLong } from '../../utils/blog';
+import { getPublishedPosts, formatPubDateLong, getRelatedPosts } from '../../utils/blog';
 import '../../styles/blog.css';
 
 export async function getStaticPaths() {
@@ -19,6 +19,7 @@ const allPosts = await getPublishedPosts();
 const currentIndex = allPosts.findIndex((p) => p.id === post.id);
 const prevPost = currentIndex >= 0 ? allPosts[currentIndex + 1] : undefined;
 const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : undefined;
+const relatedPosts = getRelatedPosts(post, allPosts, 3);
 
 const canonicalURL = post.data.canonical
   ?? `https://ralphjonas.com/blog/${post.id}/`;
@@ -98,6 +99,33 @@ const breadcrumb = {
         <Content />
       </div>
     </article>
+
+    {relatedPosts.length > 0 && (
+      <aside class="related-posts" aria-labelledby="related-posts-heading">
+        <div class="related-posts-header">
+          <span class="related-posts-prompt">$</span>
+          <span class="related-posts-cmd">grep -l related --tags</span>
+        </div>
+        <h2 id="related-posts-heading" class="related-posts-title">related reading</h2>
+        <ul class="related-posts-list">
+          {relatedPosts.map((related) => (
+            <li class="related-posts-item">
+              <a href={`/blog/${related.id}/`} class="related-posts-link">
+                <span class="related-posts-link-title">{related.data.title}</span>
+                <span class="related-posts-link-desc">{related.data.description}</span>
+                {related.data.tags.length > 0 && (
+                  <span class="related-posts-link-tags">
+                    {related.data.tags.map((tag) => (
+                      <span class="related-posts-link-tag">#{tag}</span>
+                    ))}
+                  </span>
+                )}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    )}
 
     <nav class="post-nav" aria-label="Post navigation">
       {prevPost ? (
