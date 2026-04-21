@@ -1,0 +1,119 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts, formatPubDateLong } from '../../utils/blog';
+import '../../styles/blog.css';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const allPosts = await getPublishedPosts();
+const currentIndex = allPosts.findIndex((p) => p.id === post.id);
+const prevPost = currentIndex >= 0 ? allPosts[currentIndex + 1] : undefined;
+const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : undefined;
+
+const canonicalURL = post.data.canonical
+  ?? `https://ralphjonas.com/blog/${post.id}/`;
+
+const blogPosting = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  '@id': `${canonicalURL}#blogposting`,
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+  keywords: post.data.tags.join(', '),
+  author: { '@id': 'https://ralphjonas.com/#person' },
+  publisher: { '@id': 'https://ralphjonas.com/#person' },
+  mainEntityOfPage: canonicalURL,
+  image: 'https://ralphjonas.com/og.png',
+  inLanguage: 'en'
+};
+
+const breadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ralphjonas.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Writing', item: 'https://ralphjonas.com/blog/' },
+    { '@type': 'ListItem', position: 3, name: post.data.title, item: canonicalURL }
+  ]
+};
+---
+
+<BaseLayout title={`${post.data.title} — Ralph Jonas Mungcal`} description={post.data.description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(blogPosting)}></script>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumb)}></script>
+    {post.data.canonical && <link rel="canonical" href={post.data.canonical} />}
+  </Fragment>
+
+  <main class="post-page">
+    <div class="blog-shell-bar" role="banner">
+      <div class="blog-shell-bar-dots" aria-hidden="true">
+        <span class="blog-shell-bar-dot blog-shell-bar-dot--live"></span>
+        <span class="blog-shell-bar-dot"></span>
+        <span class="blog-shell-bar-dot"></span>
+      </div>
+      <span>ralph@jonas:~/writing/{post.id} — post.md</span>
+    </div>
+
+    <article>
+      <div class="post-meta">
+        <span class="post-meta-prompt">$</span>
+        <span class="post-meta-cmd">cat {post.id}.md</span>
+      </div>
+
+      <time class="post-date" datetime={post.data.pubDate.toISOString()}>
+        {formatPubDateLong(post.data.pubDate)}
+        {post.data.updatedDate && (
+          <> &middot; updated {formatPubDateLong(post.data.updatedDate)}</>
+        )}
+      </time>
+
+      <h1 class="post-title">
+        {post.data.title}<span class="post-period">_</span>
+      </h1>
+
+      {post.data.tags.length > 0 && (
+        <div class="post-tags" aria-label="Tags">
+          {post.data.tags.map((tag) => (
+            <span class="post-tag">#{tag}</span>
+          ))}
+        </div>
+      )}
+
+      <hr class="post-rule" role="presentation" />
+
+      <div class="post-content">
+        <Content />
+      </div>
+    </article>
+
+    <nav class="post-nav" aria-label="Post navigation">
+      {prevPost ? (
+        <a href={`/blog/${prevPost.id}/`} class="post-nav-link">
+          &larr; {prevPost.data.title}
+        </a>
+      ) : (
+        <a href="/blog/" class="post-nav-link">&larr; all posts</a>
+      )}
+      {nextPost ? (
+        <a href={`/blog/${nextPost.id}/`} class="post-nav-link">
+          {nextPost.data.title} &rarr;
+        </a>
+      ) : (
+        <a href="/" class="post-nav-link">$ cd ~/</a>
+      )}
+    </nav>
+  </main>
+</BaseLayout>

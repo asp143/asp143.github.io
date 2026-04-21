@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts, formatPubDate } from '../../utils/blog';
+import '../../styles/blog.css';
+
+const posts = await getPublishedPosts();
+
+const title = 'Writing — Ralph Jonas Mungcal';
+const description = 'Notes on software engineering, AI integration, career, and craft by Ralph Jonas Mungcal.';
+---
+
+<BaseLayout title={title} description={description}>
+  <main class="blog-page">
+    <div class="blog-shell-bar" role="banner">
+      <div class="blog-shell-bar-dots" aria-hidden="true">
+        <span class="blog-shell-bar-dot blog-shell-bar-dot--live"></span>
+        <span class="blog-shell-bar-dot"></span>
+        <span class="blog-shell-bar-dot"></span>
+      </div>
+      <span>ralph@jonas:~/writing — blog.sh</span>
+    </div>
+
+    <div class="blog-header">
+      <span class="blog-header-prompt">$</span>
+      <span class="blog-header-cmd">ls ./writing/</span>
+      <span class="blog-header-flag">--sort=date -r</span>
+    </div>
+    <hr class="blog-rule" role="presentation" />
+
+    <p class="blog-intro">
+      notes on software engineering, ai integration, career, and craft. written in plain language, not clickbait.
+    </p>
+
+    {posts.length === 0 ? (
+      <p class="blog-empty">no posts yet. check back soon.</p>
+    ) : (
+      <ul class="blog-list" role="list">
+        {posts.map((post) => (
+          <li class="blog-list-item">
+            <a href={`/blog/${post.id}/`} class="blog-list-link">
+              <time class="blog-list-date" datetime={post.data.pubDate.toISOString()}>
+                {formatPubDate(post.data.pubDate)}
+              </time>
+              <span class="blog-list-title">{post.data.title}</span>
+              <span class="blog-list-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <div class="post-nav">
+      <a href="/" class="post-nav-link">$ cd ~/</a>
+      <a href="/rss.xml" class="post-nav-link">rss.xml</a>
+    </div>
+  </main>
+</BaseLayout>

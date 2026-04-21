@@ -1,13 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getBlogPosts } from '../utils/blog-feed';
+import { getPublishedPosts, formatPubDate, toIsoDate } from '../utils/blog';
 import '../styles/home.css';
 
 const currentYear = new Date().getFullYear();
 
-const BLOG_FEED_URL = 'https://ralphdev.bearblog.dev/feed/';
 const MAX_POSTS = 5;
-const blogPosts = await getBlogPosts(BLOG_FEED_URL, MAX_POSTS);
+const allPosts = await getPublishedPosts();
+const blogPosts = allPosts.slice(0, MAX_POSTS).map((post) => ({
+  title: post.data.title,
+  date: formatPubDate(post.data.pubDate),
+  datetime: toIsoDate(post.data.pubDate),
+  url: `/blog/${post.id}/`
+}));
 
 const HERO_SUBTITLE = 'full-stack developer & ai integration specialist. i build scalable, practical software — backend architecture, cloud infra, dev tooling, ai-powered workflows.';
 
@@ -326,7 +331,7 @@ const sideProjectItemList = {
           {blogPosts.length > 0 ? (
             blogPosts.map((post) => (
               <li>
-                <a href={post.url} class="writing-row motion-stagger" target="_blank" rel="noopener noreferrer">
+                <a href={post.url} class="writing-row motion-stagger">
                   <time class="writing-date" datetime={post.datetime}>{post.date}</time>
                   <span class="writing-title">{post.title}</span>
                   <span class="writing-arrow" aria-hidden="true">&rarr;</span>
@@ -335,12 +340,12 @@ const sideProjectItemList = {
             ))
           ) : (
             <li>
-              <p class="writing-empty">posts taking a coffee break. visit the blog directly.</p>
+              <p class="writing-empty">posts taking a coffee break. check back soon.</p>
             </li>
           )}
         </ul>
 
-        <a href="https://ralphdev.bearblog.dev/" class="writing-view-all motion-fade" target="_blank" rel="noopener noreferrer">
+        <a href="/blog/" class="writing-view-all motion-fade">
           view all posts <span aria-hidden="true">&rarr;</span>
         </a>
       </div>
