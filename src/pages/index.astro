@@ -10,9 +10,62 @@ const MAX_POSTS = 5;
 const blogPosts = await getBlogPosts(BLOG_FEED_URL, MAX_POSTS);
 
 const HERO_SUBTITLE = 'full-stack developer & ai integration specialist. i build scalable, practical software — backend architecture, cloud infra, dev tooling, ai-powered workflows.';
+
+const featuredProjects = [
+  { name: 'flight-rewards-search', stack: ['Node.js', 'TypeScript', 'PostgreSQL', 'GCP'], description: 'Technical lead for a UK-based SaaS — reward flight availability search across major airlines.' },
+  { name: 'billing-payment-platform', stack: ['Node.js', 'TypeScript', 'GCP', 'Event-driven'], description: 'Multi-gateway payment orchestration with unified subscription billing, dunning, and smart retry.' },
+  { name: 'airline-data-bots', stack: ['TypeScript', 'Puppeteer', 'BullMQ'], description: 'Automated scrapers collecting flight availability data from multiple airline sources on schedule.' },
+  { name: 'remote-mcp-server', stack: ['TypeScript', 'Node.js', 'Docker'], description: 'Model Context Protocol server over URL — AI assistants hit custom tools via SSE transport.' },
+  { name: 'home-infra-lab', stack: ['Docker', 'Linux', 'TrueNAS', 'Tailscale'], description: 'Multi-node self-hosted services — NAS, media, workflow automation, monitoring dashboards.' }
+];
+
+const sideProjects = [
+  { name: 'subconscious', url: 'https://subconsciousapp.co', description: 'Subscription tracking — take control of recurring expenses.' },
+  { name: 'spot-the-synth', url: 'https://spotthesynth.com', description: 'Community-driven AI photo spotting and discussion.' },
+  { name: 'the-leon-files', url: 'https://theleonfiles.com', description: 'Fan site — Leon Kennedy, Resident Evil.' }
+];
+
+const projectItemList = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Featured Projects by Ralph Jonas Mungcal',
+  itemListElement: featuredProjects.map((project, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    item: {
+      '@type': 'CreativeWork',
+      name: project.name,
+      description: project.description,
+      keywords: project.stack.join(', '),
+      creator: { '@id': 'https://ralphjonas.com/#person' }
+    }
+  }))
+};
+
+const sideProjectItemList = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Side Projects by Ralph Jonas Mungcal',
+  itemListElement: sideProjects.map((project, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    item: {
+      '@type': 'WebSite',
+      name: project.name,
+      url: project.url,
+      description: project.description,
+      creator: { '@id': 'https://ralphjonas.com/#person' }
+    }
+  }))
+};
 ---
 
 <BaseLayout>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(projectItemList)}></script>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(sideProjectItemList)}></script>
+  </Fragment>
+
   <div class="scroll-dot" aria-hidden="true"></div>
 
   <main class="portfolio-page">

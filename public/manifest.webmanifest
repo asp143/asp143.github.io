@@ -1,1 +1,18 @@
-{"name":"Ralph Jonas Mungcal","short_name":"Ralph","description":"Web Developer and Cyber security Guy","start_url":"/","background_color":"#a0d8f1","theme_color":"#6574cd","display":"standalone","icons":[{"src":"/favicon.ico","sizes":"192x192","type":"image/png"},{"src":"/favicon.ico","sizes":"512x512","type":"image/png"}],"cacheDigest":null}
+{
+  "name": "Ralph Jonas Mungcal — Full-Stack Developer & AI Integration Specialist",
+  "short_name": "Ralph Jonas",
+  "description": "Full-Stack Developer & AI Integration Specialist building scalable platforms, automation systems, and AI-enabled products.",
+  "start_url": "/",
+  "scope": "/",
+  "background_color": "#fdfbf0",
+  "theme_color": "#fdfbf0",
+  "display": "standalone",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/favicons/favicon-16x16.png", "sizes": "16x16", "type": "image/png" },
+    { "src": "/favicons/favicon-32x32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "/favicons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/favicons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/favicons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
