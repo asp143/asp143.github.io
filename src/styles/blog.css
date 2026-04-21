@@ -107,6 +107,10 @@
   outline: none;
 }
 
+.blog-list-link:focus-visible {
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
 .blog-list-date {
   font-size: 0.82rem;
   color: var(--color-ink-muted);
@@ -118,6 +122,7 @@
   font-weight: 700;
   color: var(--color-ink);
   letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
 .blog-list-arrow {
@@ -187,6 +192,7 @@
   letter-spacing: -0.03em;
   line-height: 1.05;
   margin-bottom: 1.1rem;
+  text-wrap: balance;
 }
 
 .post-period {
@@ -349,6 +355,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  min-height: 44px;
+  margin-top: clamp(-2rem, -3vh, -1rem);
   margin-bottom: 1.5rem;
   padding: 0.5rem 0.85rem;
   font-size: 0.85rem;
@@ -370,6 +378,7 @@
 
 .post-back-arrow {
   font-weight: 800;
+  line-height: 1;
 }
 
 .related-posts {
@@ -437,16 +446,23 @@
 .related-posts-link-title {
   font-weight: 800;
   font-size: 1rem;
+  text-wrap: balance;
 }
 
 .related-posts-link-desc {
   font-size: 0.88rem;
   color: var(--color-ink-soft);
   line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .related-posts-link:hover .related-posts-link-desc,
-.related-posts-link:focus-visible .related-posts-link-desc {
+.related-posts-link:focus-visible .related-posts-link-desc,
+.related-posts-link:hover .related-posts-link-tags,
+.related-posts-link:focus-visible .related-posts-link-tags {
   color: var(--color-ink);
 }
 
@@ -473,6 +489,9 @@
 }
 
 .post-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--color-ink);
@@ -488,4 +507,27 @@
   transform: translate(-2px, -2px);
   background: var(--color-accent);
   outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-back,
+  .post-nav-link,
+  .related-posts-link,
+  .blog-list-link,
+  .blog-list-arrow {
+    transition: background 0.12s ease;
+  }
+
+  .post-back:hover,
+  .post-back:focus-visible,
+  .post-nav-link:hover,
+  .post-nav-link:focus-visible,
+  .related-posts-link:hover,
+  .related-posts-link:focus-visible {
+    transform: none;
+  }
+
+  .blog-list-link:hover .blog-list-arrow {
+    transform: none;
+  }
 }
