@@ -718,7 +718,7 @@ a.brut-card {
   font-weight: 600;
   color: var(--color-accent);
   flex-shrink: 0;
-  min-width: 7ch;
+  min-width: 12ch;
   font-variant-numeric: tabular-nums;
 }
 
