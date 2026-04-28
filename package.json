@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "node scripts/generate-blog-og.mjs",
     "build": "astro build",
     "check": "astro check",
     "preview": "astro preview",
     "generate:og": "node scripts/generate-og.mjs",
+    "generate:blog-og": "node scripts/generate-blog-og.mjs",
     "generate:icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {

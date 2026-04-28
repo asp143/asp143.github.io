@@ -6,7 +6,8 @@ import {
   formatPubDateLong,
   getRelatedPosts,
   getWordCount,
-  getReadingTimeMinutes
+  getReadingTimeMinutes,
+  tagToSlug
 } from '../../utils/blog';
 import '../../styles/blog.css';
 
@@ -32,6 +33,9 @@ const canonicalURL = post.data.canonical
 
 const wordCount = getWordCount(post.body);
 const readingTime = getReadingTimeMinutes(wordCount);
+const dateModified = (post.data.updatedDate ?? post.data.pubDate).toISOString();
+const ogImage = `https://ralphjonas.com/og/${post.id}.png`;
+const ogImageAlt = `${post.data.title} — article cover by Ralph Jonas Mungcal`;
 
 const blogPosting = {
   '@context': 'https://schema.org',
@@ -40,15 +44,16 @@ const blogPosting = {
   headline: post.data.title,
   description: post.data.description,
   datePublished: post.data.pubDate.toISOString(),
-  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+  dateModified,
   keywords: post.data.tags.join(', '),
   author: { '@id': 'https://ralphjonas.com/#person' },
   publisher: { '@id': 'https://ralphjonas.com/#person' },
   mainEntityOfPage: canonicalURL,
-  image: 'https://ralphjonas.com/og.png',
+  image: ogImage,
   inLanguage: 'en',
   wordCount,
-  timeRequired: `PT${readingTime}M`
+  timeRequired: `PT${readingTime}M`,
+  isPartOf: { '@id': 'https://ralphjonas.com/#website' }
 };
 
 const breadcrumb = {
@@ -67,6 +72,9 @@ const breadcrumb = {
   description={post.data.description}
   canonicalURL={canonicalURL}
   ogType="article"
+  ogImage={ogImage}
+  ogImageAlt={ogImageAlt}
+  dateModified={dateModified}
   breadcrumb={breadcrumb}
 >
   <Fragment slot="head">
@@ -117,7 +125,7 @@ const breadcrumb = {
       {post.data.tags.length > 0 && (
         <div class="post-tags" aria-label="Tags">
           {post.data.tags.map((tag) => (
-            <span class="post-tag">#{tag}</span>
+            <a class="post-tag" href={`/blog/tags/${tagToSlug(tag)}/`}>#{tag}</a>
           ))}
         </div>
       )}

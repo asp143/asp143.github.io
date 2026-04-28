@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getAllTags } from '../../../utils/blog';
+import '../../../styles/blog.css';
+
+const tags = await getAllTags();
+
+const title = 'Tags — Writing by Ralph Jonas Mungcal';
+const description = 'Browse posts by topic — software engineering, AI integration, career, and craft.';
+const canonicalURL = 'https://ralphjonas.com/blog/tags/';
+
+const breadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ralphjonas.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Writing', item: 'https://ralphjonas.com/blog/' },
+    { '@type': 'ListItem', position: 3, name: 'Tags', item: canonicalURL }
+  ]
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalURL={canonicalURL}
+  breadcrumb={breadcrumb}
+>
+  <main class="blog-page">
+    <h1 class="visually-hidden">All tags</h1>
+
+    <div class="blog-shell-bar" role="banner">
+      <div class="blog-shell-bar-dots" aria-hidden="true">
+        <span class="blog-shell-bar-dot blog-shell-bar-dot--live"></span>
+        <span class="blog-shell-bar-dot"></span>
+        <span class="blog-shell-bar-dot"></span>
+      </div>
+      <span>ralph@jonas:~/writing — ls tags/</span>
+    </div>
+
+    <div class="blog-header">
+      <span class="blog-header-prompt">$</span>
+      <span class="blog-header-cmd">ls ./tags/</span>
+      <span class="blog-header-flag">--by-count</span>
+    </div>
+    <hr class="blog-rule" role="presentation" />
+
+    <p class="blog-intro">browse posts by topic. {tags.length} tags total.</p>
+
+    <ul class="tag-cloud" role="list">
+      {tags.map((entry) => (
+        <li>
+          <a class="post-tag" href={`/blog/tags/${entry.slug}/`}>
+            #{entry.tag} <span style="color: var(--color-ink-muted); margin-left: 0.25rem;">{entry.count}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="post-nav">
+      <a href="/blog/" class="post-nav-link">&larr; all posts</a>
+      <a href="/" class="post-nav-link">$ cd ~/</a>
+    </div>
+  </main>
+
+  <style>
+    .tag-cloud {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .tag-cloud .post-tag {
+      font-size: 0.95rem;
+      padding: 0.4rem 0.7rem;
+      text-decoration: none;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+
+    .tag-cloud .post-tag:hover,
+    .tag-cloud .post-tag:focus-visible {
+      background: var(--color-accent);
+      transform: translate(-2px, -2px);
+      outline: none;
+    }
+  </style>
+</BaseLayout>

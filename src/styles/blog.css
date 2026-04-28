@@ -222,6 +222,15 @@
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-ink);
+  text-decoration: none;
+  transition: background 0.12s ease, transform 0.12s ease;
+}
+
+a.post-tag:hover,
+a.post-tag:focus-visible {
+  background: var(--color-accent);
+  transform: translate(-1px, -1px);
+  outline: none;
 }
 
 .post-rule {
