@@ -46,6 +46,33 @@ export function getReadingTimeMinutes(wordCount: number): number {
   return Math.max(1, Math.round(wordCount / 225));
 }
 
+export function tagToSlug(tag: string): string {
+  return tag
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export async function getAllTags(): Promise<{ tag: string; slug: string; count: number }[]> {
+  const posts = await getPublishedPosts();
+  const counts = new Map<string, { tag: string; count: number }>();
+  for (const post of posts) {
+    for (const tag of post.data.tags) {
+      const slug = tagToSlug(tag);
+      const current = counts.get(slug);
+      if (current) {
+        current.count += 1;
+      } else {
+        counts.set(slug, { tag, count: 1 });
+      }
+    }
+  }
+  return [...counts.entries()]
+    .map(([slug, value]) => ({ slug, tag: value.tag, count: value.count }))
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+}
+
 export function getRelatedPosts(
   current: BlogEntry,
   all: BlogEntry[],

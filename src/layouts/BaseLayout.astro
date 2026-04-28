@@ -19,12 +19,15 @@ const {
   ogType = 'website',
   pageType = 'page',
   breadcrumb,
-  suppressDefaultBreadcrumb = false
+  suppressDefaultBreadcrumb = false,
+  dateModified,
+  noindex = false
 } = Astro.props;
 
 const canonicalURL = canonicalOverride ?? new URL(Astro.url.pathname, SITE_URL).toString();
 const currentYear = new Date().getFullYear();
 const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
+const robotsContent = noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large';
 
 const person = {
   '@type': 'Person',
@@ -34,7 +37,7 @@ const person = {
   url: SITE_URL,
   image: OG_IMAGE,
   jobTitle: 'Full-Stack Developer & AI Integration Specialist',
-  description,
+  description: 'Full-Stack Developer & AI Integration Specialist building scalable platforms, automation systems, and AI-enabled products.',
   nationality: { '@type': 'Country', name: 'Philippines' },
   knowsAbout: [
     'Full-Stack Development',
@@ -53,35 +56,67 @@ const person = {
   ]
 };
 
+const website = {
+  '@type': 'WebSite',
+  '@id': `${SITE_URL}/#website`,
+  url: SITE_URL,
+  name: 'Ralph Jonas Mungcal',
+  description: 'Full-Stack Developer & AI Integration Specialist — portfolio, writing, and projects.',
+  inLanguage: 'en',
+  publisher: { '@id': `${SITE_URL}/#person` },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: `${SITE_URL}/blog/?q={search_term_string}`
+    },
+    'query-input': 'required name=search_term_string'
+  }
+};
+
 const profilePage = pageType === 'profile'
   ? {
       '@context': 'https://schema.org',
-      '@type': 'ProfilePage',
-      '@id': `${canonicalURL}#profilepage`,
-      url: canonicalURL,
-      name: title,
-      description,
-      inLanguage: 'en',
-      dateModified: new Date().toISOString(),
-      mainEntity: person,
-      about: person,
-      copyrightYear: currentYear,
-      copyrightHolder: person,
-      publisher: person,
-      image: { '@type': 'ImageObject', url: OG_IMAGE, width: 1200, height: 630 }
+      '@graph': [
+        person,
+        website,
+        {
+          '@type': 'ProfilePage',
+          '@id': `${canonicalURL}#profilepage`,
+          url: canonicalURL,
+          name: title,
+          description,
+          inLanguage: 'en',
+          isPartOf: { '@id': `${SITE_URL}/#website` },
+          ...(dateModified ? { dateModified } : {}),
+          mainEntity: { '@id': `${SITE_URL}/#person` },
+          about: { '@id': `${SITE_URL}/#person` },
+          copyrightYear: currentYear,
+          copyrightHolder: { '@id': `${SITE_URL}/#person` },
+          publisher: { '@id': `${SITE_URL}/#person` },
+          image: { '@type': 'ImageObject', url: OG_IMAGE, width: 1200, height: 630 }
+        }
+      ]
     }
   : {
       '@context': 'https://schema.org',
-      '@type': 'WebPage',
-      '@id': `${canonicalURL}#webpage`,
-      url: canonicalURL,
-      name: title,
-      description,
-      inLanguage: 'en',
-      isPartOf: { '@id': `${SITE_URL}/#website` },
-      author: person,
-      publisher: person,
-      primaryImageOfPage: { '@type': 'ImageObject', url: ogImage }
+      '@graph': [
+        person,
+        website,
+        {
+          '@type': 'WebPage',
+          '@id': `${canonicalURL}#webpage`,
+          url: canonicalURL,
+          name: title,
+          description,
+          inLanguage: 'en',
+          isPartOf: { '@id': `${SITE_URL}/#website` },
+          ...(dateModified ? { dateModified } : {}),
+          author: { '@id': `${SITE_URL}/#person` },
+          publisher: { '@id': `${SITE_URL}/#person` },
+          primaryImageOfPage: { '@type': 'ImageObject', url: ogImage }
+        }
+      ]
     };
 
 const defaultBreadcrumb = {
@@ -129,7 +164,7 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="description" content={description} />
     <meta name="author" content="Ralph Jonas Mungcal" />
-    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="robots" content={robotsContent} />
 
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="Ralph Jonas Mungcal" />
