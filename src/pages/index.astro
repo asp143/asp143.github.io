@@ -19,10 +19,10 @@ const HERO_SUBTITLE = 'full-stack developer & ai integration specialist. i build
 const featuredProjects = [
   { name: 'flight-rewards-search', stack: ['Node.js', 'TypeScript', 'PostgreSQL', 'GCP'], description: 'Technical lead for a UK-based SaaS — reward flight availability search across major airlines.' },
   { name: 'billing-payment-platform', stack: ['Node.js', 'TypeScript', 'GCP', 'Event-driven'], description: 'Multi-gateway payment orchestration with unified subscription billing, dunning, and smart retry.' },
-  { name: 'airline-data-bots', stack: ['TypeScript', 'Puppeteer', 'BullMQ'], description: 'Automated scrapers collecting flight availability data from multiple airline sources on schedule.' },
-  { name: 'remote-mcp-server', stack: ['TypeScript', 'Node.js', 'Docker'], description: 'Model Context Protocol server over URL — AI assistants hit custom tools via SSE transport.' },
-  { name: 'home-infra-lab', stack: ['Docker', 'Linux', 'TrueNAS', 'Tailscale'], description: 'Multi-node self-hosted services — NAS, media, workflow automation, monitoring dashboards.' },
-  { name: 'ai-meeting-editor', stack: ['Python', 'Whisper', 'Deepgram', 'FFmpeg', 'PyTorch', 'AWS'], description: 'AI-powered meeting editor — auto-detects start and end of discussion, trims dead air to keep only the substance.' }
+  { name: 'subscription-event-bus', stack: ['Node.js', 'GCP', 'Pub/Sub'], description: 'Event-driven subscription billing on GCP Pub/Sub — async lifecycle fan-out, idempotent consumers, retry and dead-letter handling.' },
+  { name: 'ai-meeting-editor', stack: ['Python', 'Whisper', 'Deepgram', 'FFmpeg', 'PyTorch', 'AWS'], description: 'AI-powered meeting editor — auto-detects start and end of discussion, trims dead air to keep only the substance.' },
+  { name: 'ai-dev-workflow-standards', stack: ['Claude', 'OpenAI'], description: 'Internal standards for AI-assisted dev — agent setup, prompt patterns, review gates for the team.' },
+  { name: 'airline-data-bots', stack: ['TypeScript', 'Puppeteer', 'BullMQ'], description: 'Automated scrapers collecting flight availability data from multiple airline sources on schedule.' }
 ];
 
 const sideProjects = [
@@ -215,24 +215,24 @@ const sideProjectItemList = {
             <p class="project-desc">multi-gateway payment orchestration with unified subscription billing, dunning, smart retry.</p>
           </li>
           <li class="project-row motion-stagger">
-            <span class="project-name">airline-data-bots</span>
-            <span class="project-tech">ts · puppeteer · bullmq</span>
-            <p class="project-desc">automated scrapers collecting flight availability data from multiple airline sources on schedule.</p>
-          </li>
-          <li class="project-row motion-stagger">
-            <span class="project-name">remote-mcp-server</span>
-            <span class="project-tech">ts · node · docker</span>
-            <p class="project-desc">model context protocol server over url — ai assistants hit custom tools via sse transport.</p>
-          </li>
-          <li class="project-row motion-stagger">
-            <span class="project-name">home-infra-lab</span>
-            <span class="project-tech">docker · linux · truenas · tailscale</span>
-            <p class="project-desc">multi-node self-hosted services — nas, media, workflow automation, monitoring dashboards.</p>
+            <span class="project-name">subscription-event-bus</span>
+            <span class="project-tech">node · gcp · pub/sub</span>
+            <p class="project-desc">event-driven subscription billing on gcp pub/sub — async lifecycle fan-out, idempotent consumers, retry and dead-letter handling.</p>
           </li>
           <li class="project-row motion-stagger">
             <span class="project-name">ai-meeting-editor</span>
             <span class="project-tech">python · whisper · deepgram · ffmpeg · pytorch · aws</span>
             <p class="project-desc">ai-powered meeting editor — auto-detects start and end of discussion, trims dead air to keep only the substance.</p>
+          </li>
+          <li class="project-row motion-stagger">
+            <span class="project-name">ai-dev-workflow-standards</span>
+            <span class="project-tech">claude · openai</span>
+            <p class="project-desc">internal standards for ai-assisted dev — agent setup, prompt patterns, review gates for the team.</p>
+          </li>
+          <li class="project-row motion-stagger">
+            <span class="project-name">airline-data-bots</span>
+            <span class="project-tech">ts · puppeteer · bullmq</span>
+            <p class="project-desc">automated scrapers collecting flight availability data from multiple airline sources on schedule.</p>
           </li>
         </ul>
 
@@ -240,40 +240,36 @@ const sideProjectItemList = {
 
         <ul class="project-list" role="list" style="grid-template-columns: 1fr;">
           <li class="compact-row motion-stagger">
-            <span class="compact-name">airline-route-mapping</span>
-            <span class="compact-tech">ts · node</span>
+            <span class="compact-name">remote-mcp-server</span>
+            <span class="compact-tech">ts · node · docker</span>
+            <p class="compact-desc">model context protocol server over url — ai assistants hit custom tools via sse transport.</p>
+          </li>
+          <li class="compact-row motion-stagger">
+            <span class="compact-name">home-infra-lab</span>
+            <span class="compact-tech">docker · linux · truenas · tailscale</span>
+            <p class="compact-desc">multi-node self-hosted services — nas, media, workflow automation, monitoring dashboards.</p>
           </li>
           <li class="compact-row motion-stagger">
             <span class="compact-name">loyalty-points-transfer</span>
             <span class="compact-tech">node · ts · react</span>
-          </li>
-          <li class="compact-row motion-stagger">
-            <span class="compact-name">subscription-architecture</span>
-            <span class="compact-tech">node · gcp · pub/sub</span>
-          </li>
-          <li class="compact-row motion-stagger">
-            <span class="compact-name">ai-dev-workflow-standards</span>
-            <span class="compact-tech">claude · openai</span>
+            <p class="compact-desc">cross-program loyalty point transfer flow — backend conversion logic with a clean ui on top.</p>
           </li>
           <li class="compact-row motion-stagger">
             <span class="compact-name">local-ai-inference-server</span>
             <span class="compact-tech">linux · ml-inference</span>
+            <p class="compact-desc">self-hosted inference box for local llm + transcription workloads — keep data off the cloud.</p>
           </li>
           <li class="compact-row motion-stagger">
-            <span class="compact-name">accident-detection-device</span>
-            <span class="compact-tech">rpi · python</span>
-          </li>
-          <li class="compact-row motion-stagger">
-            <span class="compact-name">accident-detection-panel</span>
-            <span class="compact-tech">mongo · express · angular · node</span>
+            <span class="compact-name">airline-route-mapping</span>
+            <span class="compact-tech">ts · node</span>
           </li>
           <li class="compact-row motion-stagger">
             <span class="compact-name">audit-report-generator</span>
             <span class="compact-tech">angular · node · sql · aws</span>
           </li>
           <li class="compact-row motion-stagger">
-            <span class="compact-name">freelance-projects</span>
-            <span class="compact-tech">upwork</span>
+            <span class="compact-name">accident-detection-system</span>
+            <span class="compact-tech">rpi · python · mongo · express · angular</span>
           </li>
         </ul>
       </div>

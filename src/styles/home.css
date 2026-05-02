@@ -555,6 +555,14 @@ a.brut-card {
   color: var(--color-ink-muted);
 }
 
+.compact-desc {
+  width: 100%;
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+
 /* ===== Side Projects ===== */
 .side-project-intro {
   font-size: 0.85rem;
