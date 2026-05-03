@@ -391,7 +391,7 @@ a.brut-card {
   border: var(--border-w) solid var(--color-border);
   background: var(--color-bg-alt);
   box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.1s ease, background 0.1s ease;
+  transition: transform 0.12s ease, background 0.12s ease;
 }
 
 .focus-item::before {
@@ -437,10 +437,14 @@ a.brut-card {
   padding: 0.2rem 0.55rem;
   background: var(--color-surface);
   border: var(--border-w) solid var(--color-border);
+  box-shadow: var(--shadow-hard-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
 
 .about-stack-item:hover {
   background: var(--color-accent-soft);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-hard);
 }
 
 /* ===== Projects ===== */
@@ -457,21 +461,61 @@ a.brut-card {
   }
 }
 
+.project-list.other-work-list {
+  grid-template-columns: 1fr;
+}
+
 .project-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  padding: 0.9rem 1rem;
   border: var(--border-w) solid var(--color-border);
   background: var(--color-surface);
   box-shadow: var(--shadow-hard);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .project-row:hover,
 .project-row:focus-within {
   transform: translate(-2px, -2px);
   box-shadow: var(--shadow-hard-lg);
+  background: var(--color-accent-soft);
+}
+
+.project-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.9rem 1rem;
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+  height: 100%;
+}
+
+.project-link:hover .project-name,
+.project-link:focus-visible .project-name {
+  color: var(--color-accent);
+}
+
+.project-link:focus-visible {
+  outline: 2px dashed var(--color-accent);
+  outline-offset: 2px;
+}
+
+.project-link-arrow {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.85rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.project-link:hover .project-link-arrow,
+.project-link:focus-visible .project-link-arrow {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .project-name {
@@ -528,21 +572,29 @@ a.brut-card {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px dashed var(--color-border);
-  background: transparent;
-  transition: background 0.1s ease, padding-left 0.15s ease;
+  padding: 0.6rem 0.85rem;
+  border: var(--border-w) solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-hard-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
-.compact-row:hover {
+.compact-row:hover,
+.compact-row:focus-within {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hard-lg);
   background: var(--color-accent-soft);
-  padding-left: 1rem;
+}
+
+.compact-row:hover .compact-name {
+  color: var(--color-accent);
 }
 
 .compact-name {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-ink);
+  transition: color 0.15s ease;
 }
 
 .compact-name::before {
@@ -591,7 +643,7 @@ a.brut-card {
   border: var(--border-w) solid var(--color-border);
   background: var(--color-surface);
   box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.12s ease, background 0.12s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .side-project-view-all::before {
@@ -603,19 +655,9 @@ a.brut-card {
 .side-project-view-all:hover,
 .side-project-view-all:focus-visible {
   transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hard);
   background: var(--color-accent);
   outline: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .side-project-view-all {
-    transition: background 0.12s ease;
-  }
-
-  .side-project-view-all:hover,
-  .side-project-view-all:focus-visible {
-    transform: none;
-  }
 }
 
 .side-project-list {
@@ -653,6 +695,11 @@ a.brut-card {
   outline: none;
 }
 
+.side-project-row:hover .side-project-name,
+.side-project-row:focus-visible .side-project-name {
+  color: var(--color-accent);
+}
+
 .side-project-info {
   display: flex;
   flex-direction: column;
@@ -665,6 +712,7 @@ a.brut-card {
   font-weight: 700;
   color: var(--color-ink);
   letter-spacing: -0.01em;
+  transition: color 0.15s ease;
 }
 
 .side-project-name::before {
@@ -683,10 +731,11 @@ a.brut-card {
   color: var(--color-accent);
   font-weight: 700;
   flex-shrink: 0;
-  transition: transform 0.2s ease;
+  transition: transform 0.15s ease;
 }
 
-.side-project-row:hover .side-project-arrow {
+.side-project-row:hover .side-project-arrow,
+.side-project-row:focus-visible .side-project-arrow {
   transform: translateX(4px);
 }
 
@@ -709,13 +758,13 @@ a.brut-card {
   box-shadow: var(--shadow-hard-sm);
   text-decoration: none;
   color: inherit;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
   flex-wrap: wrap;
 }
 
 .writing-row:hover,
 .writing-row:focus-visible {
-  transform: translate(-1px, -1px);
+  transform: translate(-2px, -2px);
   box-shadow: var(--shadow-hard);
   background: var(--color-accent-soft);
   outline: none;
@@ -746,18 +795,25 @@ a.brut-card {
   color: var(--color-ink);
   flex: 1;
   min-width: 0;
+  transition: color 0.15s ease;
+}
+
+.writing-row:hover .writing-title,
+.writing-row:focus-visible .writing-title {
+  color: var(--color-accent);
 }
 
 .writing-arrow {
   font-size: 0.95rem;
   color: var(--color-ink-muted);
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: transform 0.15s ease, color 0.15s ease;
   margin-left: auto;
   flex-shrink: 0;
 }
 
-.writing-row:hover .writing-arrow {
-  transform: translateX(3px);
+.writing-row:hover .writing-arrow,
+.writing-row:focus-visible .writing-arrow {
+  transform: translateX(4px);
   color: var(--color-accent);
 }
 
@@ -785,7 +841,7 @@ a.brut-card {
   border: var(--border-w) solid var(--color-border);
   background: var(--color-surface);
   box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.12s ease, background 0.12s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .writing-view-all::before {
@@ -795,7 +851,8 @@ a.brut-card {
 
 .writing-view-all:hover,
 .writing-view-all:focus-visible {
-  transform: translate(-1px, -1px);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hard);
   background: var(--color-accent-soft);
   outline: none;
 }
@@ -831,7 +888,7 @@ a.brut-card {
   border: var(--border-w) solid var(--color-border);
   background: var(--color-surface);
   box-shadow: var(--shadow-hard);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
 .contact-link::before {
@@ -938,5 +995,36 @@ a.brut-card {
 
   .hero-scroll-arrow {
     animation: none;
+  }
+
+  .brut-card:hover,
+  .brut-card:focus-visible,
+  .project-row:hover,
+  .project-row:focus-within,
+  .compact-row:hover,
+  .compact-row:focus-within,
+  .side-project-row:hover,
+  .side-project-row:focus-visible,
+  .writing-row:hover,
+  .writing-row:focus-visible,
+  .contact-link:hover,
+  .contact-link:focus-visible,
+  .contact-link.is-highlighted,
+  .side-project-view-all:hover,
+  .side-project-view-all:focus-visible,
+  .writing-view-all:hover,
+  .writing-view-all:focus-visible,
+  .focus-item:hover,
+  .about-stack-item:hover {
+    transform: none;
+  }
+
+  .side-project-row:hover .side-project-arrow,
+  .side-project-row:focus-visible .side-project-arrow,
+  .writing-row:hover .writing-arrow,
+  .writing-row:focus-visible .writing-arrow,
+  .project-link:hover .project-link-arrow,
+  .project-link:focus-visible .project-link-arrow {
+    transform: none;
   }
 }
