@@ -1,4 +1,5 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPublishedPosts, formatPubDate, toIsoDate } from '../utils/blog';
 import '../styles/home.css';
@@ -16,14 +17,19 @@ const blogPosts = allPosts.slice(0, MAX_POSTS).map((post) => ({
 
 const HERO_SUBTITLE = 'full-stack developer & ai integration specialist. i build scalable, practical software — backend architecture, cloud infra, dev tooling, ai-powered workflows.';
 
-const featuredProjects = [
-  { name: 'flight-rewards-search', stack: ['Node.js', 'TypeScript', 'PostgreSQL', 'GCP'], description: 'Technical lead for a UK-based SaaS — reward flight availability search across major airlines.' },
-  { name: 'billing-payment-platform', stack: ['Node.js', 'TypeScript', 'GCP', 'Event-driven'], description: 'Multi-gateway payment orchestration with unified subscription billing, dunning, and smart retry.' },
-  { name: 'subscription-event-bus', stack: ['Node.js', 'GCP', 'Pub/Sub'], description: 'Event-driven subscription billing on GCP Pub/Sub — async lifecycle fan-out, idempotent consumers, retry and dead-letter handling.' },
-  { name: 'ai-meeting-editor', stack: ['Python', 'Whisper', 'Deepgram', 'FFmpeg', 'PyTorch', 'AWS'], description: 'AI-powered meeting editor — auto-detects start and end of discussion, trims dead air to keep only the substance.' },
-  { name: 'ai-dev-workflow-standards', stack: ['Claude', 'OpenAI'], description: 'Internal standards for AI-assisted dev — agent setup, prompt patterns, review gates for the team.' },
-  { name: 'airline-data-bots', stack: ['TypeScript', 'Puppeteer', 'BullMQ'], description: 'Automated scrapers collecting flight availability data from multiple airline sources on schedule.' }
-];
+const projectEntries = await getCollection('projects', ({ data }) => !data.draft);
+const featuredProjects = projectEntries
+  .filter((entry) => entry.data.featured)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 6)
+  .map((entry) => ({
+    slug: entry.id,
+    name: entry.data.name,
+    stack: entry.data.stack,
+    tech: entry.data.tech ?? entry.data.stack.map((s) => s.toLowerCase()).join(' · '),
+    description: entry.data.description,
+    url: `/projects/${entry.id}/`
+  }));
 
 const sideProjects = [
   { name: 'subconscious', url: 'https://subconsciousapp.co', description: 'Subscription tracking — take control of recurring expenses.' },
@@ -39,9 +45,12 @@ const projectItemList = {
   itemListElement: featuredProjects.map((project, index) => ({
     '@type': 'ListItem',
     position: index + 1,
+    url: `https://ralphjonas.com${project.url}`,
     item: {
       '@type': 'CreativeWork',
+      '@id': `https://ralphjonas.com${project.url}#project`,
       name: project.name,
+      url: `https://ralphjonas.com${project.url}`,
       description: project.description,
       keywords: project.stack.join(', '),
       creator: { '@id': 'https://ralphjonas.com/#person' }
@@ -204,41 +213,21 @@ const sideProjectItemList = {
         <hr class="section-rule" role="presentation" />
 
         <ul class="project-list" role="list">
-          <li class="project-row motion-stagger">
-            <span class="project-name">flight-rewards-search</span>
-            <span class="project-tech">node · ts · postgres · gcp</span>
-            <p class="project-desc">technical lead for a uk-based saas — reward flight availability search across major airlines.</p>
-          </li>
-          <li class="project-row motion-stagger">
-            <span class="project-name">billing-payment-platform</span>
-            <span class="project-tech">node · ts · gcp · event-driven</span>
-            <p class="project-desc">multi-gateway payment orchestration with unified subscription billing, dunning, smart retry.</p>
-          </li>
-          <li class="project-row motion-stagger">
-            <span class="project-name">subscription-event-bus</span>
-            <span class="project-tech">node · gcp · pub/sub</span>
-            <p class="project-desc">event-driven subscription billing on gcp pub/sub — async lifecycle fan-out, idempotent consumers, retry and dead-letter handling.</p>
-          </li>
-          <li class="project-row motion-stagger">
-            <span class="project-name">ai-meeting-editor</span>
-            <span class="project-tech">python · whisper · deepgram · ffmpeg · pytorch · aws</span>
-            <p class="project-desc">ai-powered meeting editor — auto-detects start and end of discussion, trims dead air to keep only the substance.</p>
-          </li>
-          <li class="project-row motion-stagger">
-            <span class="project-name">ai-dev-workflow-standards</span>
-            <span class="project-tech">claude · openai</span>
-            <p class="project-desc">internal standards for ai-assisted dev — agent setup, prompt patterns, review gates for the team.</p>
-          </li>
-          <li class="project-row motion-stagger">
-            <span class="project-name">airline-data-bots</span>
-            <span class="project-tech">ts · puppeteer · bullmq</span>
-            <p class="project-desc">automated scrapers collecting flight availability data from multiple airline sources on schedule.</p>
-          </li>
+          {featuredProjects.map((project) => (
+            <li class="project-row motion-stagger">
+              <a class="project-link" href={project.url} aria-label={`Open project: ${project.name}`}>
+                <span class="project-name">{project.name}</span>
+                <span class="project-tech">{project.tech}</span>
+                <p class="project-desc">{project.description.toLowerCase()}</p>
+                <span class="project-link-arrow" aria-hidden="true">&rarr;</span>
+              </a>
+            </li>
+          ))}
         </ul>
 
         <h3 class="other-heading motion-fade">other-work</h3>
 
-        <ul class="project-list" role="list" style="grid-template-columns: 1fr;">
+        <ul class="project-list other-work-list" role="list">
           <li class="compact-row motion-stagger">
             <span class="compact-name">remote-mcp-server</span>
             <span class="compact-tech">ts · node · docker</span>

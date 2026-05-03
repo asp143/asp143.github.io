@@ -1,0 +1,177 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/blog.css';
+import '../../styles/projects.css';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', ({ data }) => !data.draft);
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project }
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+
+const roleParts = project.data.role
+  ? project.data.role.split(/\s+[—–-]\s+/)
+  : [];
+const roleHeadline = roleParts[0]?.trim() ?? null;
+const roleResponsibilities = roleParts.slice(1).join(' — ');
+const roleItems = roleResponsibilities
+  ? roleResponsibilities.split(/\s*,\s*/).map((s) => s.trim()).filter(Boolean)
+  : [];
+
+const canonicalURL = project.data.canonical
+  ?? `https://ralphjonas.com/projects/${project.id}/`;
+
+const dateModified = project.data.updatedDate?.toISOString();
+const ogImage = 'https://ralphjonas.com/og.png';
+const ogImageAlt = `${project.data.title} — project by Ralph Jonas Mungcal`;
+
+const keywords = [
+  ...project.data.keywords,
+  ...project.data.stack
+].filter(Boolean);
+
+const creativeWork = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareSourceCode',
+  '@id': `${canonicalURL}#project`,
+  name: project.data.title,
+  alternateName: project.data.name,
+  description: project.data.description,
+  abstract: project.data.summary,
+  url: canonicalURL,
+  programmingLanguage: project.data.stack,
+  keywords: keywords.join(', '),
+  author: { '@id': 'https://ralphjonas.com/#person' },
+  creator: { '@id': 'https://ralphjonas.com/#person' },
+  isPartOf: { '@id': 'https://ralphjonas.com/#website' },
+  ...(dateModified ? { dateModified } : {}),
+  image: ogImage
+};
+
+const breadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ralphjonas.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Projects', item: 'https://ralphjonas.com/#projects' },
+    { '@type': 'ListItem', position: 3, name: project.data.title, item: canonicalURL }
+  ]
+};
+---
+
+<BaseLayout
+  title={`${project.data.title} — Ralph Jonas Mungcal`}
+  description={project.data.description}
+  canonicalURL={canonicalURL}
+  ogType="article"
+  ogImage={ogImage}
+  ogImageAlt={ogImageAlt}
+  dateModified={dateModified}
+  breadcrumb={breadcrumb}
+>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(creativeWork)}></script>
+  </Fragment>
+
+  <main
+    class="post-page project-page"
+    data-slug={project.id}
+    data-title={project.data.title}
+  >
+    <div class="blog-shell-bar" role="banner">
+      <div class="blog-shell-bar-dots" aria-hidden="true">
+        <span class="blog-shell-bar-dot blog-shell-bar-dot--live"></span>
+        <span class="blog-shell-bar-dot"></span>
+        <span class="blog-shell-bar-dot"></span>
+      </div>
+      <span>ralph@jonas:~/projects/{project.id} — readme.md</span>
+    </div>
+
+    <a href="/#projects" class="post-back" aria-label="Back to projects">
+      <span class="post-back-arrow" aria-hidden="true">&larr;</span>
+      <span class="post-back-label">all projects</span>
+    </a>
+
+    <article>
+      <div class="post-meta">
+        <span class="post-meta-prompt">$</span>
+        <span class="post-meta-cmd">cat {project.id}/readme.md</span>
+      </div>
+
+      <h1 class="post-title">
+        {project.data.name}<span class="post-period">_</span>
+      </h1>
+
+      <p class="project-tagline">{project.data.summary}</p>
+
+      <dl class="project-facts">
+        {roleHeadline && (
+          <div class="project-fact project-fact--role">
+            <dt>role</dt>
+            <dd>
+              <span class="project-role-headline">{roleHeadline}</span>
+              {roleItems.length > 0 && (
+                <ul class="project-role-list" role="list">
+                  {roleItems.map((item) => (
+                    <li class="project-role-item">{item}</li>
+                  ))}
+                </ul>
+              )}
+            </dd>
+          </div>
+        )}
+        {project.data.year && (
+          <div class="project-fact">
+            <dt>year</dt>
+            <dd>{project.data.year}</dd>
+          </div>
+        )}
+        {project.data.stack.length > 0 && (
+          <div class="project-fact project-fact--wide">
+            <dt>stack</dt>
+            <dd>
+              <ul class="project-stack" role="list">
+                {project.data.stack.map((tech) => (
+                  <li class="project-stack-chip">{tech}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        )}
+        {project.data.links.length > 0 && (
+          <div class="project-fact project-fact--wide">
+            <dt>links</dt>
+            <dd>
+              <ul class="project-links" role="list">
+                {project.data.links.map((link) => (
+                  <li>
+                    <a href={link.url} target="_blank" rel="noopener noreferrer">
+                      {link.label} &rarr;
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        )}
+      </dl>
+
+      <hr class="post-rule" role="presentation" />
+
+      <div class="post-content">
+        <Content />
+      </div>
+    </article>
+
+    <nav class="post-nav" aria-label="Project navigation">
+      <a href="/#projects" class="post-nav-link">&larr; all projects</a>
+      <a href="/" class="post-nav-link">$ cd ~/</a>
+    </nav>
+  </main>
+</BaseLayout>
