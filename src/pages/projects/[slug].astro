@@ -28,7 +28,7 @@ const canonicalURL = project.data.canonical
   ?? `https://ralphjonas.com/projects/${project.id}/`;
 
 const dateModified = project.data.updatedDate?.toISOString();
-const ogImage = 'https://ralphjonas.com/og.png';
+const ogImage = `https://ralphjonas.com/og/projects/${project.id}.png`;
 const ogImageAlt = `${project.data.title} — project by Ralph Jonas Mungcal`;
 
 const keywords = [
