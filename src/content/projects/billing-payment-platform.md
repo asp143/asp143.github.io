@@ -1,7 +1,7 @@
 ---
 name: billing-payment-platform
 title: Multi-Gateway Billing & Payment Platform
-description: Payment orchestration across multiple gateways with unified subscription billing, dunning, and smart retry logic — built in TypeScript on an event-driven GCP stack.
+description: Payment orchestration across multiple gateways with unified subscription billing, dunning, and smart retries — TypeScript on an event-driven GCP stack.
 summary: A unified subscription billing layer that abstracts multiple payment gateways behind a single domain model. Handles charges, refunds, retries, dunning, and lifecycle events without leaking gateway-specific quirks into product code.
 stack:
   - Node.js

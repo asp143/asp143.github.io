@@ -75,6 +75,8 @@ const breadcrumb = {
   ogImage={ogImage}
   ogImageAlt={ogImageAlt}
   dateModified={dateModified}
+  datePublished={post.data.pubDate.toISOString()}
+  articleTags={post.data.tags}
   breadcrumb={breadcrumb}
 >
   <Fragment slot="head">

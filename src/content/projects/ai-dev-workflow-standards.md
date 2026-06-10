@@ -1,7 +1,7 @@
 ---
 name: ai-dev-workflow-standards
 title: AI-Assisted Developer Workflow Standards
-description: Internal standards for AI-assisted development — agent setup, prompt patterns, repo conventions, and review gates that make Claude- and OpenAI-driven coding consistent and reviewable across a team.
+description: Internal standards for AI-assisted development — agent setup, prompt patterns, and review gates that keep Claude and OpenAI coding consistent across a team.
 summary: An opinionated playbook for using AI coding agents on a real codebase — how agents are configured, what they're allowed to do unattended, what they're not, and how their output gets reviewed before it lands. Built around Claude and OpenAI tooling.
 stack:
   - Claude (Anthropic)

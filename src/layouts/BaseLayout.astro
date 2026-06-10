@@ -21,6 +21,8 @@ const {
   breadcrumb,
   suppressDefaultBreadcrumb = false,
   dateModified,
+  datePublished,
+  articleTags = [],
   noindex = false
 } = Astro.props;
 
@@ -177,6 +179,19 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:type" content="image/png" />
+
+    {ogType === 'article' && datePublished && (
+      <meta property="article:published_time" content={datePublished} />
+    )}
+    {ogType === 'article' && dateModified && (
+      <meta property="article:modified_time" content={dateModified} />
+    )}
+    {ogType === 'article' && (
+      <meta property="article:author" content={SITE_URL} />
+    )}
+    {ogType === 'article' && articleTags.map((tag: string) => (
+      <meta property="article:tag" content={tag} />
+    ))}
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@ralphsenpaidev" />

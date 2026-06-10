@@ -16,6 +16,8 @@ export async function GET(context: APIContext) {
       link: `/blog/${post.id}/`,
       categories: post.data.tags
     })),
-    customData: '<language>en</language>'
+    xmlns: { atom: 'http://www.w3.org/2005/Atom' },
+    customData:
+      '<language>en</language><atom:link href="https://ralphjonas.com/rss.xml" rel="self" type="application/rss+xml"/>'
   });
 }

@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const BLOG_DIR = resolve(__dirname, '../src/content/blog');
-const OUT_DIR = resolve(__dirname, '../public/og');
+const PROJECTS_DIR = resolve(__dirname, '../src/content/projects');
+const OUT_DIR = resolve(__dirname, '../public/og/projects');
 
 if (!existsSync(OUT_DIR)) {
   mkdirSync(OUT_DIR, { recursive: true });
@@ -72,12 +72,12 @@ function wrapLines(title, maxChars, maxLines) {
   return lines;
 }
 
-function buildSvg({ title, tags }) {
+function buildSvg({ slug, title, stack }) {
   const safeTitle = escapeXml(title);
   const lines = wrapLines(safeTitle, 26, 3);
   const titleY = 290;
   const lineHeight = 78;
-  const tagItems = tags.slice(0, 4).map((t) => `#${t}`);
+  const chips = stack.slice(0, 4).map((s) => s.toLowerCase());
 
   const titleTspans = lines
     .map((line, i) => {
@@ -88,14 +88,14 @@ function buildSvg({ title, tags }) {
     })
     .join('');
 
-  let tagX = 90;
-  const tagSvg = tagItems
-    .map((tag) => {
-      const width = Math.max(80, tag.length * 14 + 30);
+  let chipX = 90;
+  const chipSvg = chips
+    .map((chip) => {
+      const width = Math.max(80, chip.length * 14 + 30);
       const block = `
-        <rect x="${tagX}" y="500" width="${width}" height="44" fill="#fdfbf0" stroke="#0a0a0a" stroke-width="2"/>
-        <text x="${tagX + 15}" y="529" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="20" font-weight="600" fill="#0a0a0a">${escapeXml(tag)}</text>`;
-      tagX += width + 14;
+        <rect x="${chipX}" y="500" width="${width}" height="44" fill="#fdfbf0" stroke="#0a0a0a" stroke-width="2"/>
+        <text x="${chipX + 15}" y="529" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="20" font-weight="600" fill="#0a0a0a">${escapeXml(chip)}</text>`;
+      chipX += width + 14;
       return block;
     })
     .join('');
@@ -118,49 +118,36 @@ function buildSvg({ title, tags }) {
   <circle cx="72" cy="66" r="7" fill="#ff6a1a"/>
   <circle cx="96" cy="66" r="7" fill="#0a0a0a" fill-opacity="0.15"/>
   <circle cx="120" cy="66" r="7" fill="#0a0a0a" fill-opacity="0.15"/>
-  <text x="160" y="73" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="18" font-weight="600" fill="#3a3a3a">ralph@jonas:~/writing — post.md</text>
+  <text x="160" y="73" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="18" font-weight="600" fill="#3a3a3a">ralph@jonas:~/projects/${escapeXml(slug)} — readme.md</text>
 
   <text x="90" y="180" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="22" fill="#6b6b66">
-    <tspan fill="#ff6a1a" font-weight="700">$</tspan> cat post.md
+    <tspan fill="#ff6a1a" font-weight="700">$</tspan> cat readme.md
   </text>
 
   <text font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="64" font-weight="800" fill="#0a0a0a" letter-spacing="-2">
     ${titleTspans}
   </text>
 
-  ${tagSvg}
+  ${chipSvg}
 
   <line x1="90" y1="585" x2="1110" y2="585" stroke="#0a0a0a" stroke-width="2"/>
-  <text x="90" y="568" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="20" font-weight="600" fill="#0a0a0a">ralphjonas.com/blog</text>
+  <text x="90" y="568" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="20" font-weight="600" fill="#0a0a0a">ralphjonas.com/projects</text>
 </svg>
 `;
 }
 
-function parseTags(raw) {
-  if (!raw) return [];
-  const trimmed = raw.trim();
-  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-    return trimmed
-      .slice(1, -1)
-      .split(',')
-      .map((t) => t.trim().replace(/^['"]|['"]$/g, ''))
-      .filter(Boolean);
-  }
-  return [];
-}
-
-const entries = readdirSync(BLOG_DIR).filter((f) => f.endsWith('.md'));
+const entries = readdirSync(PROJECTS_DIR).filter((f) => f.endsWith('.md'));
 let count = 0;
 for (const entry of entries) {
   const slug = entry.replace(/\.md$/, '');
-  const fm = readFrontmatter(join(BLOG_DIR, entry));
+  const fm = readFrontmatter(join(PROJECTS_DIR, entry));
   if (fm.draft === 'true') continue;
   const title = fm.title ?? slug;
-  const tags = Array.isArray(fm.tags) ? fm.tags : parseTags(fm.tags);
-  const svg = buildSvg({ title, tags });
+  const stack = Array.isArray(fm.stack) ? fm.stack : [];
+  const svg = buildSvg({ slug, title, stack });
   const out = join(OUT_DIR, `${slug}.png`);
   await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toFile(out);
   count += 1;
 }
 
-console.log(`generated ${count} blog OG images → ${OUT_DIR}`);
+console.log(`generated ${count} project OG images → ${OUT_DIR}`);
