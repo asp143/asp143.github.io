@@ -1,7 +1,7 @@
 ---
 name: subscription-event-bus
 title: Subscription Event Bus on GCP Pub/Sub
-description: Event-driven subscription billing on Google Cloud Pub/Sub — async lifecycle fan-out, idempotent consumers, retry policies, and dead-letter handling that keep billing reliable under load.
+description: Event-driven subscription billing on GCP Pub/Sub — lifecycle fan-out, idempotent consumers, retry policies, and dead-letter handling under load.
 summary: The event backbone behind subscription billing — a Pub/Sub-based bus that fans subscription lifecycle changes out to billing, notifications, analytics, and ops consumers. Designed for at-least-once delivery, idempotent processing, and clean recovery from upstream failures.
 stack:
   - Node.js
