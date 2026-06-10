@@ -25,11 +25,23 @@ function readFrontmatter(file) {
   const match = src.match(/^---([\s\S]*?)---/);
   if (!match) return {};
   const data = {};
+  let listKey = null;
   for (const line of match[1].split('\n')) {
-    const m = line.match(/^([a-zA-Z]+):\s*(.+)$/);
+    const item = line.match(/^\s+-\s+(.+)$/);
+    if (item && listKey) {
+      data[listKey].push(item[1].trim().replace(/^['"]|['"]$/g, ''));
+      continue;
+    }
+    const m = line.match(/^([a-zA-Z]+):\s*(.*)$/);
     if (!m) continue;
     const [, key, raw] = m;
-    data[key] = raw.trim().replace(/^['"]|['"]$/g, '');
+    if (raw.trim() === '') {
+      data[key] = [];
+      listKey = key;
+    } else {
+      data[key] = raw.trim().replace(/^['"]|['"]$/g, '');
+      listKey = null;
+    }
   }
   return data;
 }
@@ -144,7 +156,7 @@ for (const entry of entries) {
   const fm = readFrontmatter(join(BLOG_DIR, entry));
   if (fm.draft === 'true') continue;
   const title = fm.title ?? slug;
-  const tags = parseTags(fm.tags);
+  const tags = Array.isArray(fm.tags) ? fm.tags : parseTags(fm.tags);
   const svg = buildSvg({ title, tags });
   const out = join(OUT_DIR, `${slug}.png`);
   await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toFile(out);
