@@ -1,3 +1,17 @@
+/* Metric-matched fallback so the swap to JetBrains Mono doesn't shift layout.
+   JetBrains Mono is 600/1000 advance (same as generic monospace, so widths
+   already match); only its vertical metrics (ascent 1020 / descent 300) differ.
+   Overriding the fallback's metrics to match keeps line boxes stable on swap. */
+@font-face {
+  font-family: 'JetBrains Mono Fallback';
+  src: local('Menlo'), local('Consolas'), local('DejaVu Sans Mono'),
+    local('Liberation Mono'), local('Courier New');
+  size-adjust: 100%;
+  ascent-override: 102%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
 /* ===== Design Tokens — Terminal Brutalism ===== */
 :root {
   --color-bg: #fdfbf0;
@@ -17,7 +31,7 @@
 
   --border-w: 2px;
 
-  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Geist Mono', ui-monospace,
+  --font-mono: 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace,
     SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
 
