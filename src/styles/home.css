@@ -195,6 +195,20 @@
   max-width: 52ch;
   line-height: 1.6;
   min-height: 3.2em;
+  position: relative;
+}
+
+/* Invisible copy of the full subtitle reserves the final box size so the
+   typewriter never reflows the layout as it types (prevents hero CLS). */
+.hero-subtitle-sizer {
+  visibility: hidden;
+}
+
+/* The animated text is overlaid on the sizer and taken out of flow, so
+   filling it in character by character can't change the box height. */
+.hero-subtitle-typed {
+  position: absolute;
+  inset: 0;
 }
 
 .hero-subtitle-text {

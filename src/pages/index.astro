@@ -123,8 +123,12 @@ const sideProjectItemList = {
         </h1>
 
         <p class="hero-subtitle motion-fade" data-typewriter={HERO_SUBTITLE}>
-          <span class="hero-subtitle-text">{HERO_SUBTITLE}</span>
-          <span class="hero-cursor" aria-hidden="true"></span>
+          <span class="hero-subtitle-sizer" aria-hidden="true">{HERO_SUBTITLE}</span>
+          <span class="hero-subtitle-typed" aria-hidden="true">
+            <span class="hero-subtitle-text">{HERO_SUBTITLE}</span>
+            <span class="hero-cursor"></span>
+          </span>
+          <span class="visually-hidden">{HERO_SUBTITLE}</span>
         </p>
 
         <div class="hero-tags motion-fade" aria-hidden="true">
