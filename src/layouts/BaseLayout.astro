@@ -222,6 +222,11 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
             autocapture: false,
             capture_pageview: true,
             capture_pageleave: true,
+            // Skip modules we don't use so PostHog stops loading their
+            // extra bundles (surveys.js, dead-clicks, web-vitals).
+            disable_surveys: true,
+            capture_dead_clicks: false,
+            capture_performance: false,
           });
         };
         // Defer init (which loads array.js) off the critical render path.
