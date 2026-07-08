@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getPublishedPosts, formatPubDate } from '../../utils/blog';
+import { getPublishedPosts, formatPubDate, isNewPost } from '../../utils/blog';
 import '../../styles/blog.css';
 
 const posts = await getPublishedPosts();
@@ -59,7 +59,12 @@ const breadcrumb = {
                 <time class="blog-list-date" datetime={post.data.pubDate.toISOString()}>
                   {formatPubDate(post.data.pubDate)}
                 </time>
-                <span class="blog-list-title">{post.data.title}</span>
+                <span class="blog-list-title">
+                  {post.data.title}
+                  {isNewPost(post.data.pubDate) && (
+                    <span class="new-badge" data-slug={post.id} hidden>new</span>
+                  )}
+                </span>
                 <span class="blog-list-arrow" aria-hidden="true">&rarr;</span>
               </a>
             </article>
@@ -76,5 +81,6 @@ const breadcrumb = {
 
   <script>
     import '../../scripts/blog-index';
+    import '../../scripts/blog-badges';
   </script>
 </BaseLayout>

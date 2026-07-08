@@ -9,6 +9,10 @@ export async function getPublishedPosts(): Promise<BlogEntry[]> {
   );
 }
 
+export function isNewPost(pubDate: Date, windowDays = 30): boolean {
+  return Date.now() - pubDate.valueOf() < windowDays * 24 * 60 * 60 * 1000;
+}
+
 export function formatPubDate(date: Date): string {
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, '0');

@@ -114,6 +114,25 @@ h1, h2, h3, h4, h5, h6 {
   outline-offset: 3px;
 }
 
+.new-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.4rem;
+  border: var(--border-w) solid var(--color-border);
+  background: var(--color-accent);
+  color: var(--color-bg);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  vertical-align: middle;
+  transform: translateY(-1px);
+}
+
+.new-badge[hidden] {
+  display: none;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
