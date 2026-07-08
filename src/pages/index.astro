@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getPublishedPosts, formatPubDate, toIsoDate } from '../utils/blog';
+import { getPublishedPosts, formatPubDate, toIsoDate, isNewPost } from '../utils/blog';
 import '../styles/home.css';
 
 const currentYear = new Date().getFullYear();
@@ -9,10 +9,12 @@ const currentYear = new Date().getFullYear();
 const MAX_POSTS = 5;
 const allPosts = await getPublishedPosts();
 const blogPosts = allPosts.slice(0, MAX_POSTS).map((post) => ({
+  slug: post.id,
   title: post.data.title,
   date: formatPubDate(post.data.pubDate),
   datetime: toIsoDate(post.data.pubDate),
-  url: `/blog/${post.id}/`
+  url: `/blog/${post.id}/`,
+  isNew: isNewPost(post.data.pubDate)
 }));
 
 const HERO_SUBTITLE = 'full-stack developer & ai integration specialist. i build scalable, practical software — backend architecture, cloud infra, dev tooling, ai-powered workflows.';
@@ -342,7 +344,10 @@ const sideProjectItemList = {
               <li>
                 <a href={post.url} class="writing-row motion-stagger">
                   <time class="writing-date" datetime={post.datetime}>{post.date}</time>
-                  <span class="writing-title">{post.title}</span>
+                  <span class="writing-title">
+                    {post.title}
+                    {post.isNew && <span class="new-badge" data-slug={post.slug} hidden>new</span>}
+                  </span>
                   <span class="writing-arrow" aria-hidden="true">&rarr;</span>
                 </a>
               </li>
@@ -398,5 +403,6 @@ const sideProjectItemList = {
 
   <script>
     import '../scripts/home';
+    import '../scripts/blog-badges';
   </script>
 </BaseLayout>

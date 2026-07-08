@@ -3,8 +3,14 @@ type PostHogClient = {
   capture: (eventName: string, properties?: PostHogCaptureProps) => void;
 };
 
+import { markPostRead } from './read-posts';
+
 const posthog = (window as Window & { posthog?: PostHogClient }).posthog;
 const main = document.querySelector<HTMLElement>('main.post-page');
+
+if (main?.dataset.slug) {
+  markPostRead(main.dataset.slug);
+}
 
 if (posthog && main) {
   const slug = main.dataset.slug ?? '';
