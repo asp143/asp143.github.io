@@ -112,23 +112,24 @@
   gap: 0.4rem;
 }
 
+/* Mirrors .about-stack-item (daily-drivers) on the home page. */
 .project-stack-chip {
   display: inline-flex;
   align-items: center;
-  padding: 0.18rem 0.55rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 500;
   color: var(--color-ink);
-  border: 1px solid var(--color-border);
-  background: var(--color-bg);
-  letter-spacing: 0.01em;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  border: var(--border-w) solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-hard-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
 
 .project-stack-chip:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-hard-sm);
-  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-hard);
 }
 
 .project-links {
@@ -159,6 +160,6 @@
 
   .project-stack-chip:hover {
     transform: none;
-    box-shadow: none;
+    box-shadow: var(--shadow-hard-sm);
   }
 }
