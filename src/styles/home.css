@@ -245,6 +245,17 @@
   border: var(--border-w) solid var(--color-border);
   padding: 0.3rem 0.65rem;
   box-shadow: var(--shadow-hard-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+/* Hover-capable devices only: tags aren't interactive, so a tap on touch
+   screens shouldn't leave one stuck in the lifted state. */
+@media (hover: hover) {
+  .hero-tag:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-hard);
+    background: var(--color-accent-soft);
+  }
 }
 
 .hero-scroll {
@@ -1031,6 +1042,11 @@ a.brut-card {
   .focus-item:hover,
   .about-stack-item:hover {
     transform: none;
+  }
+
+  .hero-tag:hover {
+    transform: none;
+    box-shadow: var(--shadow-hard-sm);
   }
 
   .side-project-row:hover .side-project-arrow,
