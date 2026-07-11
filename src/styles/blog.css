@@ -223,13 +223,15 @@
   font-weight: 600;
   color: var(--color-ink);
   text-decoration: none;
-  transition: background 0.12s ease, transform 0.12s ease;
+  box-shadow: var(--shadow-hard-sm);
+  transition: background 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 a.post-tag:hover,
 a.post-tag:focus-visible {
   background: var(--color-accent);
   transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-hard);
   outline: none;
 }
 
@@ -621,7 +623,8 @@ a.post-tag:focus-visible {
   .post-nav-link,
   .related-posts-link,
   .blog-list-link,
-  .blog-list-arrow {
+  .blog-list-arrow,
+  .post-tag {
     transition: background 0.12s ease;
   }
 
@@ -632,6 +635,12 @@ a.post-tag:focus-visible {
   .related-posts-link:hover,
   .related-posts-link:focus-visible {
     transform: none;
+  }
+
+  a.post-tag:hover,
+  a.post-tag:focus-visible {
+    transform: none;
+    box-shadow: var(--shadow-hard-sm);
   }
 
   .blog-list-link:hover .blog-list-arrow {

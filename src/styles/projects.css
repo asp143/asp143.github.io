@@ -136,7 +136,7 @@
 }
 
 .project-stack-chip:hover {
-  background: var(--color-accent-soft);
+  background: var(--color-accent);
   transform: translate(-1px, -1px);
   box-shadow: var(--shadow-hard);
 }
