@@ -1,5 +1,10 @@
 .project-page .post-title {
   font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 0.14em;
+  text-underline-offset: 0.18em;
+  text-decoration-skip-ink: none;
 }
 
 .project-tagline {
@@ -23,7 +28,7 @@
   padding: 1rem 1.1rem;
   border: var(--border-w) solid var(--color-border);
   background: var(--color-surface);
-  box-shadow: var(--shadow-hard);
+  box-shadow: var(--shadow-hard-lg);
 }
 
 @media (min-width: 640px) {
@@ -47,12 +52,16 @@
   margin: 0;
 }
 
+/* Inverted terminal slab: reverse-video label like a selected shell prompt. */
 .project-fact dt {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  align-self: flex-start;
+  padding: 0.14rem 0.5rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-ink-muted);
+  color: var(--color-bg);
+  background: var(--color-ink);
 }
 
 .project-fact dt::before {
@@ -138,27 +147,44 @@
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1rem;
+  gap: 0.6rem 0.75rem;
 }
 
 .project-links a {
-  font-weight: 600;
-  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-ink);
   text-decoration: none;
-  border-bottom: 1px dashed currentColor;
+  border: var(--border-w) solid var(--color-border);
+  background: var(--color-accent-soft);
+  box-shadow: var(--shadow-hard-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
 
 .project-links a:hover,
 .project-links a:focus-visible {
-  color: var(--color-ink);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hard);
+  background: var(--color-accent);
+  outline: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .project-stack-chip {
+  .project-stack-chip,
+  .project-links a {
     transition: none;
   }
 
   .project-stack-chip:hover {
+    transform: none;
+    box-shadow: var(--shadow-hard-sm);
+  }
+
+  .project-links a:hover,
+  .project-links a:focus-visible {
     transform: none;
     box-shadow: var(--shadow-hard-sm);
   }
