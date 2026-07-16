@@ -379,8 +379,49 @@ const sideProjectItemList = {
         </h2>
         <hr class="section-rule" role="presentation" />
 
+        <dialog class="mail-modal" id="contact-modal" aria-labelledby="contact-modal-title">
+          <form class="mail-composer" id="contact-form" method="POST" action="https://api.web3forms.com/submit" novalidate>
+          <div class="mail-composer-bar">
+            <div class="shell-bar-dots">
+              <button type="button" class="shell-bar-dot shell-bar-dot--live mail-modal-close" aria-label="close compose window" title="close"></button>
+              <span class="shell-bar-dot"></span>
+              <span class="shell-bar-dot"></span>
+            </div>
+            <span class="mail-composer-title" id="contact-modal-title">compose — new-message.eml</span>
+            <span class="mail-modal-hint" aria-hidden="true">[esc] close</span>
+            <span class="mail-composer-mode" aria-hidden="true">-- INSERT --</span>
+          </div>
+
+          <input type="hidden" name="access_key" value="d73006a4-1984-436e-b51c-2e637168aec0" />
+          <input type="hidden" name="subject" value="new message via ralphjonas.com" />
+          <input type="checkbox" name="botcheck" class="visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <div class="mail-field mail-field--static" aria-hidden="true">
+            <span class="mail-label">to:</span>
+            <span class="mail-static-value">ralph jonas &lt;localhost&gt;</span>
+          </div>
+          <div class="mail-field">
+            <label class="mail-label" for="contact-name">from:</label>
+            <input class="mail-input" id="contact-name" type="text" name="name" placeholder="your name" autocomplete="name" required />
+          </div>
+          <div class="mail-field">
+            <label class="mail-label" for="contact-email">email:</label>
+            <input class="mail-input" id="contact-email" type="email" name="email" placeholder="your email address" autocomplete="email" required />
+          </div>
+          <div class="mail-field mail-field--body">
+            <label class="mail-label" for="contact-message">body:</label>
+            <textarea class="mail-input mail-textarea" id="contact-message" name="message" rows="6" placeholder="what should we build?" required></textarea>
+          </div>
+
+          <div class="mail-actions">
+            <button type="submit" class="mail-send">:wq — send</button>
+            <p class="mail-status" role="status" aria-live="polite"></p>
+          </div>
+          </form>
+        </dialog>
+
         <div class="contact-links">
-          <a href="mailto:ralphmungcal09@gmail.com" class="contact-link motion-stagger">email</a>
+          <button type="button" class="contact-link contact-link--wiggle motion-stagger" id="open-contact-modal">email</button>
           <a href="https://www.linkedin.com/in/ralphjonasmungcal" class="contact-link motion-stagger" target="_blank" rel="noopener noreferrer">linkedin</a>
           <a href="https://x.com/ralphsenpaidev" class="contact-link motion-stagger" target="_blank" rel="noopener noreferrer">x</a>
           <a href="https://bsky.app/profile/ralphdev.bsky.social" class="contact-link motion-stagger" target="_blank" rel="noopener noreferrer">bluesky</a>
@@ -404,5 +445,6 @@ const sideProjectItemList = {
   <script>
     import '../scripts/home';
     import '../scripts/blog-badges';
+    import '../scripts/contact-form';
   </script>
 </BaseLayout>
