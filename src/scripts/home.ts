@@ -86,13 +86,20 @@ function runEntranceAnimations() {
   document.querySelectorAll<HTMLElement>('.hero-name-letter').forEach((el, i) => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(40%)';
-    el.animate(
+    const anim = el.animate(
       [
         { opacity: 0, transform: 'translateY(40%)' },
         { opacity: 1, transform: 'translateY(0)' }
       ],
       { duration: 400, delay: i * 40, fill: 'forwards', easing: 'cubic-bezier(0.16, 1, 0.3, 1)' }
     );
+    // Release the fill-forwards lock once done so CSS hover/keyframe
+    // transforms aren't permanently overridden by the WAAPI effect
+    anim.addEventListener('finish', () => {
+      anim.cancel();
+      el.style.opacity = '';
+      el.style.transform = '';
+    });
   });
 
   // Section stagger/fade on scroll-in
@@ -105,13 +112,18 @@ function runEntranceAnimations() {
       targets.forEach((el, i) => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(8px)';
-        el.animate(
+        const anim = el.animate(
           [
             { opacity: 0, transform: 'translateY(8px)' },
             { opacity: 1, transform: 'translateY(0)' }
           ],
           { duration: 360, delay: i * 40, fill: 'forwards', easing: 'cubic-bezier(0.16, 1, 0.3, 1)' }
         );
+        anim.addEventListener('finish', () => {
+          anim.cancel();
+          el.style.opacity = '';
+          el.style.transform = '';
+        });
       });
     });
   }, { threshold: 0.08 });
