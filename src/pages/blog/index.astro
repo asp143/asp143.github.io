@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Window from '../../components/Window.astro';
 import { getPublishedPosts, formatPubDate, isNewPost } from '../../utils/blog';
 import '../../styles/blog.css';
 
@@ -25,58 +26,64 @@ const breadcrumb = {
   canonicalURL={canonicalURL}
   breadcrumb={breadcrumb}
 >
+  <a slot="menubar-back" class="menubar-back" href="/">&larr; ~/</a>
+
   <main class="blog-page">
     <h1 class="visually-hidden">Writing by Ralph Jonas Mungcal</h1>
 
-    <div class="blog-shell-bar" role="banner">
-      <div class="blog-shell-bar-dots" aria-hidden="true">
-        <span class="blog-shell-bar-dot blog-shell-bar-dot--live"></span>
-        <span class="blog-shell-bar-dot"></span>
-        <span class="blog-shell-bar-dot"></span>
+    <Window
+      title={`~/writing — ${posts.length} ${posts.length === 1 ? 'item' : 'items'}`}
+      app="writing"
+      variant="page"
+      closeHref="/"
+      statusbar
+      headingLevel={2}
+      class="blog-window"
+    >
+      <div class="blog-header">
+        <span class="blog-header-prompt">$</span>
+        <span class="blog-header-cmd">ls ./writing/</span>
+        <span class="blog-header-flag">--sort=date -r</span>
       </div>
-      <span>ralph@jonas:~/writing — blog.sh</span>
-    </div>
 
-    <div class="blog-header">
-      <span class="blog-header-prompt">$</span>
-      <span class="blog-header-cmd">ls ./writing/</span>
-      <span class="blog-header-flag">--sort=date -r</span>
-    </div>
-    <hr class="blog-rule" role="presentation" />
+      <p class="blog-intro">
+        notes on software engineering, ai integration, career, and craft. written in plain language, not clickbait.
+      </p>
 
-    <p class="blog-intro">
-      notes on software engineering, ai integration, career, and craft. written in plain language, not clickbait.
-    </p>
+      {posts.length === 0 ? (
+        <p class="blog-empty">no posts yet. check back soon.</p>
+      ) : (
+        <ul class="blog-list" role="list">
+          {posts.map((post) => (
+            <li class="blog-list-item">
+              <article>
+                <a href={`/blog/${post.id}/`} class="blog-list-link">
+                  <time class="blog-list-date" datetime={post.data.pubDate.toISOString()}>
+                    {formatPubDate(post.data.pubDate)}
+                  </time>
+                  <span class="blog-list-title">
+                    {post.data.title}
+                    {isNewPost(post.data.pubDate) && (
+                      <span class="new-badge" data-slug={post.id} hidden>new</span>
+                    )}
+                  </span>
+                  <span class="blog-list-arrow" aria-hidden="true">&rarr;</span>
+                </a>
+              </article>
+            </li>
+          ))}
+        </ul>
+      )}
 
-    {posts.length === 0 ? (
-      <p class="blog-empty">no posts yet. check back soon.</p>
-    ) : (
-      <ul class="blog-list" role="list">
-        {posts.map((post) => (
-          <li class="blog-list-item">
-            <article>
-              <a href={`/blog/${post.id}/`} class="blog-list-link">
-                <time class="blog-list-date" datetime={post.data.pubDate.toISOString()}>
-                  {formatPubDate(post.data.pubDate)}
-                </time>
-                <span class="blog-list-title">
-                  {post.data.title}
-                  {isNewPost(post.data.pubDate) && (
-                    <span class="new-badge" data-slug={post.id} hidden>new</span>
-                  )}
-                </span>
-                <span class="blog-list-arrow" aria-hidden="true">&rarr;</span>
-              </a>
-            </article>
-          </li>
-        ))}
-      </ul>
-    )}
-
-    <div class="post-nav">
-      <a href="/" class="post-nav-link">$ cd ~/</a>
-      <a href="/rss.xml" class="post-nav-link">rss.xml</a>
-    </div>
+      <Fragment slot="status">
+        <span class="statusbar-info">{posts.length} items &middot; sorted by date desc</span>
+        <span class="statusbar-unread" data-unread-count></span>
+        <span class="statusbar-links">
+          <a href="/rss.xml" class="statusbar-link post-nav-link">rss.xml</a>
+          <a href="/" class="statusbar-link">$ exit</a>
+        </span>
+      </Fragment>
+    </Window>
   </main>
 
   <script>

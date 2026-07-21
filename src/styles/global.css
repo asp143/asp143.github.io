@@ -12,34 +12,129 @@
   line-gap-override: 0%;
 }
 
-/* ===== Design Tokens — Terminal Brutalism ===== */
+/* ===== Design Tokens — ralphOS (PostHog-OS restyle) ===== */
 :root {
-  --color-bg: #fdfbf0;
-  --color-bg-alt: #f5f1dc;
+  color-scheme: light;
+
+  /* ── surfaces ─────────────────────────────────────────── */
+  --color-bg: #fdfbf0;            /* window body / page bg inside windows */
+  --color-bg-alt: #f5f1dc;        /* inactive titlebars, inset wells */
+  --color-surface: #fffdf3;       /* cards, inputs, menubar/taskbar bg */
+  --color-desktop: #f0ead6;       /* desktop wallpaper base (darker than bg so windows sit on top) */
+  --color-terminal-bg: #101010;   /* hero terminal + pre blocks */
+  --color-terminal-fg: #d8f5c0;   /* phosphor green-cream terminal text */
+
+  /* ── ink ──────────────────────────────────────────────── */
   --color-ink: #0a0a0a;
   --color-ink-soft: #3a3a3a;
   --color-ink-muted: #6b6b66;
-  --color-border: #0a0a0a;
-  --color-accent: #ff6a1a;
-  --color-accent-soft: #ffd9b8;
-  --color-cursor: #ff6a1a;
-  --color-surface: #fffdf3;
+  --color-border-faint: #d9d4bf;  /* 1px hairline dividers inside windows (rows, statusbars) */
 
-  --shadow-hard: 4px 4px 0 0 var(--color-border);
-  --shadow-hard-lg: 6px 6px 0 0 var(--color-border);
-  --shadow-hard-sm: 2px 2px 0 0 var(--color-border);
+  /* ── legacy aliases (older page CSS still references these) ── */
+  --color-border: var(--color-ink);
+  --color-cursor: var(--color-accent);
 
-  --border-w: 2px;
+  /* ── accent ───────────────────────────────────────────── */
+  --color-accent: #ff6a1a;        /* brand orange; projects app, primary keycaps, links, selection */
+  --color-accent-soft: #ffd9b8;   /* hover fills */
+  --color-sticky: #fff9c4;        /* sticky notes (desktop TODO note, folder-hint CTA) */
 
-  --font-mono: 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace,
-    SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-    monospace;
+  /* ── app accents (titlebar fills, chips, row hovers — NEVER body text on cream) ── */
+  --color-app-about: #14a5a5;     /* teal   — about */
+  --color-app-projects: var(--color-accent); /* orange — projects */
+  --color-app-side: #ffb400;      /* gold   — side projects */
+  --color-app-writing: #9a6bff;   /* lilac  — writing / all blog routes */
+  --color-app-contact: #37b24d;   /* green  — contact / mail */
+  --color-error: #e5484d;         /* 404 dialog, form failure */
+  /* precomputed ~18% tints on --color-bg, for row hovers / badge fills */
+  --tint-about: #d3eeee;
+  --tint-projects: var(--color-accent-soft);
+  --tint-side: #ffedc2;
+  --tint-writing: #e6dcff;
+  --tint-contact: #d5efdb;
 
+  /* ── status (now page, form states, traffic dots) ─────── */
+  --status-running: #37b24d;
+  --status-building: #ffb400;
+  --status-iterating: #14a5a5;
+  --status-idle: var(--color-ink-muted);
+
+  /* ── shadows (hard, 0-blur) ───────────────────────────── */
+  --shadow-hard-sm: 2px 2px 0 var(--color-ink);   /* chips, controls, mobile cards */
+  --shadow-hard: 4px 4px 0 var(--color-ink);      /* cards, keycap rest */
+  --shadow-hard-lg: 6px 6px 0 var(--color-ink);   /* floating windows, keycap hover */
+  --shadow-win-focus: 8px 8px 0 var(--color-ink); /* dragged / focused floating window */
+
+  /* ── borders ──────────────────────────────────────────── */
+  --border-w: 2px;                /* default window/card border */
+  --border-w-focus: 3px;          /* focused/draggable window, :focus-visible */
+
+  /* ── chrome metrics ───────────────────────────────────── */
+  --menubar-h: 34px;              /* 28px under 720px */
+  --titlebar-h: 34px;             /* 28px under 720px */
+  --taskbar-h: 40px;
+  --statusbar-h: 26px;
+  --icon-cell: 88px;              /* desktop icon grid cell */
+
+  /* ── z-scale ──────────────────────────────────────────── */
+  --z-float: 10;                  /* floating windows base; draggable.ts increments from here */
+  --z-taskbar: 900;
+  --z-menubar: 910;
+  --z-dialog: 1000;               /* native <dialog> sits in top layer anyway */
+  --z-toast: 1100;
+
+  /* ── type ─────────────────────────────────────────────── */
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono Fallback',
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+  --font-pixel: 'Silkscreen', var(--font-mono);
+  /* sizes: body 15px; titlebar title 11px pixel; icon label 10px pixel;
+     statusbar 12px mono; badges 10px pixel */
+
+  /* ── motion ───────────────────────────────────────────── */
+  --t-fast: 120ms steps(2, end);  /* pixel-y snap for hovers */
+  --t-normal: 200ms ease;         /* window pops, collapses */
+
+  /* ── layout ───────────────────────────────────────────── */
   --max-width: 1180px;
   --section-padding-y: clamp(3.5rem, 9vh, 7rem);
   --section-padding-x: clamp(1.25rem, 5vw, 5rem);
+  --space-section: clamp(2.5rem, 8vh, 5rem);  /* margin between section windows */
+}
 
-  color-scheme: light;
+@media (max-width: 719.98px) {
+  :root {
+    --menubar-h: 28px;
+    --titlebar-h: 28px;
+  }
+}
+
+/* Dark theme — DEFINED NOW, SHIPPED PHASE 2. Gated behind an explicit attribute
+   (never prefers-color-scheme) so launch risk is zero. Do not add a toggle in v1;
+   the CRT easter egg is the pressure valve. */
+:root[data-theme='dark'] {
+  --color-bg: #1e1f23;
+  --color-bg-alt: #2b2c33;
+  --color-surface: #232429;
+  --color-desktop: #16171b;
+  --color-ink: #eeefe9;
+  --color-ink-soft: #bfc1b7;
+  --color-ink-muted: #9ea096;
+  --color-border-faint: #3a3b42;
+  --color-accent: #ff6a1a;        /* unchanged */
+  --color-accent-soft: #6b3410;
+  --color-sticky: #56502a;
+  --tint-about: #123a3a;
+  --tint-projects: #4a2410;
+  --tint-side: #453208;
+  --tint-writing: #2e2450;
+  --tint-contact: #143a1f;
+  --shadow-hard-sm: 2px 2px 0 #000;
+  --shadow-hard: 4px 4px 0 #000;
+  --shadow-hard-lg: 6px 6px 0 #000;
+  --shadow-win-focus: 8px 8px 0 #000;
+  /* app accents are mid-value; they hold on dark unchanged.
+     Phase-2 checklist: color-scheme, theme-color, OG scripts, dark pre-block audit. */
 }
 
 /* ===== Reset ===== */
@@ -57,11 +152,13 @@ html {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   scroll-behavior: smooth;
-  background-color: var(--color-bg);
-  /* Subtle scanline/grid texture */
+  /* anchor/vim scrolls must clear the fixed menubar */
+  scroll-padding-top: calc(var(--menubar-h) + 8px);
+  /* Desktop wallpaper: darker cream + subtle recolored grid texture */
+  background-color: var(--color-desktop);
   background-image:
-    linear-gradient(var(--color-bg-alt) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-bg-alt) 1px, transparent 1px);
+    linear-gradient(rgba(10, 10, 10, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 10, 10, 0.06) 1px, transparent 1px);
   background-size: 48px 48px;
   background-position: -1px -1px;
 }
@@ -105,13 +202,41 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::selection {
-  background: var(--color-accent);
-  color: var(--color-bg);
+  background: var(--color-accent-soft);
+  color: var(--color-ink);
 }
 
 :focus-visible {
-  outline: var(--border-w) solid var(--color-accent);
-  outline-offset: 3px;
+  outline: var(--border-w-focus) solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ===== Scrollbars — chunky, square, OS-chrome ===== */
+html {
+  scrollbar-color: var(--color-ink) var(--color-bg-alt);
+}
+
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-alt);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface);
+  border: var(--border-w) solid var(--color-ink);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-soft);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--color-bg-alt);
 }
 
 .new-badge {
@@ -120,7 +245,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0.05rem 0.4rem;
   border: var(--border-w) solid var(--color-border);
   background: var(--color-accent);
-  color: var(--color-bg);
+  color: var(--color-ink); /* ink-on-accent (keycap--primary grammar): 6.9:1 vs cream's failing 2.75:1 */
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.06em;

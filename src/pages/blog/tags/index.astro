@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Window from '../../../components/Window.astro';
 import { getAllTags } from '../../../utils/blog';
 import '../../../styles/blog.css';
 
@@ -25,66 +26,57 @@ const breadcrumb = {
   description={description}
   canonicalURL={canonicalURL}
   breadcrumb={breadcrumb}
+  osPath="~/writing/tags"
 >
+  <a slot="menubar-back" class="menubar-back" href="/blog/">&larr; ~/writing</a>
+
   <main class="blog-page">
     <h1 class="visually-hidden">All tags</h1>
 
-    <div class="blog-shell-bar" role="banner">
-      <div class="blog-shell-bar-dots" aria-hidden="true">
-        <span class="blog-shell-bar-dot blog-shell-bar-dot--live"></span>
-        <span class="blog-shell-bar-dot"></span>
-        <span class="blog-shell-bar-dot"></span>
+    <Window
+      title="tags.db"
+      app="writing"
+      variant="page"
+      closeHref="/blog/"
+      statusbar
+      headingLevel={2}
+      class="blog-window"
+    >
+      <div class="blog-header">
+        <span class="blog-header-prompt">$</span>
+        <span class="blog-header-cmd">ls ./tags/</span>
+        <span class="blog-header-flag">--by-count</span>
       </div>
-      <span>ralph@jonas:~/writing — ls tags/</span>
-    </div>
 
-    <div class="blog-header">
-      <span class="blog-header-prompt">$</span>
-      <span class="blog-header-cmd">ls ./tags/</span>
-      <span class="blog-header-flag">--by-count</span>
-    </div>
-    <hr class="blog-rule" role="presentation" />
+      <p class="blog-intro">browse posts by topic. {tags.length} tags total.</p>
 
-    <p class="blog-intro">browse posts by topic. {tags.length} tags total.</p>
+      <ul class="tag-grid" role="list">
+        {tags.map((entry) => (
+          <li>
+            <a class="tag-folder" href={`/blog/tags/${entry.slug}/`}>
+              <svg class="tag-folder-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M3 5h7l3 3h8v11H3z"
+                  fill="var(--tint-writing)"
+                  stroke="var(--color-ink)"
+                  stroke-width="2"
+                  stroke-linejoin="miter"
+                />
+              </svg>
+              <span class="tag-folder-name">#{entry.tag}</span>
+              <span class="tag-folder-count">{entry.count} {entry.count === 1 ? 'post' : 'posts'}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
 
-    <ul class="tag-cloud" role="list">
-      {tags.map((entry) => (
-        <li>
-          <a class="post-tag" href={`/blog/tags/${entry.slug}/`}>
-            #{entry.tag} <span style="color: var(--color-ink-muted); margin-left: 0.25rem;">{entry.count}</span>
-          </a>
-        </li>
-      ))}
-    </ul>
-
-    <div class="post-nav">
-      <a href="/blog/" class="post-nav-link">&larr; all posts</a>
-      <a href="/" class="post-nav-link">$ cd ~/</a>
-    </div>
+      <Fragment slot="status">
+        <span class="statusbar-info">{tags.length} tags</span>
+        <span class="statusbar-links">
+          <a href="/blog/" class="statusbar-link">&larr; all posts</a>
+          <a href="/" class="statusbar-link">$ exit</a>
+        </span>
+      </Fragment>
+    </Window>
   </main>
-
-  <style>
-    .tag-cloud {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 2.5rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-    }
-
-    .tag-cloud .post-tag {
-      font-size: 0.95rem;
-      padding: 0.4rem 0.7rem;
-      text-decoration: none;
-      transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
-    }
-
-    .tag-cloud .post-tag:hover,
-    .tag-cloud .post-tag:focus-visible {
-      background: var(--color-accent);
-      transform: translate(-2px, -2px);
-      outline: none;
-    }
-  </style>
 </BaseLayout>

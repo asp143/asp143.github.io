@@ -1,0 +1,53 @@
+---
+/**
+ * ralphOS taskbar — fixed bottom chrome, home only, ≥720px only (hidden on
+ * mobile via os.css). Rendered by BaseLayout when `taskbar` is set.
+ *
+ * Active-app sync: home.ts's existing section IntersectionObserver should
+ * dispatch `document.dispatchEvent(new CustomEvent('os:section-viewed',
+ * { detail: { id } }))` (or import setActiveTaskbarApp from scripts/window)
+ * — window.ts toggles .is-active on the matching [data-target].
+ */
+import StartMenu from './StartMenu.astro';
+
+interface TaskbarApp {
+  id: string;
+  num: string;
+  label: string;
+  app: 'about' | 'projects' | 'side' | 'writing' | 'contact';
+}
+
+interface Props {
+  apps?: TaskbarApp[];
+}
+
+const DEFAULT_APPS: TaskbarApp[] = [
+  { id: 'about', num: '01', label: 'about', app: 'about' },
+  { id: 'projects', num: '02', label: 'projects', app: 'projects' },
+  { id: 'side-projects', num: '03', label: 'side', app: 'side' },
+  { id: 'writing', num: '04', label: 'writing', app: 'writing' },
+  { id: 'contact', num: '05', label: 'contact', app: 'contact' }
+];
+
+const { apps = DEFAULT_APPS } = Astro.props;
+
+const appStyle = (app: TaskbarApp['app']) =>
+  `--app: var(--color-app-${app}); --app-tint: var(--tint-${app});`;
+---
+
+<nav class="taskbar" aria-label="Taskbar">
+  <div class="taskbar-left">
+    <StartMenu direction="up" label="▸ ralph" />
+  </div>
+  <div class="taskbar-apps">
+    {apps.map((a) => (
+      <a class="taskbar-app" href={`#${a.id}`} data-target={a.id} style={appStyle(a.app)}>
+        <span class="taskbar-app-num" aria-hidden="true">{a.num}</span>{a.label}
+      </a>
+    ))}
+  </div>
+  <div class="taskbar-right">
+    <a class="taskbar-glyph" href="/rss.xml" aria-label="RSS feed">rss</a>
+    <a class="taskbar-glyph" href="https://github.com/asp143" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">github</a>
+  </div>
+</nav>

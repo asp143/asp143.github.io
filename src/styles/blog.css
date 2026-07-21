@@ -1,52 +1,50 @@
-/* ===== Blog — Terminal Brutalism ===== */
+/* ===== Blog — ralphOS "writing" app =====================================
+   Blog index + tag pages: file-explorer window (.blog-window).
+   Post page: maximized reader window (.post-window) — long-form reading
+   comfort is the top priority.
+   Window chrome (.win, .win-bar, .win-statusbar, .keycap, .chip) comes from
+   os.css; this file only styles app content inside the windows. */
+
+/* ── Page containers — center the maximized window under the menubar ──── */
 
 .blog-page,
 .post-page {
-  min-height: 100vh;
-  max-width: var(--max-width);
   margin: 0 auto;
-  padding: clamp(1.25rem, 3vw, 2.25rem) var(--section-padding-x)
-    clamp(3.5rem, 9vh, 7rem);
+  padding: clamp(1.25rem, 4vh, 2.75rem) clamp(1rem, 4vw, 2.5rem)
+    clamp(3rem, 8vh, 5.5rem);
 }
 
-.blog-shell-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.55rem 0.9rem;
-  background: var(--color-bg-alt);
-  border: var(--border-w) solid var(--color-border);
-  box-shadow: var(--shadow-hard);
-  font-size: 0.78rem;
-  color: var(--color-ink-soft);
-  margin-bottom: clamp(2rem, 5vh, 3.25rem);
+.blog-page {
+  max-width: 58rem;
 }
 
-.blog-shell-bar-dots {
-  display: inline-flex;
-  gap: 0.3rem;
+.post-page {
+  max-width: 47rem; /* window hugs the 68ch reading column */
 }
 
-.blog-shell-bar-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(10, 10, 10, 0.2);
-  border: 1px solid var(--color-border);
+@media (max-width: 719.98px) {
+  .blog-page,
+  .post-page {
+    /* .win--page goes edge-to-edge (os.css drops its side borders) */
+    padding-inline: 0;
+    padding-top: 0.75rem;
+  }
 }
 
-.blog-shell-bar-dot--live {
-  background: var(--color-accent);
+/* ── Explorer window (index, tag pages) ───────────────────────────────── */
+
+.blog-window {
+  --win-pad: 0; /* rows manage their own padding for full-bleed hairlines */
+  --blog-pad-x: clamp(1rem, 3.5vw, 1.6rem);
 }
 
-/* ===== Blog index ===== */
 .blog-header {
   display: flex;
   align-items: baseline;
   gap: 0.6rem;
   flex-wrap: wrap;
-  font-size: clamp(1rem, 2vw, 1.15rem);
-  margin-bottom: 1.1rem;
+  font-size: 0.85rem;
+  padding: 1.1rem var(--blog-pad-x) 0;
 }
 
 .blog-header-prompt {
@@ -63,32 +61,39 @@
   color: var(--color-ink-muted);
 }
 
-.blog-rule {
-  border: none;
-  border-top: var(--border-w) solid var(--color-border);
-  margin-bottom: 2.25rem;
-}
-
 .blog-intro {
   color: var(--color-ink-soft);
   font-size: 0.92rem;
   line-height: 1.65;
-  margin-bottom: 2.5rem;
+  padding: 0.6rem var(--blog-pad-x) 1.1rem;
   max-width: 60ch;
 }
 
+.blog-intro-link {
+  color: var(--color-accent);
+  margin-left: 0.5rem;
+}
+
+.blog-intro-link:hover,
+.blog-intro-link:focus-visible {
+  text-decoration: underline;
+}
+
+/* Rows: flat file-explorer rows — hairline separators, tint fill on hover.
+   (Shadow-noise rule: the window carries the chrome; rows go flat.) */
 .blog-list {
   list-style: none;
-  padding: 0;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  border-top: var(--border-w) solid var(--color-border);
+  padding: 0;
+  border-top: 1px solid var(--color-border-faint);
 }
 
 .blog-list-item {
-  border-bottom: var(--border-w) solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-faint);
+}
+
+.blog-list-item:last-child {
+  border-bottom: 0; /* the statusbar's top hairline closes the list */
 }
 
 .blog-list-link {
@@ -96,14 +101,13 @@
   grid-template-columns: 110px 1fr auto;
   gap: 1.25rem;
   align-items: baseline;
-  padding: 1.1rem 0.25rem;
-  transition: background 0.12s ease, padding-left 0.12s ease;
+  padding: 1rem var(--blog-pad-x);
+  transition: background var(--t-fast);
 }
 
 .blog-list-link:hover,
 .blog-list-link:focus-visible {
-  background: var(--color-bg-alt);
-  padding-left: 0.6rem;
+  background: var(--tint-writing);
   outline: none;
 }
 
@@ -128,7 +132,7 @@
 .blog-list-arrow {
   font-weight: 700;
   color: var(--color-accent);
-  transition: transform 0.12s ease;
+  transition: transform var(--t-fast);
 }
 
 .blog-list-link:hover .blog-list-arrow {
@@ -136,9 +140,17 @@
 }
 
 .blog-empty {
-  padding: 2rem 0;
+  padding: 1.5rem var(--blog-pad-x) 2rem;
   color: var(--color-ink-muted);
   font-size: 0.92rem;
+}
+
+/* NEW badge → 10px Silkscreen chip (overrides the legacy global.css look) */
+.blog-page .new-badge {
+  font: 700 10px/1.5 var(--font-pixel);
+  letter-spacing: 0;
+  padding: 1px 5px;
+  border-width: 1px;
 }
 
 @media (max-width: 640px) {
@@ -165,7 +177,131 @@
   }
 }
 
-/* ===== Post page ===== */
+/* ── Statusbar contents (shared by all blog windows) ──────────────────── */
+
+.blog-window .win-statusbar,
+.post-window .win-statusbar {
+  flex-wrap: wrap;
+  padding-block: 5px;
+}
+
+.statusbar-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
+}
+
+.statusbar-link {
+  color: var(--color-ink-muted);
+}
+
+.statusbar-link:hover,
+.statusbar-link:focus-visible {
+  color: var(--color-accent);
+}
+
+.statusbar-unread {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.statusbar-unread:empty {
+  display: none;
+}
+
+/* ── Tags: folder grid (tags.db window) ───────────────────────────────── */
+
+.tag-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem var(--blog-pad-x) 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 10px;
+}
+
+.tag-folder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 1rem 0.6rem 0.85rem;
+  border: 1px solid var(--color-border-faint);
+  background: var(--color-surface);
+  text-align: center;
+  transition: background var(--t-fast);
+}
+
+.tag-folder:hover,
+.tag-folder:focus-visible {
+  background: var(--tint-writing);
+  border-color: var(--color-ink);
+}
+
+.tag-folder-icon {
+  width: 28px;
+  height: 28px;
+  shape-rendering: crispEdges;
+}
+
+.tag-folder-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.tag-folder-count {
+  font-size: 0.72rem;
+  color: var(--color-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 480px) {
+  .tag-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2-col folder grid on mobile */
+  }
+}
+
+/* ── Reader window (post page) ────────────────────────────────────────── */
+
+.post-window {
+  --win-pad: clamp(1.4rem, 5vw, 2.75rem);
+}
+
+/* Sticky titlebar + reading-progress bar directly under it: title and
+   progress stay visible for the whole read. */
+.post-window > .win-bar {
+  position: sticky;
+  top: var(--menubar-h);
+  z-index: 6;
+}
+
+.post-progress {
+  position: sticky;
+  top: calc(var(--menubar-h) + var(--titlebar-h));
+  z-index: 6;
+  height: 3px;
+  pointer-events: none;
+}
+
+.post-progress-bar {
+  height: 100%;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  will-change: transform;
+}
+
+/* Long-form column: everything reads at the same comfortable measure */
+.post-article,
+.post-follow,
+.related-posts {
+  max-width: 68ch;
+  margin-inline: auto;
+}
+
 .post-meta {
   display: flex;
   align-items: baseline;
@@ -186,19 +322,6 @@
   color: var(--color-ink);
 }
 
-.post-title {
-  font-size: clamp(2rem, 5vw, 3.25rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  margin-bottom: 1.1rem;
-  text-wrap: balance;
-}
-
-.post-period {
-  color: var(--color-accent);
-}
-
 .post-date {
   display: block;
   font-size: 0.85rem;
@@ -207,44 +330,42 @@
   font-variant-numeric: tabular-nums;
 }
 
+.post-title {
+  font-size: clamp(1.9rem, 4.5vw, 2.7rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  margin-bottom: 1.1rem;
+  text-wrap: balance;
+}
+
+.post-period {
+  color: var(--color-accent);
+}
+
 .post-tags {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin-bottom: 2.25rem;
+  margin-bottom: 2rem;
 }
 
+/* tags are shared .chip elements; only spacing/decoration is local */
 .post-tag {
-  display: inline-block;
-  padding: 0.22rem 0.55rem;
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-bg-alt);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-ink);
   text-decoration: none;
-  box-shadow: var(--shadow-hard-sm);
-  transition: background 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-a.post-tag:hover,
-a.post-tag:focus-visible {
-  background: var(--color-accent);
-  transform: translate(-1px, -1px);
-  box-shadow: var(--shadow-hard);
-  outline: none;
 }
 
 .post-rule {
   border: none;
-  border-top: var(--border-w) solid var(--color-border);
+  border-top: 1px solid var(--color-border-faint);
   margin: 0 0 2.25rem;
 }
 
+/* ── Long-form typography ─────────────────────────────────────────────── */
+
 .post-content {
-  max-width: 68ch;
   font-size: 1rem;
-  line-height: 1.72;
+  line-height: 1.75;
   color: var(--color-ink);
 }
 
@@ -252,6 +373,7 @@ a.post-tag:focus-visible {
   margin-top: 1.1rem;
 }
 
+/* anchored headings must clear menubar + sticky titlebar + progress bar */
 .post-content h2,
 .post-content h3,
 .post-content h4 {
@@ -259,20 +381,24 @@ a.post-tag:focus-visible {
   letter-spacing: -0.02em;
   margin-top: 2.25rem;
   margin-bottom: 0.5rem;
+  scroll-margin-top: calc(var(--menubar-h) + var(--titlebar-h) + 15px);
 }
 
 .post-content h2 {
   font-size: 1.5rem;
+  line-height: 1.2;
   padding-bottom: 0.4rem;
-  border-bottom: var(--border-w) solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-faint);
 }
 
 .post-content h3 {
   font-size: 1.2rem;
+  line-height: 1.25;
 }
 
 .post-content h4 {
   font-size: 1.05rem;
+  line-height: 1.3;
 }
 
 .post-content p {
@@ -297,7 +423,11 @@ a.post-tag:focus-visible {
 .post-content a:hover,
 .post-content a:focus-visible {
   background-size: 100% 36%;
-  outline: none;
+}
+
+.post-content a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .post-content ul,
@@ -328,15 +458,16 @@ a.post-tag:focus-visible {
   font-size: 0.88em;
   padding: 0.12rem 0.35rem;
   background: var(--color-bg-alt);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-faint);
 }
 
+/* terminal-inside-reader: flat 2px border, radius 0, no shadow */
 .post-content pre {
-  background: #0a0a0a;
-  color: #f5f1dc;
+  background: var(--color-terminal-bg);
+  color: var(--color-terminal-fg);
   padding: 1rem 1.1rem;
-  border: var(--border-w) solid var(--color-border);
-  box-shadow: var(--shadow-hard);
+  border: var(--border-w) solid var(--color-ink);
+  border-radius: 0;
   overflow-x: auto;
   font-size: 0.85rem;
   line-height: 1.55;
@@ -352,54 +483,38 @@ a.post-tag:focus-visible {
 
 .post-content hr {
   border: none;
-  border-top: var(--border-w) solid var(--color-border);
+  border-top: 1px solid var(--color-border-faint);
   margin: 2.25rem 0;
 }
 
 .post-content img {
-  border: var(--border-w) solid var(--color-border);
-  box-shadow: var(--shadow-hard);
+  border: var(--border-w) solid var(--color-ink);
   margin: 1.5rem 0;
 }
 
-.post-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 44px;
-  margin-top: clamp(-2rem, -3vh, -1rem);
-  margin-bottom: 1.5rem;
-  padding: 0.5rem 0.85rem;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--color-ink);
-  text-decoration: none;
-  background: var(--color-surface);
-  border: var(--border-w) solid var(--color-border);
-  box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.12s ease, background 0.12s ease;
-}
-
-.post-back:hover,
-.post-back:focus-visible {
-  transform: translate(-2px, -2px);
-  background: var(--color-accent);
-  outline: none;
-}
-
-.post-back-arrow {
-  font-weight: 800;
-  line-height: 1;
-}
+/* ── Follow CTA → small system-notification card ──────────────────────── */
 
 .post-follow {
-  margin-top: 3.5rem;
-  padding: 1.5rem 1.25rem;
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-bg-alt);
-  box-shadow: var(--shadow-hard);
+  margin-top: 3.25rem;
+  border: var(--border-w) solid var(--color-ink);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.post-follow-chrome {
+  display: block;
+  font: 700 10px/1 var(--font-pixel);
+  text-transform: lowercase;
+  color: var(--color-ink);
+  background: var(--tint-writing);
+  padding: 6px 10px;
+  border-bottom: var(--border-w) solid var(--color-ink);
+}
+
+.post-follow-inner {
   display: grid;
   gap: 0.6rem;
+  padding: 1.1rem 1.15rem 1.3rem;
 }
 
 .post-follow-header {
@@ -420,7 +535,7 @@ a.post-tag:focus-visible {
 }
 
 .post-follow-title {
-  font-size: clamp(1.15rem, 2.25vw, 1.5rem);
+  font-size: clamp(1.1rem, 2.25vw, 1.35rem);
   font-weight: 800;
   line-height: 1.15;
   margin: 0;
@@ -440,60 +555,25 @@ a.post-tag:focus-visible {
   max-width: 52ch;
 }
 
+/* .keycap provides the button look; local rules only lay out the contents */
 .post-follow-cta {
   justify-self: start;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  min-height: 44px;
   margin-top: 0.35rem;
-  padding: 0.55rem 0.95rem;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--color-ink);
   text-decoration: none;
-  background: var(--color-surface);
-  border: var(--border-w) solid var(--color-border);
-  box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.12s ease, background 0.12s ease;
-}
-
-.post-follow-cta:hover,
-.post-follow-cta:focus-visible {
-  transform: translate(-2px, -2px);
-  background: var(--color-accent);
-  outline: none;
 }
 
 .post-follow-cta-arrow {
   font-weight: 800;
   line-height: 1;
-  transition: transform 0.12s ease;
 }
 
-.post-follow-cta:hover .post-follow-cta-arrow,
-.post-follow-cta:focus-visible .post-follow-cta-arrow {
-  transform: translateX(3px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .post-follow-cta,
-  .post-follow-cta-arrow {
-    transition: background 0.12s ease;
-  }
-
-  .post-follow-cta:hover,
-  .post-follow-cta:focus-visible,
-  .post-follow-cta:hover .post-follow-cta-arrow,
-  .post-follow-cta:focus-visible .post-follow-cta-arrow {
-    transform: none;
-  }
-}
+/* ── Related posts → "you may also open:" flat file rows ──────────────── */
 
 .related-posts {
-  margin-top: 3.5rem;
-  padding-top: 1.5rem;
-  border-top: var(--border-w) solid var(--color-border);
+  margin-top: 3.25rem;
 }
 
 .related-posts-header {
@@ -515,9 +595,9 @@ a.post-tag:focus-visible {
 }
 
 .related-posts-title {
-  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  font-size: clamp(1rem, 2vw, 1.2rem);
   font-weight: 800;
-  margin: 0 0 1rem;
+  margin: 0 0 0.85rem;
   color: var(--color-ink);
 }
 
@@ -525,36 +605,36 @@ a.post-tag:focus-visible {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: 0.85rem;
+  border-top: 1px solid var(--color-border-faint);
 }
 
 .related-posts-item {
   margin: 0;
+  border-bottom: 1px solid var(--color-border-faint);
 }
 
 .related-posts-link {
   display: grid;
-  gap: 0.35rem;
-  padding: 0.9rem 1rem;
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-hard-sm);
+  gap: 0.3rem;
+  padding: 0.9rem 0.6rem;
   color: var(--color-ink);
   text-decoration: none;
-  transition: transform 0.12s ease, background 0.12s ease;
+  transition: background var(--t-fast);
 }
 
 .related-posts-link:hover,
 .related-posts-link:focus-visible {
-  transform: translate(-2px, -2px);
-  background: var(--color-accent);
+  background: var(--tint-writing);
   outline: none;
+}
+
+.related-posts-link:focus-visible {
+  box-shadow: inset 3px 0 0 var(--color-accent); /* visible focus: tint alone is sub-threshold */
 }
 
 .related-posts-link-title {
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 0.98rem;
   text-wrap: balance;
 }
 
@@ -568,82 +648,71 @@ a.post-tag:focus-visible {
   overflow: hidden;
 }
 
-.related-posts-link:hover .related-posts-link-desc,
-.related-posts-link:focus-visible .related-posts-link-desc,
-.related-posts-link:hover .related-posts-link-tags,
-.related-posts-link:focus-visible .related-posts-link-tags {
-  color: var(--color-ink);
-}
-
 .related-posts-link-tags {
   display: inline-flex;
   flex-wrap: wrap;
   gap: 0.4rem;
   font-size: 0.75rem;
-  color: var(--color-ink-soft);
+  color: var(--color-ink-muted);
 }
 
 .related-posts-link-tag {
   font-weight: 700;
 }
 
+/* ── Post statusbar: contextual info + prev/next keycaps ──────────────── */
+
+.post-window .win-statusbar {
+  padding: 10px;
+  row-gap: 10px;
+}
+
+.post-statusbar-info {
+  font-variant-numeric: tabular-nums;
+}
+
 .post-nav {
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
   flex-wrap: wrap;
-  margin-top: 3.5rem;
-  padding-top: 1.5rem;
-  border-top: var(--border-w) solid var(--color-border);
+  gap: 10px;
+  justify-content: flex-end;
+  margin-left: auto;
 }
 
-.post-nav-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--color-ink);
-  padding: 0.5rem 0.85rem;
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.12s ease, background 0.12s ease;
+/* keycap supplies the look; keep long titles readable */
+.post-nav .post-nav-link {
+  max-width: 100%;
+  text-decoration: none;
 }
 
-.post-nav-link:hover,
-.post-nav-link:focus-visible {
-  transform: translate(-2px, -2px);
-  background: var(--color-accent);
-  outline: none;
+@media (max-width: 640px) {
+  .post-window .win-statusbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .post-nav {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
 }
+
+/* ── Reduced motion (blog-specific motion only; OS chrome motion is
+      handled by the consolidated block in os.css) ──────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .post-back,
-  .post-nav-link,
-  .related-posts-link,
   .blog-list-link,
   .blog-list-arrow,
-  .post-tag {
-    transition: background 0.12s ease;
-  }
-
-  .post-back:hover,
-  .post-back:focus-visible,
-  .post-nav-link:hover,
-  .post-nav-link:focus-visible,
-  .related-posts-link:hover,
-  .related-posts-link:focus-visible {
-    transform: none;
-  }
-
-  a.post-tag:hover,
-  a.post-tag:focus-visible {
-    transform: none;
-    box-shadow: var(--shadow-hard-sm);
+  .tag-folder,
+  .related-posts-link {
+    transition: none;
   }
 
   .blog-list-link:hover .blog-list-arrow {
     transform: none;
+  }
+
+  .post-content a {
+    transition: none;
   }
 }

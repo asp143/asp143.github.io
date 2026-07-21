@@ -1,0 +1,32 @@
+---
+/**
+ * ralphOS menu bar — fixed top chrome on every route. Rendered by
+ * BaseLayout (pass `menubar={false}` to BaseLayout to opt out, e.g. 404).
+ *
+ * Slots (forwarded through BaseLayout as `menubar-back` / `menubar-hint`):
+ * - back: inner pages' "← ~/" link. Use class="menubar-back".
+ * - hint: home's kbd hint. Hidden under 720px.
+ */
+import StartMenu from './StartMenu.astro';
+
+interface Props {
+  path?: string;
+}
+
+const { path = '~/' } = Astro.props;
+---
+
+<header class="menubar" role="banner">
+  <div class="menubar-left">
+    <StartMenu />
+  </div>
+  <div class="menubar-center">
+    <slot name="back" />
+    <span class="menubar-path">{path}</span>
+  </div>
+  <div class="menubar-right">
+    <span class="menubar-hint"><slot name="hint" /></span>
+    <span class="menubar-clock" data-os-clock aria-hidden="true"></span>
+    <a class="menubar-glyph" href="/rss.xml" aria-label="RSS feed">rss</a>
+  </div>
+</header>
