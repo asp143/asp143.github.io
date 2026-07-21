@@ -143,6 +143,78 @@
   transform: translateX(4px);
 }
 
+/* ── /projects/ — other-work + side-quests compact rows ─────────────── */
+
+.projects-subheading {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-ink-muted);
+  letter-spacing: 0.05em;
+  margin: clamp(1.5rem, 3vw, 2rem) 0 0.6rem;
+  padding-inline: clamp(1rem, 3vw, 2rem);
+}
+
+.projects-subheading::before {
+  content: '$ ls ';
+  color: var(--color-accent);
+}
+
+.projects-compact {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--color-border-faint);
+}
+
+.projects-compact-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  padding: 0.6rem clamp(1rem, 3vw, 2rem);
+  border-bottom: 1px solid var(--color-border-faint);
+  transition: background var(--t-fast);
+}
+
+.projects-compact-row:hover {
+  background: var(--tint-projects);
+}
+
+.projects-compact-row--link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.projects-compact-row--link:hover .projects-compact-name {
+  color: var(--color-accent);
+}
+
+.projects-compact-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  transition: color var(--t-fast);
+}
+
+.projects-compact-name::before {
+  content: '— ';
+  color: var(--color-accent);
+}
+
+.projects-compact-tech {
+  font-size: 0.7rem;
+  color: var(--color-ink-muted);
+}
+
+.projects-compact-desc {
+  width: 100%;
+  margin: 0.1rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+
 /* ── Statusbar nav links (both pages) ───────────────────────────────── */
 
 .projects-statusnav,
@@ -387,7 +459,9 @@
   }
 
   .project-tile-link,
-  .project-tile-arrow {
+  .project-tile-arrow,
+  .projects-compact-row,
+  .projects-compact-name {
     transition: none;
   }
 

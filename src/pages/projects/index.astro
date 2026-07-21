@@ -2,10 +2,12 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Window from '../../components/Window.astro';
+import { otherWork, sideProjects } from '../../data/projects';
 import '../../styles/projects.css';
 
 const projects = (await getCollection('projects', ({ data }) => !data.draft))
   .sort((a, b) => a.data.order - b.data.order);
+const totalItems = projects.length + otherWork.length + sideProjects.length;
 
 const title = 'Projects — Ralph Jonas Mungcal';
 const description =
@@ -30,13 +32,27 @@ const collectionPage = {
   description,
   inLanguage: 'en',
   isPartOf: { '@id': 'https://ralphjonas.com/#website' },
-  hasPart: projects.map((project) => ({
-    '@type': 'SoftwareSourceCode',
-    '@id': `https://ralphjonas.com/projects/${project.id}/#project`,
-    name: project.data.title,
-    url: `https://ralphjonas.com/projects/${project.id}/`,
-    description: project.data.description
-  }))
+  hasPart: [
+    ...projects.map((project) => ({
+      '@type': 'SoftwareSourceCode',
+      '@id': `https://ralphjonas.com/projects/${project.id}/#project`,
+      name: project.data.title,
+      url: `https://ralphjonas.com/projects/${project.id}/`,
+      description: project.data.description
+    })),
+    ...otherWork.map((item) => ({
+      '@type': 'CreativeWork',
+      name: item.name,
+      ...(item.description ? { description: item.description } : {}),
+      keywords: item.tech
+    })),
+    ...sideProjects.map((item) => ({
+      '@type': 'CreativeWork',
+      name: item.name,
+      url: item.url,
+      description: item.description
+    }))
+  ]
 };
 ---
 
@@ -57,7 +73,7 @@ const collectionPage = {
     <h1 class="visually-hidden">Projects by Ralph Jonas Mungcal</h1>
 
     <Window
-      title={`~/projects — ${projects.length} items`}
+      title={`~/projects — ${totalItems} items`}
       app="projects"
       variant="page"
       headingLevel={2}
@@ -104,8 +120,37 @@ const collectionPage = {
         ))}
       </ul>
 
+      <h3 class="projects-subheading">./other-work/</h3>
+      <ul class="projects-compact" role="list">
+        {otherWork.map((item) => (
+          <li class="projects-compact-row">
+            <span class="projects-compact-name">{item.name}</span>
+            <span class="projects-compact-tech">{item.tech}</span>
+            {item.description && <p class="projects-compact-desc">{item.description}</p>}
+          </li>
+        ))}
+      </ul>
+
+      <h3 class="projects-subheading">./side-quests/</h3>
+      <ul class="projects-compact" role="list">
+        {sideProjects.map((item) => (
+          <li>
+            <a
+              class="projects-compact-row projects-compact-row--link"
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="projects-compact-name">{item.name}</span>
+              <span class="projects-compact-tech">{item.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+              <p class="projects-compact-desc">{item.description}</p>
+            </a>
+          </li>
+        ))}
+      </ul>
+
       <Fragment slot="status">
-        <span class="projects-statusinfo">{projects.length} items · view: large icons</span>
+        <span class="projects-statusinfo">{totalItems} items · view: large icons</span>
         <nav class="projects-statusnav" aria-label="Projects navigation">
           <a href="/now/">/now &rarr;</a>
           <a href="/">$ exit</a>

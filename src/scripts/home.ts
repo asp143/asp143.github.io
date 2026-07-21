@@ -303,19 +303,24 @@ function initDesktopWindows(): DesktopController {
     }
   });
 
-  /* intercept internal page links on the desktop (icons, window rows,
-     keycaps, sticky note). OS chrome (menubar/start menu/taskbar) and
-     external/_blank links keep their normal behavior. */
+  /* intercept EVERY internal page link on the home desktop (icons, window
+     rows, keycaps, sticky note, start menu entries like now/tags) — they
+     all open in the browser window. Only external/_blank links and xml
+     feeds keep their normal behavior. */
   document.addEventListener('click', (ev) => {
     if (!isDesktop()) return;
     const a = (ev.target as HTMLElement).closest<HTMLAnchorElement>('a[href]');
     if (!a || a.target === '_blank') return;
-    if (!a.closest('main.portfolio-page') || a.closest('#browser-win')) return;
+    if (a.closest('#browser-win')) return;
     const url = new URL(a.href, window.location.href);
     if (url.origin !== window.location.origin) return;
     if (url.pathname === window.location.pathname) return; // #hash links → window manager
     if (url.pathname.endsWith('.xml')) return; // rss/sitemap are real navigations
     ev.preventDefault();
+    // a start-menu link keeps its <details> open after preventDefault
+    document
+      .querySelectorAll<HTMLDetailsElement>('details.startmenu[open]')
+      .forEach((menu) => { menu.open = false; });
     openBrowser(url);
   });
 

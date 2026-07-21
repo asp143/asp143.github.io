@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Window from '../components/Window.astro';
 import { getPublishedPosts, formatPubDate, toIsoDate, isNewPost } from '../utils/blog';
+import { otherWork, sideProjects } from '../data/projects';
 import '../styles/home.css';
 
 const currentYear = new Date().getFullYear();
@@ -34,12 +35,7 @@ const featuredProjects = projectEntries
     url: `/projects/${entry.id}/`
   }));
 
-const sideProjects = [
-  { name: 'subconscious', url: 'https://subconsciousapp.co', description: 'Subscription tracking — take control of recurring expenses.' },
-  { name: 'spot-the-synth', url: 'https://spotthesynth.com', description: 'Community-driven AI photo spotting and discussion.' },
-  { name: 'ascii-art-gen', url: 'https://ascii-art-gen.fly.dev/', description: 'Generate ASCII art from text and images, right in the browser.' },
-  { name: 'the-leon-files', url: 'https://theleonfiles.com', description: 'Fan site — Leon Kennedy, Resident Evil.' }
-];
+const featuredSideProjects = sideProjects.slice(0, 3);
 
 const projectItemList = {
   '@context': 'https://schema.org',
@@ -155,7 +151,7 @@ const sideProjectItemList = {
           </svg>
           <span class="desktop-icon-label">about.md</span>
         </a>
-        <a class="desktop-icon" href="#projects" style="--app-tint: var(--tint-projects);">
+        <a class="desktop-icon" href="/projects/" style="--app-tint: var(--tint-projects);">
           <svg viewBox="0 0 12 12" aria-hidden="true">
             <path d="M1 2h4l1 1h5v7H1z" fill="var(--tint-projects)" stroke="var(--color-ink)" stroke-width="1" />
             <path d="M1 5h10" stroke="var(--color-ink)" stroke-width="1" />
@@ -176,7 +172,7 @@ const sideProjectItemList = {
           </svg>
           <span class="desktop-icon-label">writing/</span>
         </a>
-        <a class="desktop-icon" href="#contact" style="--app-tint: var(--tint-contact);">
+        <a class="desktop-icon desktop-icon--wiggle" href="#contact" style="--app-tint: var(--tint-contact);">
           <svg viewBox="0 0 12 12" aria-hidden="true">
             <rect x="1" y="3" width="10" height="7" fill="var(--tint-contact)" stroke="var(--color-ink)" stroke-width="1" />
             <path d="M1 3l5 4 5-4" fill="none" stroke="var(--color-ink)" stroke-width="1" />
@@ -289,38 +285,13 @@ const sideProjectItemList = {
         <h3 class="other-heading motion-fade">other-work</h3>
 
         <ul class="project-list other-work-list" role="list">
-          <li class="compact-row motion-stagger">
-            <span class="compact-name">remote-mcp-server</span>
-            <span class="compact-tech">ts · node · docker</span>
-            <p class="compact-desc">model context protocol server over url — ai assistants hit custom tools via sse transport.</p>
-          </li>
-          <li class="compact-row motion-stagger">
-            <span class="compact-name">home-infra-lab</span>
-            <span class="compact-tech">docker · linux · truenas · tailscale</span>
-            <p class="compact-desc">multi-node self-hosted services — nas, media, workflow automation, monitoring dashboards.</p>
-          </li>
-          <li class="compact-row motion-stagger">
-            <span class="compact-name">loyalty-points-transfer</span>
-            <span class="compact-tech">node · ts · react</span>
-            <p class="compact-desc">cross-program loyalty point transfer flow — backend conversion logic with a clean ui on top.</p>
-          </li>
-          <li class="compact-row motion-stagger">
-            <span class="compact-name">local-ai-inference-server</span>
-            <span class="compact-tech">linux · ml-inference</span>
-            <p class="compact-desc">self-hosted inference box for local llm + transcription workloads — keep data off the cloud.</p>
-          </li>
-          <li class="compact-row motion-stagger">
-            <span class="compact-name">airline-route-mapping</span>
-            <span class="compact-tech">ts · node</span>
-          </li>
-          <li class="compact-row motion-stagger">
-            <span class="compact-name">audit-report-generator</span>
-            <span class="compact-tech">angular · node · sql · aws</span>
-          </li>
-          <li class="compact-row motion-stagger">
-            <span class="compact-name">accident-detection-system</span>
-            <span class="compact-tech">rpi · python · mongo · express · angular</span>
-          </li>
+          {otherWork.map((item) => (
+            <li class="compact-row motion-stagger">
+              <span class="compact-name">{item.name}</span>
+              <span class="compact-tech">{item.tech}</span>
+              {item.description && <p class="compact-desc">{item.description}</p>}
+            </li>
+          ))}
         </ul>
 
         <a href="/projects/" class="keycap view-all-keycap motion-fade">
@@ -339,33 +310,17 @@ const sideProjectItemList = {
         </p>
 
         <ul class="side-project-list" role="list">
-          <li>
-            <a href="https://subconsciousapp.co" class="side-project-row motion-stagger" target="_blank" rel="noopener noreferrer">
-              <div class="side-project-info">
-                <span class="side-project-name">subconscious</span>
-                <p class="side-project-desc">subscription tracking — take control of recurring expenses.</p>
-              </div>
-              <span class="side-project-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
-          <li>
-            <a href="https://spotthesynth.com" class="side-project-row motion-stagger" target="_blank" rel="noopener noreferrer">
-              <div class="side-project-info">
-                <span class="side-project-name">spot-the-synth</span>
-                <p class="side-project-desc">community-driven ai photo spotting and discussion.</p>
-              </div>
-              <span class="side-project-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
-          <li>
-            <a href="https://ascii-art-gen.fly.dev/" class="side-project-row motion-stagger" target="_blank" rel="noopener noreferrer">
-              <div class="side-project-info">
-                <span class="side-project-name">ascii-art-gen</span>
-                <p class="side-project-desc">generate ascii art from text and images, right in the browser.</p>
-              </div>
-              <span class="side-project-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
+          {featuredSideProjects.map((item) => (
+            <li>
+              <a href={item.url} class="side-project-row motion-stagger" target="_blank" rel="noopener noreferrer">
+                <div class="side-project-info">
+                  <span class="side-project-name">{item.name}</span>
+                  <p class="side-project-desc">{item.description}</p>
+                </div>
+                <span class="side-project-arrow" aria-hidden="true">&rarr;</span>
+              </a>
+            </li>
+          ))}
         </ul>
 
         <a href="/now/" class="keycap view-all-keycap motion-fade">
