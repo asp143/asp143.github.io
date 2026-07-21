@@ -1,10 +1,10 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Window from '../../../components/Window.astro';
 import {
   getPublishedPosts,
   formatPubDate,
-  tagToSlug,
-  getAllTags
+  tagToSlug
 } from '../../../utils/blog';
 import '../../../styles/blog.css';
 
@@ -74,53 +74,61 @@ const collectionPage = {
   canonicalURL={canonicalURL}
   breadcrumb={breadcrumb}
   dateModified={new Date(dateModified).toISOString()}
+  osPath={`~/writing?tag=${tag}`}
 >
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(collectionPage)}></script>
   </Fragment>
 
+  <a slot="menubar-back" class="menubar-back" href="/blog/">&larr; ~/writing</a>
+
   <main class="blog-page">
     <h1 class="visually-hidden">Posts tagged {tag}</h1>
 
-    <div class="blog-shell-bar" role="banner">
-      <div class="blog-shell-bar-dots" aria-hidden="true">
-        <span class="blog-shell-bar-dot blog-shell-bar-dot--live"></span>
-        <span class="blog-shell-bar-dot"></span>
-        <span class="blog-shell-bar-dot"></span>
+    <Window
+      title={`~/writing?tag=${tag}`}
+      app="writing"
+      variant="page"
+      closeHref="/blog/"
+      statusbar
+      headingLevel={2}
+      class="blog-window"
+    >
+      <div class="blog-header">
+        <span class="blog-header-prompt">$</span>
+        <span class="blog-header-cmd">grep -l "#{tag}" ./writing/</span>
       </div>
-      <span>ralph@jonas:~/writing — grep #{tag}</span>
-    </div>
 
-    <div class="blog-header">
-      <span class="blog-header-prompt">$</span>
-      <span class="blog-header-cmd">grep -l "#{tag}" ./writing/</span>
-    </div>
-    <hr class="blog-rule" role="presentation" />
+      <p class="blog-intro">
+        {posts.length} {posts.length === 1 ? 'post' : 'posts'} tagged <strong>#{tag}</strong>.
+        <a href="/blog/tags/" class="blog-intro-link">all tags &rarr;</a>
+      </p>
 
-    <p class="blog-intro">
-      {posts.length} {posts.length === 1 ? 'post' : 'posts'} tagged <strong>#{tag}</strong>.
-      <a href="/blog/tags/" style="color: var(--color-accent); margin-left: 0.5rem;">all tags &rarr;</a>
-    </p>
+      <ul class="blog-list" role="list">
+        {posts.map((post) => (
+          <li class="blog-list-item">
+            <article>
+              <a href={`/blog/${post.id}/`} class="blog-list-link">
+                <time class="blog-list-date" datetime={post.data.pubDate.toISOString()}>
+                  {formatPubDate(post.data.pubDate)}
+                </time>
+                <span class="blog-list-title">{post.data.title}</span>
+                <span class="blog-list-arrow" aria-hidden="true">&rarr;</span>
+              </a>
+            </article>
+          </li>
+        ))}
+      </ul>
 
-    <ul class="blog-list" role="list">
-      {posts.map((post) => (
-        <li class="blog-list-item">
-          <article>
-            <a href={`/blog/${post.id}/`} class="blog-list-link">
-              <time class="blog-list-date" datetime={post.data.pubDate.toISOString()}>
-                {formatPubDate(post.data.pubDate)}
-              </time>
-              <span class="blog-list-title">{post.data.title}</span>
-              <span class="blog-list-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-          </article>
-        </li>
-      ))}
-    </ul>
-
-    <div class="post-nav">
-      <a href="/blog/" class="post-nav-link">&larr; all posts</a>
-      <a href="/blog/tags/" class="post-nav-link">all tags</a>
-    </div>
+      <Fragment slot="status">
+        <span class="statusbar-info">
+          {posts.length} {posts.length === 1 ? 'item' : 'items'} tagged #{tag}
+        </span>
+        <span class="statusbar-links">
+          <a href="/blog/tags/" class="statusbar-link">all tags</a>
+          <a href="/" class="statusbar-link">$ exit</a>
+        </span>
+      </Fragment>
+    </Window>
   </main>
 </BaseLayout>

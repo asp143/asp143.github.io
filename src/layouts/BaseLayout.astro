@@ -1,10 +1,15 @@
 ---
-import '@fontsource/jetbrains-mono/latin-400.css';
-import '@fontsource/jetbrains-mono/latin-500.css';
-import '@fontsource/jetbrains-mono/latin-600.css';
-import '@fontsource/jetbrains-mono/latin-700.css';
-import '@fontsource/jetbrains-mono/latin-800.css';
+/* Variable font: one 40KB woff2 covers weights 100-800 (replaces five
+   ~21KB static weight files — smaller AND fewer requests). */
+import '@fontsource-variable/jetbrains-mono/index.css';
+/* Pixel font — OS chrome only (window titles, menubar/taskbar, clock,
+   icon labels, badges). Never body copy. 700 only — everything pixel
+   renders bold, so the 400 file would be dead weight. */
+import '@fontsource/silkscreen/latin-700.css';
 import '../styles/global.css';
+import '../styles/os.css';
+import MenuBar from '../components/MenuBar.astro';
+import Taskbar from '../components/Taskbar.astro';
 
 const SITE_URL = 'https://ralphjonas.com';
 const OG_IMAGE = `${SITE_URL}/og.png`;
@@ -23,10 +28,29 @@ const {
   dateModified,
   datePublished,
   articleTags = [],
-  noindex = false
+  noindex = false,
+  /* ralphOS chrome: menubar renders on every route unless opted out
+     (404 sets menubar={false} — the OS crashed). Taskbar is home-only:
+     index.astro sets taskbar. osPath overrides the menubar path label. */
+  menubar = true,
+  taskbar = false,
+  osPath
 } = Astro.props;
 
 const canonicalURL = canonicalOverride ?? new URL(Astro.url.pathname, SITE_URL).toString();
+
+const pathname = Astro.url.pathname;
+const derivedOsPath =
+  pathname === '/'
+    ? '~/portfolio'
+    : pathname.startsWith('/blog')
+      ? '~/writing'
+      : pathname.startsWith('/projects')
+        ? '~/projects'
+        : pathname.startsWith('/now')
+          ? '~/now'
+          : '~/';
+const resolvedOsPath = osPath ?? derivedOsPath;
 const currentYear = new Date().getFullYear();
 const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
 const robotsContent = noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large';
@@ -162,7 +186,7 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
     />
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
 
-    <meta name="msapplication-TileColor" content="#a0d8f1" />
+    <meta name="msapplication-TileColor" content="#fdfbf0" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="description" content={description} />
     <meta name="author" content="Ralph Jonas Mungcal" />
@@ -213,7 +237,18 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
 
     {posthogKey && (
       <script is:inline define:vars={{ posthogKey }}>
+        // Framed previews (the home desktop's in-OS browser window) skip
+        // analytics entirely: no duplicate $pageview, no array.js download —
+        // the parent page already captures browser_window_opened.
+        if (window.self === window.top) {
         !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageviewId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        // Page scripts capture() at load, but the stub above only gains a
+        // .capture method once init() runs (deferred to idle). Queue early
+        // events so they neither throw nor get lost, flush after init.
+        var earlyQ = [];
+        if (!window.posthog.capture) {
+          window.posthog.capture = function () { earlyQ.push([].slice.call(arguments)); };
+        }
         var startPosthog = function () {
           posthog.init(posthogKey, {
             api_host: 'https://us.i.posthog.com',
@@ -228,6 +263,11 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
             capture_dead_clicks: false,
             capture_performance: false,
           });
+          // init replaced .capture with the real queueing stub — flush.
+          for (var qi = 0; qi < earlyQ.length; qi++) {
+            posthog.capture.apply(posthog, earlyQ[qi]);
+          }
+          earlyQ.length = 0;
         };
         // Defer init (which loads array.js) off the critical render path.
         if ('requestIdleCallback' in window) {
@@ -235,10 +275,22 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
         } else {
           setTimeout(startPosthog, 1200);
         }
+        }
       </script>
     )}
   </head>
-  <body>
+  <body class:list={[{ 'has-menubar': menubar, 'has-taskbar': taskbar }]}>
+    {menubar && (
+      <MenuBar path={resolvedOsPath}>
+        <slot name="menubar-back" slot="back" />
+        <slot name="menubar-hint" slot="hint" />
+      </MenuBar>
+    )}
     <slot />
+    {taskbar && <Taskbar />}
+    <script>
+      import '../scripts/window';
+      import '../scripts/clock';
+    </script>
   </body>
 </html>

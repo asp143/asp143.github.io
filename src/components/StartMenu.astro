@@ -1,0 +1,29 @@
+---
+/**
+ * ralphOS start menu — shared between MenuBar (drops down) and Taskbar
+ * (pops up). <details> keeps it keyboard-accessible with zero JS;
+ * window.ts adds Esc + outside-click close.
+ */
+interface Props {
+  direction?: 'down' | 'up';
+  label?: string;
+}
+
+const { direction = 'down', label = 'ralphOS ▸' } = Astro.props;
+---
+
+<details class:list={['startmenu', { 'startmenu--up': direction === 'up' }]}>
+  <summary class="startmenu-summary">{label}</summary>
+  <nav class="startmenu-panel" aria-label="Start menu">
+    <a class="startmenu-link" href="/">home</a>
+    <a class="startmenu-link" href="/blog/">writing</a>
+    <a class="startmenu-link" href="/projects/">projects</a>
+    <a class="startmenu-link" href="/now/">now</a>
+    <a class="startmenu-link" href="/blog/tags/">tags</a>
+    <hr class="startmenu-sep" />
+    <a class="startmenu-link" href="/rss.xml">rss</a>
+    <a class="startmenu-link" href="https://github.com/asp143" target="_blank" rel="noopener noreferrer">github</a>
+    <hr class="startmenu-sep" />
+    <a class="startmenu-link startmenu-link--shutdown" href="/#contact">shut down</a>
+  </nav>
+</details>

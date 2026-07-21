@@ -1,9 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import '../styles/blog.css';
+import Window from '../components/Window.astro';
 import '../styles/now.css';
 
 type NowStatus = 'shipping' | 'building' | 'iterating' | 'maintenance';
+
+/* taskmgr status remap (spec §4 /now/):
+   shipping → ▮ running · building → ▯ compiling… · iterating → ▮ updating ·
+   maintenance → ▯ idle. `segments` drives the static 10-segment CPU meter. */
+const STATUS_META: Record<NowStatus, { glyph: string; label: string; segments: number }> = {
+  shipping: { glyph: '▮', label: 'running', segments: 9 },
+  building: { glyph: '▯', label: 'compiling…', segments: 5 },
+  iterating: { glyph: '▮', label: 'updating', segments: 7 },
+  maintenance: { glyph: '▯', label: 'idle', segments: 2 }
+};
 
 const nowProjects: Array<{
   name: string;
@@ -17,6 +27,8 @@ const nowProjects: Array<{
   { name: 'the-leon-files', url: 'https://theleonfiles.com',        status: 'iterating', update: 'Resident Evil fan site (Leon Kennedy) — content + UI touch-ups.' }
 ];
 
+/* NOTE: duplicated in astro.config.mjs (sitemap lastmod) — known wart,
+   fix out of scope for the OS restyle. Keep the two in sync by hand. */
 const NOW_UPDATED = '2026-04-22';
 
 const title = 'Now — Ralph Jonas Mungcal';
@@ -66,64 +78,90 @@ const formattedUpdated = new Date(`${NOW_UPDATED}T00:00:00Z`).toLocaleDateString
     <script is:inline type="application/ld+json" set:html={JSON.stringify(nowItemList)}></script>
   </Fragment>
 
+  <a slot="menubar-back" class="menubar-back" href="/">&larr; ~/</a>
+
   <main class="now-page" data-project-count={nowProjects.length}>
-    <div class="blog-shell-bar" role="banner">
-      <div class="blog-shell-bar-dots" aria-hidden="true">
-        <span class="blog-shell-bar-dot blog-shell-bar-dot--live"></span>
-        <span class="blog-shell-bar-dot"></span>
-        <span class="blog-shell-bar-dot"></span>
+    <Window
+      title="taskmgr — now"
+      app="system"
+      variant="page"
+      headingLevel={1}
+      closeHref="/"
+      statusbar
+      class="now-window"
+      style="--win-pad: 0;"
+    >
+      <div class="now-intro-block">
+        <p class="now-prompt" aria-hidden="true">
+          <span class="now-prompt-sign">$</span>
+          <span class="now-prompt-cmd">cat now.md</span>
+        </p>
+
+        <p class="now-title">
+          what i'm up to<span class="now-period">_</span>
+        </p>
+
+        <p class="now-updated">
+          <span class="now-updated-label">last updated</span>
+          <time datetime={NOW_UPDATED}>{formattedUpdated}</time>
+        </p>
+
+        <p class="now-intro">
+          the side projects i'm actively iterating on right now. if something here catches your eye, pop into it or message me on x.
+        </p>
       </div>
-      <span>ralph@jonas:~/now — status.sh</span>
-    </div>
 
-    <div class="now-header">
-      <span class="now-header-prompt">$</span>
-      <span class="now-header-cmd">cat now.md</span>
-    </div>
-    <hr class="now-rule" role="presentation" />
+      <div class="now-cols" aria-hidden="true">
+        <span class="now-cols-process">process</span>
+        <span class="now-cols-status">status</span>
+        <span class="now-cols-cpu">cpu</span>
+      </div>
 
-    <h1 class="now-title">
-      what i'm up to<span class="now-period">_</span>
-    </h1>
+      <ul class="now-list" role="list">
+        {nowProjects.map((project) => {
+          const meta = STATUS_META[project.status];
+          return (
+            <li class="now-item">
+              <a
+                href={project.url}
+                class="now-project-row"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-name={project.name}
+                data-status={project.status}
+              >
+                <span class="now-led" aria-hidden="true"></span>
+                <span class="now-project-name">{project.name}</span>
+                <span class={`now-status now-status--${project.status}`}>
+                  <span aria-hidden="true">{meta.glyph}</span> {meta.label}
+                </span>
+                <span
+                  class="now-meter"
+                  aria-hidden="true"
+                  style={`--segs: ${meta.segments};`}
+                ></span>
+                <p class="now-project-update">{project.update}</p>
+                <span class="now-project-link" aria-hidden="true">
+                  <span class="now-project-link-arrow">&rarr;</span>
+                  <span class="now-project-link-url">{project.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
 
-    <p class="now-updated">
-      <span class="now-updated-label">last updated</span>
-      <time datetime={NOW_UPDATED}>{formattedUpdated}</time>
-    </p>
-
-    <p class="now-intro">
-      the side projects i'm actively iterating on right now. if something here catches your eye, pop into it or message me on x.
-    </p>
-
-    <ul class="now-list" role="list">
-      {nowProjects.map((project) => (
-        <li class="now-item">
-          <a
-            href={project.url}
-            class="now-project-row"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-name={project.name}
-            data-status={project.status}
-          >
-            <div class="now-project-head">
-              <span class="now-project-name">{project.name}</span>
-              <span class={`now-status now-status--${project.status}`}>{project.status}</span>
-            </div>
-            <p class="now-project-update">{project.update}</p>
-            <span class="now-project-link" aria-hidden="true">
-              <span class="now-project-link-arrow">&rarr;</span>
-              <span class="now-project-link-url">{project.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
-            </span>
-          </a>
-        </li>
-      ))}
-    </ul>
-
-    <nav class="post-nav" aria-label="Page navigation">
-      <a href="/" class="post-nav-link">&larr; $ cd ~/</a>
-      <a href="/blog/" class="post-nav-link">/blog &rarr;</a>
-    </nav>
+      <Fragment slot="status">
+        <span class="now-statusbar-left">
+          {nowProjects.length} processes ·
+          last updated: <time datetime={NOW_UPDATED}>{NOW_UPDATED}</time>
+        </span>
+        <span class="now-statusbar-nav">
+          <a href="/blog/" class="post-nav-link">/blog &rarr;</a>
+          <a href="/" class="post-nav-link">$ exit</a>
+        </span>
+      </Fragment>
+    </Window>
   </main>
 
   <script>

@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Window from '../components/Window.astro';
 import { getPublishedPosts, formatPubDate, toIsoDate, isNewPost } from '../utils/blog';
 import '../styles/home.css';
 
@@ -78,87 +79,148 @@ const sideProjectItemList = {
 };
 ---
 
-<BaseLayout pageType="profile">
+<BaseLayout pageType="profile" taskbar>
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(projectItemList)}></script>
     <script is:inline type="application/ld+json" set:html={JSON.stringify(sideProjectItemList)}></script>
   </Fragment>
 
-  <div class="scroll-dot" aria-hidden="true"></div>
+  <Fragment slot="menubar-hint">
+    press <kbd>g</kbd> then <kbd>h</kbd>/<kbd>a</kbd>/<kbd>p</kbd>/<kbd>s</kbd>/<kbd>w</kbd>/<kbd>c</kbd>
+  </Fragment>
 
-  <main class="portfolio-page">
-    <!-- Shell Bar -->
-    <div class="shell-bar" role="banner">
-      <div class="shell-bar-dots" aria-hidden="true">
-        <span class="shell-bar-dot shell-bar-dot--live"></span>
-        <span class="shell-bar-dot"></span>
-        <span class="shell-bar-dot"></span>
-      </div>
-      <span class="shell-bar-path">ralph@jonas:~ — portfolio.sh</span>
-      <span class="shell-bar-hint">
-        press <kbd>g</kbd> then <kbd>a</kbd>/<kbd>p</kbd>/<kbd>s</kbd>/<kbd>w</kbd>/<kbd>c</kbd>
-      </span>
-    </div>
-
-    <!-- Hero -->
-    <section class="hero" id="hero">
-      <div class="hero-inner">
-        <div class="hero-whoami" aria-hidden="true">
-          <span class="hero-whoami-prompt">$</span>
-          <span>whoami</span>
-          <span style="color: var(--color-ink-muted);">--verbose</span>
-        </div>
-
-        <h1 class="hero-name">
-          <span class="visually-hidden">Ralph Jonas Mungcal — Full-Stack Developer & AI Integration Specialist</span>
-          <span class="hero-name-line" aria-hidden="true">
-            {'Ralph'.split('').map(letter => (
-              <span class="hero-name-letter motion-letter">{letter}</span>
-            ))}
+  <main class="portfolio-page" data-desktop>
+    <!-- ── Desktop zone ─────────────────────────────────────────────── -->
+    <section class="desktop" id="hero" aria-label="ralphOS desktop">
+      <!-- Hero window (floating ≥1024px + fine pointer; in-flow card otherwise) -->
+      <section
+        class="win win--floating hero-window"
+        data-draggable
+        aria-label="welcome window"
+      >
+        <header class="win-bar">
+          <span class="win-title">readme.md — ralph jonas</span>
+          <span class="win-controls">
+            <button type="button" class="win-btn win-btn--close" data-close-joke aria-label="close" hidden>×</button>
           </span>
-          <span class="hero-name-line" aria-hidden="true">
-            {'Jonas'.split('').map(letter => (
-              <span class="hero-name-letter motion-letter">{letter}</span>
-            ))}
-            <span class="hero-name-letter motion-letter hero-period">_</span>
-          </span>
-        </h1>
+        </header>
+        <div class="win-body hero-window-body">
+          <div class="hero-whoami" aria-hidden="true">
+            <span class="hero-whoami-prompt">$</span>
+            <span>whoami</span>
+            <span class="hero-whoami-flag">--verbose</span>
+          </div>
 
-        <p class="hero-subtitle motion-fade" data-typewriter={HERO_SUBTITLE}>
-          <span class="hero-subtitle-sizer" aria-hidden="true">{HERO_SUBTITLE}</span>
-          <span class="hero-subtitle-typed" aria-hidden="true">
-            <span class="hero-subtitle-text">{HERO_SUBTITLE}</span>
-            <span class="hero-cursor"></span>
-          </span>
-          <span class="visually-hidden">{HERO_SUBTITLE}</span>
-        </p>
+          <h1 class="hero-name">
+            <span class="visually-hidden">Ralph Jonas Mungcal — Full-Stack Developer & AI Integration Specialist</span>
+            <span class="hero-name-line" aria-hidden="true">
+              {'Ralph'.split('').map(letter => (
+                <span class="hero-name-letter motion-letter">{letter}</span>
+              ))}
+            </span>
+            <span class="hero-name-line" aria-hidden="true">
+              {'Jonas'.split('').map(letter => (
+                <span class="hero-name-letter motion-letter">{letter}</span>
+              ))}
+              <span class="hero-name-letter motion-letter hero-period">_</span>
+            </span>
+          </h1>
 
-        <div class="hero-tags motion-fade" aria-hidden="true">
-          <span class="hero-tag">#typescript</span>
-          <span class="hero-tag">#node</span>
-          <span class="hero-tag">#gcp</span>
-          <span class="hero-tag">#ai</span>
-          <span class="hero-tag">#linux</span>
+          <p class="hero-subtitle motion-fade" data-typewriter={HERO_SUBTITLE}>
+            <span class="hero-subtitle-sizer" aria-hidden="true">{HERO_SUBTITLE}</span>
+            <span class="hero-subtitle-typed" aria-hidden="true">
+              <span class="hero-subtitle-text">{HERO_SUBTITLE}</span>
+              <span class="hero-cursor"></span>
+            </span>
+            <span class="visually-hidden">{HERO_SUBTITLE}</span>
+          </p>
+
+          <div class="hero-tags motion-fade" aria-hidden="true">
+            <span class="hero-tag">#typescript</span>
+            <span class="hero-tag">#node</span>
+            <span class="hero-tag">#gcp</span>
+            <span class="hero-tag">#ai</span>
+            <span class="hero-tag">#linux</span>
+          </div>
         </div>
+      </section>
 
-        <div class="hero-scroll motion-fade">
-          <span class="hero-scroll-text">scroll</span>
-          <span class="hero-scroll-arrow">&#8595;</span>
-        </div>
+      <!-- Desktop icons -->
+      <nav class="desktop-icons" aria-label="desktop shortcuts">
+        <a class="desktop-icon" href="#about" style="--app-tint: var(--tint-about);">
+          <svg viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M2 1h5l3 3v7H2z" fill="var(--color-surface)" stroke="var(--color-ink)" stroke-width="1" />
+            <path d="M7 1v3h3" fill="none" stroke="var(--color-ink)" stroke-width="1" />
+            <path d="M4 6h4M4 8h4" stroke="var(--color-app-about)" stroke-width="1" />
+          </svg>
+          <span class="desktop-icon-label">about.md</span>
+        </a>
+        <a class="desktop-icon" href="#projects" style="--app-tint: var(--tint-projects);">
+          <svg viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M1 2h4l1 1h5v7H1z" fill="var(--tint-projects)" stroke="var(--color-ink)" stroke-width="1" />
+            <path d="M1 5h10" stroke="var(--color-ink)" stroke-width="1" />
+          </svg>
+          <span class="desktop-icon-label">projects/</span>
+        </a>
+        <a class="desktop-icon" href="#side-projects" style="--app-tint: var(--tint-side);">
+          <svg viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M1 2h4l1 1h5v7H1z" fill="var(--tint-side)" stroke="var(--color-ink)" stroke-width="1" />
+            <path d="M1 5h10" stroke="var(--color-ink)" stroke-width="1" />
+          </svg>
+          <span class="desktop-icon-label">side-quests/</span>
+        </a>
+        <a class="desktop-icon" href="#writing" style="--app-tint: var(--tint-writing);">
+          <svg viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M1 2h4l1 1h5v7H1z" fill="var(--tint-writing)" stroke="var(--color-ink)" stroke-width="1" />
+            <path d="M1 5h10" stroke="var(--color-ink)" stroke-width="1" />
+          </svg>
+          <span class="desktop-icon-label">writing/</span>
+        </a>
+        <a class="desktop-icon" href="#contact" style="--app-tint: var(--tint-contact);">
+          <svg viewBox="0 0 12 12" aria-hidden="true">
+            <rect x="1" y="3" width="10" height="7" fill="var(--tint-contact)" stroke="var(--color-ink)" stroke-width="1" />
+            <path d="M1 3l5 4 5-4" fill="none" stroke="var(--color-ink)" stroke-width="1" />
+          </svg>
+          <span class="desktop-icon-label">contact.exe</span>
+        </a>
+        <a class="desktop-icon" href="/now/">
+          <svg viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M2 1h8v8l-2 2H2z" fill="var(--color-sticky)" stroke="var(--color-ink)" stroke-width="1" />
+            <path d="M8 11V9h2" fill="none" stroke="var(--color-ink)" stroke-width="1" />
+            <path d="M4 4h4M4 6h3" stroke="var(--color-ink-muted)" stroke-width="1" />
+          </svg>
+          <span class="desktop-icon-label">now.txt</span>
+        </a>
+        <button type="button" class="desktop-icon desktop-icon--trash" id="open-trash">
+          <svg viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M3 3h6v8H3z" fill="var(--color-bg-alt)" stroke="var(--color-ink)" stroke-width="1" />
+            <path d="M2 3h8M5 1h2v2" fill="none" stroke="var(--color-ink)" stroke-width="1" />
+            <path d="M5 5v4M7 5v4" stroke="var(--color-ink-muted)" stroke-width="1" />
+          </svg>
+          <span class="desktop-icon-label">trash</span>
+        </button>
+      </nav>
+
+      <!-- Sticky note (desktop only) -->
+      <aside class="sticky-note" data-draggable="self" aria-label="sticky note">
+        <p class="sticky-line">TODO: touch grass</p>
+        <p class="sticky-line"><a href="/now/">check ~/now</a></p>
+        <p class="sticky-line sticky-sig" aria-hidden="true">– ralph</p>
+      </aside>
+
+      <div class="hero-scroll motion-fade">
+        <span class="hero-scroll-flow"><span class="hero-scroll-text">scroll</span> <span class="hero-scroll-arrow" aria-hidden="true">&#8595;</span></span>
+        <span class="hero-scroll-desktop">click a folder to open it</span>
       </div>
     </section>
 
-    <!-- 01. About -->
-    <section class="section" id="about">
-      <div class="section-inner">
-        <div class="section-header">
-          <span class="section-prompt">$</span>
-          <span class="section-cmd">cat about.md</span>
-          <span class="section-cmd-flag">--format=plain</span>
-          <span class="section-number">01<span class="dot-target" aria-hidden="true">.</span></span>
-        </div>
-        <h2 class="section-heading visually-hidden">About Ralph Jonas Mungcal</h2>
-        <hr class="section-rule" role="presentation" />
+    <!-- ── Section windows 01–05 ────────────────────────────────────── -->
+    <div class="home-sections">
+      <!-- 01. About -->
+      <Window title="about.md — 01" app="about" id="about" variant="section" headingLevel={2} collapsible>
+        <p class="win-cmdline" aria-hidden="true">
+          <span class="cmd-prompt">$</span> cat about.md <span class="cmd-flag">--format=plain</span>
+        </p>
 
         <div class="about-grid">
           <div class="about-col-left">
@@ -203,20 +265,13 @@ const sideProjectItemList = {
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </Window>
 
-    <!-- 02. Projects -->
-    <section class="section" id="projects">
-      <div class="section-inner">
-        <div class="section-header">
-          <span class="section-prompt">$</span>
-          <span class="section-cmd">ls ./projects/</span>
-          <span class="section-cmd-flag">-la</span>
-          <span class="section-number">02<span class="dot-target" aria-hidden="true">.</span></span>
-        </div>
-        <h2 class="section-heading visually-hidden">Projects</h2>
-        <hr class="section-rule" role="presentation" />
+      <!-- 02. Projects -->
+      <Window title="ls ./projects — 02" app="projects" id="projects" variant="section" headingLevel={2} collapsible>
+        <p class="win-cmdline" aria-hidden="true">
+          <span class="cmd-prompt">$</span> ls ./projects/ <span class="cmd-flag">-la</span>
+        </p>
 
         <ul class="project-list" role="list">
           {featuredProjects.map((project) => (
@@ -268,23 +323,16 @@ const sideProjectItemList = {
           </li>
         </ul>
 
-        <a href="/projects/" class="writing-view-all motion-fade">
+        <a href="/projects/" class="keycap view-all-keycap motion-fade">
           view all projects <span aria-hidden="true">&rarr;</span>
         </a>
-      </div>
-    </section>
+      </Window>
 
-    <!-- 03. Side Projects -->
-    <section class="section" id="side-projects">
-      <div class="section-inner">
-        <div class="section-header">
-          <span class="section-prompt">$</span>
-          <span class="section-cmd">cd ~/side-projects/</span>
-          <span class="section-cmd-flag">&amp;&amp; ls</span>
-          <span class="section-number">03<span class="dot-target" aria-hidden="true">.</span></span>
-        </div>
-        <h2 class="section-heading visually-hidden">Side Projects</h2>
-        <hr class="section-rule" role="presentation" />
+      <!-- 03. Side Projects -->
+      <Window title="side-quests — 03" app="side" id="side-projects" variant="section" headingLevel={2} collapsible>
+        <p class="win-cmdline" aria-hidden="true">
+          <span class="cmd-prompt">$</span> cd ~/side-projects/ <span class="cmd-flag">&amp;&amp; ls</span>
+        </p>
 
         <p class="side-project-intro motion-fade">
           showing 3 of what i'm up to right now. tap <strong>see all projects</strong> below for the full list.
@@ -320,23 +368,16 @@ const sideProjectItemList = {
           </li>
         </ul>
 
-        <a href="/now/" class="side-project-view-all motion-fade">
+        <a href="/now/" class="keycap view-all-keycap motion-fade">
           see all projects <span aria-hidden="true">&rarr;</span>
         </a>
-      </div>
-    </section>
+      </Window>
 
-    <!-- 04. Writing -->
-    <section class="section" id="writing">
-      <div class="section-inner">
-        <div class="section-header">
-          <span class="section-prompt">$</span>
-          <span class="section-cmd">git log ./writing/</span>
-          <span class="section-cmd-flag">--oneline -5</span>
-          <span class="section-number">04<span class="dot-target" aria-hidden="true">.</span></span>
-        </div>
-        <h2 class="section-heading visually-hidden">Writing</h2>
-        <hr class="section-rule" role="presentation" />
+      <!-- 04. Writing -->
+      <Window title="git log ./writing — 04" app="writing" id="writing" variant="section" headingLevel={2} collapsible>
+        <p class="win-cmdline" aria-hidden="true">
+          <span class="cmd-prompt">$</span> git log ./writing/ <span class="cmd-flag">--oneline -5</span>
+        </p>
 
         <ul class="writing-list" role="list">
           {blogPosts.length > 0 ? (
@@ -359,25 +400,20 @@ const sideProjectItemList = {
           )}
         </ul>
 
-        <a href="/blog/" class="writing-view-all motion-fade">
+        <a href="/blog/" class="keycap view-all-keycap motion-fade">
           view all posts <span aria-hidden="true">&rarr;</span>
         </a>
-      </div>
-    </section>
+      </Window>
 
-    <!-- 05. Contact -->
-    <section class="section" id="contact">
-      <div class="section-inner">
-        <div class="section-header">
-          <span class="section-prompt">$</span>
-          <span class="section-cmd">echo "let's build"</span>
-          <span class="section-cmd-flag">| mail -s hi</span>
-          <span class="section-number">05<span class="dot-target" aria-hidden="true">.</span></span>
-        </div>
-        <h2 class="contact-cta motion-fade">
+      <!-- 05. Contact -->
+      <Window title="mail — 05" app="contact" id="contact" variant="section" headingLevel={2} collapsible>
+        <p class="win-cmdline" aria-hidden="true">
+          <span class="cmd-prompt">$</span> echo "let's build" <span class="cmd-flag">| mail -s hi</span>
+        </p>
+
+        <h3 class="contact-cta motion-fade">
           let's work<br />together<span class="contact-period">_</span>
-        </h2>
-        <hr class="section-rule" role="presentation" />
+        </h3>
 
         <dialog class="mail-modal" id="contact-modal" aria-labelledby="contact-modal-title">
           <form class="mail-composer" id="contact-form" method="POST" action="https://api.web3forms.com/submit" novalidate>
@@ -421,18 +457,55 @@ const sideProjectItemList = {
         </dialog>
 
         <div class="contact-links">
-          <button type="button" class="contact-link contact-link--wiggle motion-stagger" id="open-contact-modal">email</button>
-          <a href="https://www.linkedin.com/in/ralphjonasmungcal" class="contact-link motion-stagger" target="_blank" rel="noopener noreferrer">linkedin</a>
-          <a href="https://x.com/ralphsenpaidev" class="contact-link motion-stagger" target="_blank" rel="noopener noreferrer">x</a>
-          <a href="https://bsky.app/profile/ralphdev.bsky.social" class="contact-link motion-stagger" target="_blank" rel="noopener noreferrer">bluesky</a>
+          <button type="button" class="keycap keycap--primary contact-link contact-link--wiggle motion-stagger" id="open-contact-modal">email</button>
+          <a href="https://www.linkedin.com/in/ralphjonasmungcal" class="keycap contact-link motion-stagger" target="_blank" rel="noopener noreferrer">linkedin</a>
+          <a href="https://x.com/ralphsenpaidev" class="keycap contact-link motion-stagger" target="_blank" rel="noopener noreferrer">x</a>
+          <a href="https://bsky.app/profile/ralphdev.bsky.social" class="keycap contact-link motion-stagger" target="_blank" rel="noopener noreferrer">bluesky</a>
+        </div>
+
+        <footer class="site-footer">
+          <span>process exited — ralph jonas mungcal &copy; {currentYear}</span>
+          <span aria-hidden="true">[ctrl+c to detach]</span>
+        </footer>
+      </Window>
+    </div>
+
+    <!-- Browser window (desktop mode: internal pages open here instead of navigating) -->
+    <section class="win win--floating browser-win" id="browser-win" aria-label="browser window">
+      <header class="win-bar">
+        <span class="win-title" id="browser-title">browser</span>
+        <span class="win-controls">
+          <a class="win-btn" id="browser-open-tab" href="/" target="_blank" rel="noopener" aria-label="open page in new tab">&nearr;</a>
+          <button type="button" class="win-btn win-btn--close" id="browser-close" aria-label="close browser">×</button>
+        </span>
+      </header>
+      <div class="browser-toolbar" aria-hidden="true">
+        <span class="browser-home">⌂</span>
+        <span class="browser-address" id="browser-address">ralphjonas.com</span>
+      </div>
+      <iframe class="browser-frame" id="browser-frame" title="page preview"></iframe>
+    </section>
+
+    <!-- Trash (easter egg dialog) -->
+    <dialog class="trash-modal" id="trash-modal" aria-labelledby="trash-modal-title" data-draggable>
+      <div class="trash-win win--inverse" style="--app: var(--color-ink);">
+        <header class="win-bar">
+          <span class="win-title" id="trash-modal-title">trash</span>
+          <span class="win-controls">
+            <button type="button" class="win-btn win-btn--close trash-close" aria-label="close trash">×</button>
+          </span>
+        </header>
+        <ul class="trash-list" role="list">
+          <li class="trash-row"><span class="trash-file">jquery-portfolio-2014.zip</span><span class="trash-meta">4.2 mb</span></li>
+          <li class="trash-row"><span class="trash-file">ideas-from-3am/</span><span class="trash-meta">47 items</span></li>
+          <li class="trash-row"><span class="trash-file">unused-domain-names.txt</span><span class="trash-meta">12 kb</span></li>
+          <li class="trash-row"><span class="trash-file">todo-before-launch.txt</span><span class="trash-meta">∞ kb</span></li>
+        </ul>
+        <div class="trash-actions">
+          <button type="button" class="keycap" id="empty-trash">empty trash</button>
         </div>
       </div>
-
-      <footer class="site-footer">
-        <span>process exited — ralph jonas mungcal &copy; {currentYear}</span>
-        <span aria-hidden="true">[ctrl+c to detach]</span>
-      </footer>
-    </section>
+    </dialog>
 
     <!-- Keyboard Nav Toast -->
     <div class="kbd-toast" id="kbd-toast" aria-live="polite">

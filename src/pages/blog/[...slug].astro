@@ -7,7 +7,8 @@ import {
   getRelatedPosts,
   getWordCount,
   getReadingTimeMinutes,
-  tagToSlug
+  tagToSlug,
+  type BlogEntry
 } from '../../utils/blog';
 import '../../styles/blog.css';
 
@@ -17,6 +18,10 @@ export async function getStaticPaths() {
     params: { slug: post.id },
     props: { post }
   }));
+}
+
+interface Props {
+  post: BlogEntry;
 }
 
 const { post } = Astro.props;
@@ -78,10 +83,13 @@ const breadcrumb = {
   datePublished={post.data.pubDate.toISOString()}
   articleTags={post.data.tags}
   breadcrumb={breadcrumb}
+  osPath={`~/writing/${post.id}`}
 >
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(blogPosting)}></script>
   </Fragment>
+
+  <a slot="menubar-back" class="menubar-back post-back" href="/blog/" aria-label="Back to all posts">&larr; ~/writing</a>
 
   <main
     class="post-page"
@@ -90,120 +98,134 @@ const breadcrumb = {
     data-tags={post.data.tags.join(',')}
     data-pub-date={post.data.pubDate.toISOString()}
   >
-    <div class="blog-shell-bar" role="banner">
-      <div class="blog-shell-bar-dots" aria-hidden="true">
-        <span class="blog-shell-bar-dot blog-shell-bar-dot--live"></span>
-        <span class="blog-shell-bar-dot"></span>
-        <span class="blog-shell-bar-dot"></span>
-      </div>
-      <span>ralph@jonas:~/writing/{post.id} — post.md</span>
-    </div>
+    {/* Reader window: hand-rolled .win markup (not <Window/>) so the titlebar
+        stays a <span> — the post <h1> must remain the only h1 in the outline. */}
+    <section
+      class="win win--page post-window"
+      style="--app: var(--color-app-writing); --app-tint: var(--tint-writing);"
+    >
+      <header class="win-bar">
+        <span class="win-title">~/writing/{post.id}.md</span>
+        <span class="win-controls">
+          <a class="win-btn win-btn--close" href="/blog/" aria-label="close">&times;</a>
+        </span>
+      </header>
 
-    <a href="/blog/" class="post-back" aria-label="Back to all posts">
-      <span class="post-back-arrow" aria-hidden="true">&larr;</span>
-      <span class="post-back-label">all posts</span>
-    </a>
-
-    <article>
-      <div class="post-meta">
-        <span class="post-meta-prompt">$</span>
-        <span class="post-meta-cmd">cat {post.id}.md</span>
+      <div class="post-progress" aria-hidden="true">
+        <div class="post-progress-bar"></div>
       </div>
 
-      <time class="post-date" datetime={post.data.pubDate.toISOString()}>
-        {formatPubDateLong(post.data.pubDate)}
-        {post.data.updatedDate && (
-          <> &middot; updated {formatPubDateLong(post.data.updatedDate)}</>
+      <div class="win-body">
+        <article class="post-article">
+          <div class="post-meta">
+            <span class="post-meta-prompt">$</span>
+            <span class="post-meta-cmd">cat {post.id}.md</span>
+          </div>
+
+          <time class="post-date" datetime={post.data.pubDate.toISOString()}>
+            {formatPubDateLong(post.data.pubDate)}
+            {post.data.updatedDate && (
+              <> &middot; updated {formatPubDateLong(post.data.updatedDate)}</>
+            )}
+            {readingTime > 0 && (
+              <> &middot; {readingTime} min read</>
+            )}
+          </time>
+
+          <h1 class="post-title">
+            {post.data.title}<span class="post-period">_</span>
+          </h1>
+
+          {post.data.tags.length > 0 && (
+            <div class="post-tags" aria-label="Tags">
+              {post.data.tags.map((tag) => (
+                <a class="chip post-tag" href={`/blog/tags/${tagToSlug(tag)}/`}>#{tag}</a>
+              ))}
+            </div>
+          )}
+
+          <hr class="post-rule" role="presentation" />
+
+          <div class="post-content">
+            <Content />
+          </div>
+        </article>
+
+        <aside class="post-follow" aria-labelledby="post-follow-heading">
+          <span class="post-follow-chrome" aria-hidden="true">notification</span>
+          <div class="post-follow-inner">
+            <div class="post-follow-header">
+              <span class="post-follow-prompt">$</span>
+              <span class="post-follow-cmd">echo "liked this?"</span>
+            </div>
+            <h2 id="post-follow-heading" class="post-follow-title">
+              follow <span class="post-follow-handle">@ralphsenpaidev</span> on x
+            </h2>
+            <p class="post-follow-desc">
+              more notes on engineering, ai, and building things &mdash; usually before they land here.
+            </p>
+            <a
+              href="https://x.com/ralphsenpaidev"
+              class="post-follow-cta keycap"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="post-follow-cta-arrow" aria-hidden="true">&rarr;</span>
+              <span>x.com/ralphsenpaidev</span>
+            </a>
+          </div>
+        </aside>
+
+        {relatedPosts.length > 0 && (
+          <aside class="related-posts" aria-labelledby="related-posts-heading">
+            <div class="related-posts-header">
+              <span class="related-posts-prompt">$</span>
+              <span class="related-posts-cmd">grep -l related --tags</span>
+            </div>
+            <h2 id="related-posts-heading" class="related-posts-title">you may also open:</h2>
+            <ul class="related-posts-list">
+              {relatedPosts.map((related) => (
+                <li class="related-posts-item">
+                  <a href={`/blog/${related.id}/`} class="related-posts-link">
+                    <span class="related-posts-link-title">{related.data.title}</span>
+                    <span class="related-posts-link-desc">{related.data.description}</span>
+                    {related.data.tags.length > 0 && (
+                      <span class="related-posts-link-tags">
+                        {related.data.tags.map((tag) => (
+                          <span class="related-posts-link-tag">#{tag}</span>
+                        ))}
+                      </span>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </aside>
         )}
-        {readingTime > 0 && (
-          <> &middot; {readingTime} min read</>
-        )}
-      </time>
-
-      <h1 class="post-title">
-        {post.data.title}<span class="post-period">_</span>
-      </h1>
-
-      {post.data.tags.length > 0 && (
-        <div class="post-tags" aria-label="Tags">
-          {post.data.tags.map((tag) => (
-            <a class="post-tag" href={`/blog/tags/${tagToSlug(tag)}/`}>#{tag}</a>
-          ))}
-        </div>
-      )}
-
-      <hr class="post-rule" role="presentation" />
-
-      <div class="post-content">
-        <Content />
       </div>
-    </article>
 
-    <aside class="post-follow" aria-labelledby="post-follow-heading">
-      <div class="post-follow-header">
-        <span class="post-follow-prompt">$</span>
-        <span class="post-follow-cmd">echo "liked this?"</span>
-      </div>
-      <h2 id="post-follow-heading" class="post-follow-title">
-        follow <span class="post-follow-handle">@ralphsenpaidev</span> on x
-      </h2>
-      <p class="post-follow-desc">
-        more notes on engineering, ai, and building things &mdash; usually before they land here.
-      </p>
-      <a
-        href="https://x.com/ralphsenpaidev"
-        class="post-follow-cta"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <span class="post-follow-cta-arrow" aria-hidden="true">&rarr;</span>
-        <span>x.com/ralphsenpaidev</span>
-      </a>
-    </aside>
-
-    {relatedPosts.length > 0 && (
-      <aside class="related-posts" aria-labelledby="related-posts-heading">
-        <div class="related-posts-header">
-          <span class="related-posts-prompt">$</span>
-          <span class="related-posts-cmd">grep -l related --tags</span>
-        </div>
-        <h2 id="related-posts-heading" class="related-posts-title">related reading</h2>
-        <ul class="related-posts-list">
-          {relatedPosts.map((related) => (
-            <li class="related-posts-item">
-              <a href={`/blog/${related.id}/`} class="related-posts-link">
-                <span class="related-posts-link-title">{related.data.title}</span>
-                <span class="related-posts-link-desc">{related.data.description}</span>
-                {related.data.tags.length > 0 && (
-                  <span class="related-posts-link-tags">
-                    {related.data.tags.map((tag) => (
-                      <span class="related-posts-link-tag">#{tag}</span>
-                    ))}
-                  </span>
-                )}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </aside>
-    )}
-
-    <nav class="post-nav" aria-label="Post navigation">
-      {prevPost ? (
-        <a href={`/blog/${prevPost.id}/`} class="post-nav-link">
-          &larr; {prevPost.data.title}
-        </a>
-      ) : (
-        <a href="/blog/" class="post-nav-link">&larr; all posts</a>
-      )}
-      {nextPost ? (
-        <a href={`/blog/${nextPost.id}/`} class="post-nav-link">
-          {nextPost.data.title} &rarr;
-        </a>
-      ) : (
-        <a href="/" class="post-nav-link">$ cd ~/</a>
-      )}
-    </nav>
+      <footer class="win-statusbar">
+        <span class="post-statusbar-info">
+          {wordCount} words &middot; {readingTime} min read
+        </span>
+        <nav class="post-nav" aria-label="Post navigation">
+          {prevPost ? (
+            <a href={`/blog/${prevPost.id}/`} class="post-nav-link keycap">
+              &larr; {prevPost.data.title}
+            </a>
+          ) : (
+            <a href="/blog/" class="post-nav-link keycap">&larr; all posts</a>
+          )}
+          {nextPost ? (
+            <a href={`/blog/${nextPost.id}/`} class="post-nav-link keycap">
+              {nextPost.data.title} &rarr;
+            </a>
+          ) : (
+            <a href="/" class="post-nav-link keycap">$ cd ~/</a>
+          )}
+        </nav>
+      </footer>
+    </section>
   </main>
 
   <script>

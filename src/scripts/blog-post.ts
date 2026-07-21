@@ -7,29 +7,36 @@ import { markPostRead } from './read-posts';
 
 const posthog = (window as Window & { posthog?: PostHogClient }).posthog;
 const main = document.querySelector<HTMLElement>('main.post-page');
+const progressBar = document.querySelector<HTMLElement>('.post-progress-bar');
 
 if (main?.dataset.slug) {
   markPostRead(main.dataset.slug);
 }
 
-if (posthog && main) {
+/* ---------- Reading progress + scroll depth (single rAF-gated listener).
+   The progress bar works even when PostHog is unavailable; depth events
+   stay PostHog-gated. ---------- */
+if (main && (progressBar || posthog)) {
   const slug = main.dataset.slug ?? '';
-  const title = main.dataset.title ?? '';
-  const tags = main.dataset.tags ?? '';
-  const pubDate = main.dataset.pubDate ?? '';
-
-  posthog.capture('blog_post_viewed', { slug, title, tags, pub_date: pubDate });
-
-  /* ---------- Scroll depth ---------- */
   const depthMarks = new Set<number>();
   let depthTicking = false;
+
+  const paintProgress = (): number => {
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const ratio =
+      docHeight > 0 ? Math.min(Math.max(window.scrollY / docHeight, 0), 1) : 0;
+    if (progressBar) {
+      progressBar.style.transform = `scaleX(${ratio})`;
+    }
+    return ratio;
+  };
+
   const onScrollDepth = () => {
     if (depthTicking) return;
     depthTicking = true;
     requestAnimationFrame(() => {
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (docHeight > 0) {
-        const pct = Math.round((window.scrollY / docHeight) * 100);
+      const pct = Math.round(paintProgress() * 100);
+      if (posthog) {
         [25, 50, 75, 100].forEach((mark) => {
           if (pct >= mark && !depthMarks.has(mark)) {
             depthMarks.add(mark);
@@ -41,6 +48,16 @@ if (posthog && main) {
     });
   };
   window.addEventListener('scroll', onScrollDepth, { passive: true });
+  paintProgress(); // initial paint (deep links / restored scroll position)
+}
+
+if (posthog && main) {
+  const slug = main.dataset.slug ?? '';
+  const title = main.dataset.title ?? '';
+  const tags = main.dataset.tags ?? '';
+  const pubDate = main.dataset.pubDate ?? '';
+
+  posthog.capture('blog_post_viewed', { slug, title, tags, pub_date: pubDate });
 
   /* ---------- Read time (active dwell, visibility-gated) ---------- */
   let activeMs = 0;
@@ -110,8 +127,8 @@ if (posthog && main) {
     if (link.matches('.post-nav-link')) {
       const text = link.textContent?.trim() ?? '';
       let direction = 'other';
-      if (text.startsWith('\u2190')) direction = 'prev';
-      else if (text.endsWith('\u2192')) direction = 'next';
+      if (text.startsWith('←')) direction = 'prev';
+      else if (text.endsWith('→')) direction = 'next';
       else if (text.includes('cd ~/')) direction = 'home';
       posthog.capture('blog_post_nav_clicked', {
         from_slug: slug,

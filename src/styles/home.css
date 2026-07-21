@@ -1,162 +1,95 @@
+/* ===== ralphOS home — the desktop ====================================
+   Builds on os.css (window chrome, keycaps, chips, menubar, taskbar,
+   desktop-icon, toast). This file owns: desktop zone layout, hero
+   terminal, sticky note, section-window interiors (flat rows per the
+   shadow-noise rule), contact/mail restyle, trash dialog, CRT egg. */
+
 /* ===== Layout ===== */
 .portfolio-page {
   position: relative;
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: clamp(1rem, 3vw, 2rem) var(--section-padding-x);
 }
 
-/* ===== Top Shell Bar ===== */
-.shell-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-surface);
-  padding: 0.5rem 0.875rem;
-  box-shadow: var(--shadow-hard-sm);
-  font-size: 0.75rem;
-  margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
-}
-
-.shell-bar-dots {
-  display: flex;
-  gap: 0.35rem;
-}
-
-.shell-bar-dot {
-  width: 11px;
-  height: 11px;
-  border: 1.5px solid var(--color-border);
-  border-radius: 50%;
-  background: var(--color-bg-alt);
-}
-
-.shell-bar-dot--live {
-  background: var(--color-accent);
-}
-
-.shell-bar-path {
-  flex: 1;
-  color: var(--color-ink-soft);
-  font-size: 0.75rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.shell-bar-hint {
-  display: none;
-  color: var(--color-ink-muted);
-  font-size: 0.7rem;
-}
-
-.shell-bar-hint kbd {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  background: var(--color-bg-alt);
-  border: 1px solid var(--color-border);
-  padding: 0 0.3rem;
-  border-radius: 2px;
-}
-
-@media (min-width: 720px) {
-  .shell-bar-hint {
-    display: inline-flex;
-    gap: 0.35rem;
-    align-items: center;
-  }
-}
-
-/* ===== Section ===== */
-.section {
+/* ===== Desktop zone =====
+   Mobile-first: a stacked compact header — hero terminal card first in
+   flow, icons as a tile grid beneath it, sticky note hidden.
+   Under html.js-desktop (≥1024px + fine pointer, set by window.ts) it
+   becomes a real desktop: absolute icons column, floating windows. */
+.desktop {
   position: relative;
-  width: 100%;
-  padding: clamp(2rem, 5vw, 3.5rem) 0;
-  scroll-margin-top: 1.5rem;
-}
-
-.section-inner {
-  width: 100%;
-}
-
-/* Section header as a shell prompt */
-.section-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.6rem 0.9rem;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
-  border-bottom: var(--border-w) dashed var(--color-border);
-}
-
-.section-prompt {
-  color: var(--color-accent);
-  font-weight: 700;
-  font-size: 0.95rem;
-  user-select: none;
-}
-
-.section-cmd {
-  font-size: clamp(1.05rem, 2.2vw, 1.4rem);
-  font-weight: 700;
-  color: var(--color-ink);
-  letter-spacing: -0.01em;
-}
-
-.section-cmd-flag {
-  color: var(--color-ink-muted);
-  font-weight: 500;
-}
-
-.section-number {
-  margin-left: auto;
-  font-size: 0.75rem;
-  color: var(--color-ink-muted);
-  letter-spacing: 0.05em;
-}
-
-/* Dot target preserved for JS compat but hidden visually */
-.dot-target {
-  color: transparent;
-  pointer-events: none;
-  user-select: none;
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-}
-
-.section-rule {
-  display: none;
-}
-
-/* ===== Hero ===== */
-.hero {
-  min-height: calc(100svh - 4rem);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  position: relative;
-  padding: clamp(2rem, 6vw, 4rem) 0;
+  gap: clamp(1.5rem, 4vw, 2.25rem);
+  padding: clamp(1rem, 3vw, 2rem) var(--section-padding-x) clamp(1.5rem, 4vw, 2.5rem);
 }
 
-.hero-inner {
+.js-desktop .desktop {
+  display: block;
+  min-height: calc(100dvh - var(--menubar-h));
+  padding: 0;
+}
+
+/* Icons: 3-up tile grid on small screens, left column on the desktop */
+.desktop-icons {
+  display: grid;
+  grid-template-columns: repeat(3, var(--icon-cell));
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.js-desktop .desktop-icons {
+  position: absolute;
+  top: 24px;
+  left: 20px;
+  bottom: calc(var(--taskbar-h) + 24px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* trash pinned to the bottom of the icon column */
+.js-desktop .desktop-icon--trash {
+  margin-top: auto;
+}
+
+/* the trash icon is a <button> — strip UA chrome, inherit the pattern */
+button.desktop-icon {
+  appearance: none;
+  background: transparent;
+  border: none;
+  font: inherit;
+  color: inherit;
+}
+
+/* ===== Hero window (a normal window — terminal voice stays in the
+   cmdline, the chrome is the same cream as every other window) ===== */
+.hero-window {
   width: 100%;
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-hard-lg);
-  padding: clamp(1.25rem, 4vw, 2.5rem);
+  max-width: 56rem;
+  margin-inline: auto;
+  --win-pad: clamp(1.25rem, 3.5vw, 2.25rem);
+}
+
+/* Hero owns the RIGHT half of the desktop; section windows cascade on the
+   left (their right edges stay short of 52vw) so opening a folder never
+   covers the hero. */
+.js-desktop .hero-window {
+  margin: 0;
+  max-width: none;
+  top: 7%;
+  left: 52%;
+  width: min(600px, 46vw);
 }
 
 .hero-whoami {
   font-size: 0.8rem;
-  color: var(--color-ink-muted);
+  color: var(--color-ink-soft);
   margin-bottom: 1.5rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border-faint);
 }
 
 .hero-whoami-prompt {
@@ -164,9 +97,13 @@
   font-weight: 700;
 }
 
+.hero-whoami-flag {
+  color: var(--color-ink-muted);
+}
+
 .hero-name {
   font-family: var(--font-mono);
-  font-size: clamp(2.75rem, 11vw, 7rem);
+  font-size: clamp(2.5rem, 8vw, 5.25rem);
   font-weight: 800;
   line-height: 0.95;
   letter-spacing: -0.04em;
@@ -188,7 +125,7 @@
 
 .hero-subtitle {
   font-family: var(--font-mono);
-  font-size: clamp(0.95rem, 1.6vw, 1.125rem);
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
   font-weight: 400;
   color: var(--color-ink-soft);
   margin-top: clamp(1.25rem, 2.5vw, 1.75rem);
@@ -220,7 +157,7 @@
   width: 0.55ch;
   height: 1em;
   vertical-align: -0.12em;
-  background: var(--color-cursor);
+  background: var(--color-accent);
   margin-left: 2px;
   animation: cursor-blink 1s steps(2) infinite;
 }
@@ -238,28 +175,70 @@
 }
 
 .hero-tag {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 500;
   color: var(--color-ink);
-  background: var(--color-bg-alt);
-  border: var(--border-w) solid var(--color-border);
-  padding: 0.3rem 0.65rem;
-  box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  background: var(--color-surface);
+  border: 1px solid var(--color-ink);
+  padding: 0.25rem 0.6rem;
+  transition: background var(--t-fast);
 }
 
 /* Hover-capable devices only: tags aren't interactive, so a tap on touch
-   screens shouldn't leave one stuck in the lifted state. */
+   screens shouldn't leave one stuck in the hover state. */
 @media (hover: hover) {
   .hero-tag:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: var(--shadow-hard);
     background: var(--color-accent-soft);
   }
 }
 
+/* ===== Sticky note (desktop only) ===== */
+.sticky-note {
+  display: none;
+}
+
+.js-desktop .sticky-note {
+  display: block;
+  position: absolute;
+  z-index: var(--z-float);
+  top: 60%;
+  left: 15%;
+  width: 180px;
+  padding: 0.9rem 1rem 1rem;
+  background: var(--color-sticky);
+  border: var(--border-w) solid var(--color-ink);
+  box-shadow: var(--shadow-hard);
+  rotate: -2deg; /* rotate property — draggable.ts owns left/top only */
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--color-ink);
+  cursor: grab;
+  touch-action: none;
+}
+
+.sticky-line {
+  margin: 0;
+}
+
+.sticky-line a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: 2px;
+}
+
+.sticky-line a:hover {
+  color: var(--color-accent);
+}
+
+.sticky-sig {
+  margin-top: 0.4rem;
+  color: var(--color-ink-soft);
+}
+
+/* ===== Scroll hint (flow) / open hint (desktop) ===== */
 .hero-scroll {
-  margin-top: clamp(2rem, 4vw, 3rem);
+  align-self: center;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -268,9 +247,46 @@
   letter-spacing: 0.05em;
 }
 
-.hero-scroll-text,
-.hero-scroll-arrow {
+.hero-scroll-flow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hero-scroll-desktop {
+  display: none;
+}
+
+/* desktop mode: the hint is a second sticky note slapped above the taskbar */
+.js-desktop .hero-scroll {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  bottom: calc(var(--taskbar-h) + 24px);
+  rotate: -2deg;
+  padding: 0.7rem 0.9rem;
+  background: var(--color-sticky);
+  border: var(--border-w) solid var(--color-ink);
+  box-shadow: var(--shadow-hard);
+  color: var(--color-ink);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+/* desktop mode doesn't scroll — swap the hint */
+.js-desktop .hero-scroll-flow {
+  display: none;
+}
+
+.js-desktop .hero-scroll-desktop {
   display: inline;
+}
+
+.js-desktop .hero-scroll-desktop::before {
+  content: '→ ';
+  color: var(--color-accent);
+  font-weight: 700;
 }
 
 .hero-scroll-arrow {
@@ -278,41 +294,207 @@
   animation: bounce-arrow 1.6s ease-in-out infinite;
 }
 
-.hero-scroll-line {
-  display: none;
-}
-
 @keyframes bounce-arrow {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(3px); }
 }
 
-/* ===== Shared Card ===== */
-.brut-card {
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-hard);
-  padding: clamp(0.875rem, 2vw, 1.25rem);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+/* ===== Section windows container ===== */
+.home-sections {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding-inline: var(--section-padding-x);
 }
 
-.brut-card:hover,
-.brut-card:focus-visible {
-  transform: translate(-2px, -2px);
+.home-sections .win--section {
+  --win-pad: clamp(1.25rem, 3.5vw, 2.5rem);
+}
+
+/* mobile: lighter shadow so windows don't crowd narrow screens */
+@media (max-width: 719.98px) {
+  .home-sections .win--section {
+    box-shadow: var(--shadow-hard-sm);
+  }
+}
+
+/* ===== Desktop mode: sections are REAL windows =========================
+   Under html.js-desktop the home page stops scrolling entirely. Section
+   windows hide until opened from a desktop icon / taskbar app / g-key /
+   #hash, then float on the desktop: draggable by titlebar, closable,
+   focus-raised, scrolling internally. Flow layout (mobile / no-JS /
+   coarse pointer) is untouched — content stays crawlable. */
+
+.js-desktop body.has-taskbar {
+  overflow: hidden; /* the desktop is the viewport; windows scroll inside */
+}
+
+.js-desktop .home-sections {
+  max-width: none;
+  padding: 0;
+}
+
+.js-desktop .home-sections .win--section {
+  display: none;
+  position: absolute;
+  top: var(--wy, 12%);
+  left: var(--wx, 20%);
+  z-index: var(--z-float);
+  /* right edge (--wx + width) stays < the hero's 52vw left edge */
+  width: min(600px, 42vw);
+  /* deepest cascade slot (--wy 32%) + height must clear the taskbar */
+  max-height: min(62dvh, calc(100dvh - var(--menubar-h) - var(--taskbar-h) - 48px));
+  margin: 0;
+  flex-direction: column;
+  border-width: var(--border-w-focus);
   box-shadow: var(--shadow-hard-lg);
 }
 
-.brut-card:focus-visible {
-  outline: none;
-  border-color: var(--color-accent);
+.js-desktop .home-sections .win--section.is-open {
+  display: flex;
+  animation: win-pop var(--t-normal);
 }
 
-a.brut-card {
-  color: inherit;
-  display: block;
+.js-desktop .home-sections .win--section.is-focused {
+  box-shadow: var(--shadow-win-focus);
 }
 
-/* ===== About ===== */
+.js-desktop .home-sections .win--section:focus-visible {
+  outline-offset: 4px;
+}
+
+.js-desktop .home-sections .win--section > .win-bar {
+  flex: none;
+  cursor: move;
+  touch-action: none;
+}
+
+.js-desktop .home-sections .win--section > .win-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+}
+
+/* boot cascade — left column, clear of the icon strip and the hero
+   (drag overrides). --wx + 42vw ≤ 52vw at every viewport ≥1024px. */
+.js-desktop .home-sections .win--section:nth-of-type(1) { --wx: 7%; --wy: 8%; }
+.js-desktop .home-sections .win--section:nth-of-type(2) { --wx: 8%; --wy: 14%; }
+.js-desktop .home-sections .win--section:nth-of-type(3) { --wx: 9%; --wy: 20%; }
+.js-desktop .home-sections .win--section:nth-of-type(4) { --wx: 7.5%; --wy: 26%; }
+.js-desktop .home-sections .win--section:nth-of-type(5) { --wx: 8.5%; --wy: 32%; }
+
+/* Windows are ~42vw now — their multi-column layouts key off VIEWPORT
+   media queries, so force the single-column variants inside windows. */
+.js-desktop .home-sections .about-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.js-desktop .home-sections .side-project-list {
+  grid-template-columns: 1fr;
+}
+
+@keyframes win-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+/* ===== Browser window (desktop mode only) ==============================
+   Internal page links on the desktop open here — a browser-chromed
+   floating window with the real page in a same-origin iframe. Closed and
+   inert everywhere else (flow mode navigates normally). */
+
+.browser-win {
+  display: none;
+}
+
+.js-desktop .browser-win.is-open {
+  display: flex;
+  flex-direction: column;
+  top: 6%;
+  left: 11%;
+  width: min(920px, 76vw);
+  height: min(84dvh, calc(100dvh - var(--menubar-h) - var(--taskbar-h) - 40px));
+  background: var(--color-bg);
+  animation: win-pop var(--t-normal);
+}
+
+.browser-win > .win-bar {
+  flex: none;
+}
+
+.browser-toolbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  font: 400 12px var(--font-mono);
+  color: var(--color-ink-soft);
+  background: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border-faint);
+}
+
+.browser-home {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.browser-address {
+  flex: 1;
+  min-width: 0;
+  padding: 3px 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-ink);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.browser-frame {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border: 0;
+  background: var(--color-bg);
+}
+
+/* The old shell-prompt section header lives on as the first line of each
+   window body — the terminal voice survives inside the window. */
+.win-cmdline {
+  font-size: 0.8rem;
+  color: var(--color-ink-soft);
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border-faint);
+}
+
+.cmd-prompt {
+  color: var(--color-accent);
+  font-weight: 700;
+  user-select: none;
+}
+
+.cmd-flag {
+  color: var(--color-ink-muted);
+}
+
+/* shared "view all" keycap links */
+.view-all-keycap {
+  display: inline-block;
+  margin-top: 1.25rem;
+  text-decoration: none;
+  color: var(--color-ink);
+}
+
+.view-all-keycap::before {
+  content: '$ ';
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+/* ===== About (01) ===== */
 .about-grid {
   display: flex;
   flex-direction: column;
@@ -328,12 +510,7 @@ a.brut-card {
   }
 }
 
-.about-col-left {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
+.about-col-left,
 .about-col-right {
   display: flex;
   flex-direction: column;
@@ -346,8 +523,8 @@ a.brut-card {
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--color-ink);
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-accent);
+  border: var(--border-w) solid var(--color-ink);
+  background: var(--app-tint, var(--color-accent-soft));
   padding: 0.45rem 0.85rem;
   box-shadow: var(--shadow-hard-sm);
   align-self: flex-start;
@@ -365,6 +542,8 @@ a.brut-card {
   color: var(--color-ink-muted);
 }
 
+/* Shadow-noise rule: the window carries the shadow — inner stat cards go
+   flat with hairline borders. */
 .about-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -375,9 +554,8 @@ a.brut-card {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  border: var(--border-w) solid var(--color-border);
+  border: 1px solid var(--color-border-faint);
   background: var(--color-surface);
-  box-shadow: var(--shadow-hard-sm);
   padding: 0.75rem 0.9rem;
 }
 
@@ -402,6 +580,7 @@ a.brut-card {
   color: var(--color-accent);
 }
 
+/* chips keep their sm shadow (chip grammar, not card grammar) */
 .focus-list {
   display: flex;
   flex-wrap: wrap;
@@ -413,10 +592,10 @@ a.brut-card {
   font-weight: 500;
   color: var(--color-ink);
   padding: 0.25rem 0.6rem;
-  border: var(--border-w) solid var(--color-border);
+  border: var(--border-w) solid var(--color-ink);
   background: var(--color-bg-alt);
   box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.12s ease, background 0.12s ease;
+  transition: background var(--t-fast);
 }
 
 .focus-item::before {
@@ -426,8 +605,7 @@ a.brut-card {
 }
 
 .focus-item:hover {
-  background: var(--color-accent-soft);
-  transform: translate(-1px, -1px);
+  background: var(--app-tint, var(--color-accent-soft));
 }
 
 .about-stack {
@@ -461,58 +639,41 @@ a.brut-card {
   color: var(--color-ink);
   padding: 0.2rem 0.55rem;
   background: var(--color-surface);
-  border: var(--border-w) solid var(--color-border);
+  border: var(--border-w) solid var(--color-ink);
   box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  transition: background var(--t-fast);
 }
 
 .about-stack-item:hover {
-  background: var(--color-accent-soft);
-  transform: translate(-1px, -1px);
-  box-shadow: var(--shadow-hard);
+  background: var(--app-tint, var(--color-accent-soft));
 }
 
-/* ===== Projects ===== */
+/* ===== Projects (02) — flat explorer rows ===== */
 .project-list {
   list-style: none;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-}
-
-@media (min-width: 720px) {
-  .project-list {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.project-list.other-work-list {
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-border-faint);
 }
 
 .project-row {
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-hard);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  border-bottom: 1px solid var(--color-border-faint);
+  transition: background var(--t-fast);
 }
 
 .project-row:hover,
 .project-row:focus-within {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-hard-lg);
-  background: var(--color-accent-soft);
+  background: var(--app-tint, var(--color-accent-soft));
 }
 
 .project-link {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  padding: 0.9rem 1rem;
+  gap: 0.35rem;
+  padding: 0.85rem 0.75rem;
   color: inherit;
   text-decoration: none;
   position: relative;
-  height: 100%;
 }
 
 .project-link:hover .project-name,
@@ -520,21 +681,16 @@ a.brut-card {
   color: var(--color-accent);
 }
 
-.project-link:focus-visible {
-  outline: 2px dashed var(--color-accent);
-  outline-offset: 2px;
-}
-
 .project-link-arrow {
   position: absolute;
-  top: 0.7rem;
-  right: 0.85rem;
+  top: 0.85rem;
+  right: 0.75rem;
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--color-accent);
   opacity: 0;
   transform: translateX(-4px);
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity var(--t-fast), transform var(--t-fast);
 }
 
 .project-link:hover .project-link-arrow,
@@ -569,6 +725,7 @@ a.brut-card {
   font-size: 0.825rem;
   color: var(--color-ink-soft);
   line-height: 1.55;
+  margin: 0;
 }
 
 .project-desc::before {
@@ -576,7 +733,7 @@ a.brut-card {
   color: var(--color-ink-muted);
 }
 
-/* Other work — compact */
+/* Other work — compact flat rows */
 .other-heading {
   font-size: 0.78rem;
   font-weight: 600;
@@ -596,19 +753,15 @@ a.brut-card {
   align-items: baseline;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.5rem 1rem;
-  padding: 0.6rem 0.85rem;
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  gap: 0.35rem 1rem;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--color-border-faint);
+  transition: background var(--t-fast);
 }
 
 .compact-row:hover,
 .compact-row:focus-within {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-hard-lg);
-  background: var(--color-accent-soft);
+  background: var(--app-tint, var(--color-accent-soft));
 }
 
 .compact-row:hover .compact-name {
@@ -619,7 +772,7 @@ a.brut-card {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-ink);
-  transition: color 0.15s ease;
+  transition: color var(--t-fast);
 }
 
 .compact-name::before {
@@ -634,13 +787,13 @@ a.brut-card {
 
 .compact-desc {
   width: 100%;
-  margin: 0.25rem 0 0;
+  margin: 0.1rem 0 0;
   font-size: 0.78rem;
   line-height: 1.5;
   color: var(--color-ink-soft);
 }
 
-/* ===== Side Projects ===== */
+/* ===== Side projects (03) ===== */
 .side-project-intro {
   font-size: 0.85rem;
   line-height: 1.55;
@@ -654,42 +807,11 @@ a.brut-card {
   font-weight: 700;
 }
 
-.side-project-view-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  min-height: 44px;
-  margin-top: 1.25rem;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--color-ink);
-  text-decoration: none;
-  padding: 0.5rem 0.85rem;
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-}
-
-.side-project-view-all::before {
-  content: '$ ';
-  color: var(--color-accent);
-  font-weight: 800;
-}
-
-.side-project-view-all:hover,
-.side-project-view-all:focus-visible {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-hard);
-  background: var(--color-accent);
-  outline: none;
-}
-
 .side-project-list {
   list-style: none;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
 @media (min-width: 720px) {
@@ -703,21 +825,18 @@ a.brut-card {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 1rem;
-  border: var(--border-w) solid var(--color-border);
+  height: 100%;
+  padding: 0.9rem;
+  border: 1px solid var(--color-border-faint);
   background: var(--color-surface);
-  box-shadow: var(--shadow-hard);
   color: inherit;
   text-decoration: none;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: background var(--t-fast);
 }
 
 .side-project-row:hover,
 .side-project-row:focus-visible {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-hard-lg);
-  background: var(--color-accent-soft);
-  outline: none;
+  background: var(--app-tint, var(--color-accent-soft));
 }
 
 .side-project-row:hover .side-project-name,
@@ -737,7 +856,7 @@ a.brut-card {
   font-weight: 700;
   color: var(--color-ink);
   letter-spacing: -0.01em;
-  transition: color 0.15s ease;
+  transition: color var(--t-fast);
 }
 
 .side-project-name::before {
@@ -749,6 +868,7 @@ a.brut-card {
   font-size: 0.78rem;
   color: var(--color-ink-soft);
   line-height: 1.5;
+  margin: 0;
 }
 
 .side-project-arrow {
@@ -756,20 +876,14 @@ a.brut-card {
   color: var(--color-accent);
   font-weight: 700;
   flex-shrink: 0;
-  transition: transform 0.15s ease;
 }
 
-.side-project-row:hover .side-project-arrow,
-.side-project-row:focus-visible .side-project-arrow {
-  transform: translateX(4px);
-}
-
-/* ===== Writing ===== */
+/* ===== Writing (04) — flat log rows ===== */
 .writing-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  border-top: 1px solid var(--color-border-faint);
 }
 
 .writing-row {
@@ -778,21 +892,18 @@ a.brut-card {
   align-items: baseline;
   gap: 0.75rem;
   padding: 0.6rem 0.75rem;
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-hard-sm);
+  border-bottom: 1px solid var(--color-border-faint);
   text-decoration: none;
   color: inherit;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: background var(--t-fast);
   flex-wrap: wrap;
 }
 
 .writing-row:hover,
 .writing-row:focus-visible {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-hard);
-  background: var(--color-accent-soft);
+  background: var(--app-tint, var(--color-accent-soft));
   outline: none;
+  box-shadow: inset 3px 0 0 var(--color-accent); /* visible focus: tint alone is sub-threshold */
 }
 
 .writing-date {
@@ -820,7 +931,7 @@ a.brut-card {
   color: var(--color-ink);
   flex: 1;
   min-width: 0;
-  transition: color 0.15s ease;
+  transition: color var(--t-fast);
 }
 
 .writing-row:hover .writing-title,
@@ -828,17 +939,24 @@ a.brut-card {
   color: var(--color-accent);
 }
 
+/* NEW badge → pixel chip */
+.writing-title .new-badge {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
 .writing-arrow {
   font-size: 0.95rem;
   color: var(--color-ink-muted);
-  transition: transform 0.15s ease, color 0.15s ease;
   margin-left: auto;
   flex-shrink: 0;
+  transition: color var(--t-fast);
 }
 
 .writing-row:hover .writing-arrow,
 .writing-row:focus-visible .writing-arrow {
-  transform: translateX(4px);
   color: var(--color-accent);
 }
 
@@ -853,36 +971,7 @@ a.brut-card {
   color: var(--color-accent);
 }
 
-.writing-view-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 1rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--color-ink);
-  text-decoration: none;
-  padding: 0.4rem 0.75rem;
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-}
-
-.writing-view-all::before {
-  content: '$ ';
-  color: var(--color-accent);
-}
-
-.writing-view-all:hover,
-.writing-view-all:focus-visible {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-hard);
-  background: var(--color-accent-soft);
-  outline: none;
-}
-
-/* ===== Contact ===== */
+/* ===== Contact (05) ===== */
 .contact-cta {
   font-family: var(--font-mono);
   font-size: clamp(1.75rem, 5vw, 3rem);
@@ -890,18 +979,30 @@ a.brut-card {
   line-height: 1.05;
   letter-spacing: -0.02em;
   color: var(--color-ink);
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .contact-period {
   color: var(--color-accent);
-  opacity: 1;
 }
 
 .contact-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.75rem;
+}
+
+.contact-link {
+  text-decoration: none;
+}
+
+.contact-link::before {
+  content: '> ';
+  color: var(--color-accent);
+}
+
+.keycap--primary.contact-link::before {
+  color: var(--color-ink);
 }
 
 .contact-link--wiggle {
@@ -933,37 +1034,9 @@ a.brut-card {
   }
 }
 
-.contact-link {
-  appearance: none;
-  font-family: var(--font-mono);
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-ink);
-  text-decoration: none;
-  padding: 0.55rem 1rem;
-  border: var(--border-w) solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-hard);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
-}
-
-.contact-link::before {
-  content: '> ';
-  color: var(--color-accent);
-}
-
-.contact-link:hover,
-.contact-link:focus-visible,
-.contact-link.is-highlighted {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-hard-lg);
-  background: var(--color-accent);
-  color: var(--color-ink);
-  outline: none;
-}
-
-/* ===== Mail Composer (modal) ===== */
+/* ===== Mail composer (modal) — functionality untouched, chrome restyled
+   to titlebar grammar. Class names are load-bearing for contact-form.ts
+   (drag handle .mail-composer-bar, #open-contact-modal, .mail-modal-close). */
 .mail-modal {
   width: min(44rem, calc(100vw - 2rem));
   max-height: calc(100dvh - 2rem);
@@ -990,15 +1063,23 @@ a.brut-card {
 }
 
 .mail-composer {
-  border: var(--border-w) solid var(--color-border);
+  border: var(--border-w-focus) solid var(--color-ink);
   background: var(--color-surface);
   box-shadow: var(--shadow-hard-lg);
 }
 
 .mail-modal-close {
   appearance: none;
+  position: relative;
   padding: 0;
   cursor: pointer;
+}
+
+/* 11px dot needs a real hit area (neighbor dots are decorative spans) */
+.mail-modal-close::after {
+  content: '';
+  position: absolute;
+  inset: -12px;
 }
 
 .mail-modal-close:hover {
@@ -1006,7 +1087,8 @@ a.brut-card {
 }
 
 .mail-modal-hint {
-  color: var(--color-ink-muted);
+  color: var(--color-ink);
+  opacity: 0.7;
   font-size: 0.7rem;
   white-space: nowrap;
 }
@@ -1015,11 +1097,12 @@ a.brut-card {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 0.875rem;
-  border-bottom: var(--border-w) solid var(--color-border);
-  background: var(--color-bg-alt);
+  min-height: var(--titlebar-h);
+  padding: 0.35rem 0.875rem;
+  border-bottom: var(--border-w) solid var(--color-ink);
+  background: var(--color-app-contact);
   font-size: 0.72rem;
-  color: var(--color-ink-soft);
+  color: var(--color-ink);
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -1033,19 +1116,39 @@ a.brut-card {
   animation: none;
 }
 
+.shell-bar-dots {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.shell-bar-dot {
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid var(--color-ink);
+  background: var(--color-bg-alt);
+}
+
+.shell-bar-dot--live {
+  background: var(--color-accent);
+}
+
 .mail-composer-title {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: lowercase;
 }
 
 .mail-composer-mode {
-  color: var(--color-accent);
+  color: var(--color-ink);
   font-weight: 700;
   letter-spacing: 0.05em;
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--t-fast);
 }
 
 .mail-composer:focus-within .mail-composer-mode {
@@ -1057,8 +1160,8 @@ a.brut-card {
   align-items: baseline;
   gap: 0.6rem;
   padding: 0.65rem clamp(0.875rem, 2vw, 1.5rem);
-  border-bottom: 1.5px dashed var(--color-border);
-  transition: background 0.15s ease;
+  border-bottom: 1px solid var(--color-border-faint);
+  transition: background var(--t-fast);
 }
 
 .mail-field:focus-within {
@@ -1116,7 +1219,7 @@ a.brut-card {
   align-items: center;
   gap: 0.75rem 1rem;
   padding: 0.75rem clamp(0.875rem, 2vw, 1.5rem);
-  border-top: var(--border-w) solid var(--color-border);
+  border-top: 1px solid var(--color-border-faint);
   background: var(--color-bg-alt);
 }
 
@@ -1126,24 +1229,29 @@ a.brut-card {
   font-weight: 600;
   color: var(--color-ink);
   padding: 0.55rem 1rem;
-  border: var(--border-w) solid var(--color-border);
+  border: var(--border-w) solid var(--color-ink);
   background: var(--color-surface);
   box-shadow: var(--shadow-hard);
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  translate: 0 0;
+  transition: translate var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
 }
 
 .mail-send:hover,
 .mail-send:focus-visible {
-  transform: translate(-2px, -2px);
+  translate: -2px -2px;
   box-shadow: var(--shadow-hard-lg);
   background: var(--color-accent);
-  outline: none;
+}
+
+.mail-send:active {
+  translate: 2px 2px;
+  box-shadow: var(--shadow-hard-sm);
 }
 
 .mail-send:disabled {
   cursor: wait;
-  transform: none;
+  translate: 0 0;
   box-shadow: var(--shadow-hard);
   background: var(--color-bg-alt);
   color: var(--color-ink-muted);
@@ -1173,13 +1281,13 @@ a.brut-card {
   content: '\2717 ';
 }
 
-/* ===== Footer ===== */
+/* ===== Footer (status line inside window 05) ===== */
 .site-footer {
-  padding: 2rem 0 1rem;
+  padding: 1.5rem 0 0;
+  margin-top: 2rem;
   font-size: 0.75rem;
   color: var(--color-ink-muted);
-  border-top: var(--border-w) dashed var(--color-border);
-  margin-top: 2rem;
+  border-top: 1px solid var(--color-border-faint);
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -1187,24 +1295,91 @@ a.brut-card {
 }
 
 .site-footer::before {
-  content: '$ exit';
+  content: '$ shutdown -h now';
   color: var(--color-accent);
   font-weight: 700;
 }
 
-/* ===== Scroll Dot (disabled in brutalist theme) ===== */
-.scroll-dot {
-  display: none !important;
+/* ===== Trash dialog (easter egg) ===== */
+.trash-modal {
+  margin: auto;
+  padding: 0 6px 6px 0;
+  border: none;
+  background: transparent;
 }
 
-/* ===== Keyboard Nav Toast ===== */
+.trash-modal::backdrop {
+  background: rgba(10, 10, 10, 0.6);
+}
+
+.trash-win {
+  width: min(24rem, calc(100vw - 3rem));
+  border: var(--border-w-focus) solid var(--color-ink);
+  background: var(--color-bg);
+  box-shadow: var(--shadow-hard-lg);
+}
+
+.trash-modal .win-bar {
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+}
+
+.trash-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.trash-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid var(--color-border-faint);
+  font-size: 0.8rem;
+}
+
+.trash-row:hover {
+  background: var(--color-bg-alt);
+}
+
+.trash-file {
+  color: var(--color-ink);
+}
+
+.trash-meta {
+  color: var(--color-ink-muted);
+  font-size: 0.72rem;
+  flex-shrink: 0;
+}
+
+.trash-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem 0.85rem;
+  background: var(--color-bg-alt);
+}
+
+.trash-shake {
+  animation: trash-shake 0.3s ease;
+}
+
+@keyframes trash-shake {
+  0%, 100% { translate: 0 0; }
+  25% { translate: -6px 0; }
+  75% { translate: 6px 0; }
+}
+
+/* ===== Keyboard nav toast ===== */
 .kbd-toast {
   position: fixed;
   bottom: 1.25rem;
   right: 1.25rem;
-  z-index: 200;
+  z-index: var(--z-toast);
   padding: 0.6rem 0.85rem;
-  border: var(--border-w) solid var(--color-border);
+  border: var(--border-w) solid var(--color-ink);
   background: var(--color-surface);
   box-shadow: var(--shadow-hard);
   font-size: 0.8rem;
@@ -1213,6 +1388,13 @@ a.brut-card {
   transform: translateY(10px);
   transition: opacity 0.18s ease, transform 0.18s ease;
   pointer-events: none;
+}
+
+/* clear the fixed taskbar when it's present */
+@media (min-width: 720px) {
+  .kbd-toast {
+    bottom: calc(var(--taskbar-h) + 16px);
+  }
 }
 
 .kbd-toast--visible {
@@ -1224,9 +1406,8 @@ a.brut-card {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   background: var(--color-bg-alt);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-ink);
   padding: 0.05rem 0.35rem;
-  border-radius: 2px;
   margin-right: 0.2rem;
 }
 
@@ -1240,66 +1421,60 @@ a.brut-card {
 .motion-fade,
 .motion-letter,
 .motion-stagger {
-  /* Static by default in brutalist theme — JS may animate entrance */
+  /* Static by default — JS may animate entrance */
   opacity: 1;
   transform: none;
 }
 
-/* ===== Reduced Motion ===== */
+/* ===== Reduced Motion (home-owned motion only; OS chrome motion is
+   handled by the consolidated block in os.css) ===== */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
   .hero-cursor {
     animation: none;
     opacity: 0.6;
   }
 
   .hero-scroll-arrow,
-  .contact-link--wiggle {
+  .contact-link--wiggle,
+  .trash-shake {
     animation: none;
   }
 
-  .brut-card:hover,
-  .brut-card:focus-visible,
-  .project-row:hover,
-  .project-row:focus-within,
-  .compact-row:hover,
-  .compact-row:focus-within,
-  .side-project-row:hover,
-  .side-project-row:focus-visible,
-  .writing-row:hover,
-  .writing-row:focus-visible,
-  .contact-link:hover,
-  .contact-link:focus-visible,
-  .contact-link.is-highlighted,
+  .js-desktop .home-sections .win--section.is-open,
+  .js-desktop .browser-win.is-open {
+    animation: none;
+  }
+
+  .mail-modal[open] {
+    animation: none;
+  }
+
+  .hero-tag,
+  .project-row,
+  .project-link-arrow,
+  .compact-row,
+  .compact-name,
+  .side-project-row,
+  .side-project-name,
+  .writing-row,
+  .writing-title,
+  .writing-arrow,
+  .focus-item,
+  .about-stack-item,
+  .mail-field,
+  .mail-composer-mode,
+  .mail-send,
+  .kbd-toast {
+    transition: none;
+  }
+
+  .project-link-arrow {
+    transform: none;
+  }
+
   .mail-send:hover,
   .mail-send:focus-visible,
-  .side-project-view-all:hover,
-  .side-project-view-all:focus-visible,
-  .writing-view-all:hover,
-  .writing-view-all:focus-visible,
-  .focus-item:hover,
-  .about-stack-item:hover {
-    transform: none;
-  }
-
-  .hero-tag:hover {
-    transform: none;
-    box-shadow: var(--shadow-hard-sm);
-  }
-
-  .side-project-row:hover .side-project-arrow,
-  .side-project-row:focus-visible .side-project-arrow,
-  .writing-row:hover .writing-arrow,
-  .writing-row:focus-visible .writing-arrow,
-  .project-link:hover .project-link-arrow,
-  .project-link:focus-visible .project-link-arrow {
-    transform: none;
+  .mail-send:active {
+    translate: 0 0;
   }
 }

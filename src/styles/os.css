@@ -1,0 +1,600 @@
+/* ===== ralphOS shared chrome ==========================================
+   Window chrome, keycaps, chips, menubar, taskbar, start menu, desktop
+   icons, statusbars, toast + THE consolidated reduced-motion block.
+   Imported by BaseLayout on every page — page CSS builds on top of this,
+   never redefines it. */
+
+/* ── Window chrome ──────────────────────────────────────────────────── */
+
+.win {
+  background: var(--color-bg);
+  border: var(--border-w) solid var(--color-ink);
+}
+
+.win--section {
+  box-shadow: var(--shadow-hard-lg);
+  margin-block: var(--space-section);
+}
+
+.win--page {
+  box-shadow: none; /* maximized: shadow-none when maximized */
+}
+
+.win--floating {
+  border-width: var(--border-w-focus);
+  box-shadow: var(--shadow-hard-lg);
+}
+
+/* Floating layout only under the JS desktop gate (≥1024px + fine pointer,
+   set by window.ts). Without JS floating windows stay in flow. */
+.js-desktop .win--floating {
+  position: absolute;
+  z-index: var(--z-float);
+}
+
+.js-desktop .win--floating.is-focused {
+  box-shadow: var(--shadow-win-focus);
+}
+
+.win-bar {
+  height: var(--titlebar-h);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-inline: 10px 6px;
+  background: var(--app, var(--color-bg-alt));
+  border-bottom: var(--border-w) solid var(--color-ink);
+}
+
+.js-desktop .win--floating .win-bar {
+  touch-action: none; /* drag handle */
+  cursor: move;
+}
+
+.win-title {
+  font: 700 11px/1 var(--font-pixel);
+  color: var(--color-ink);
+  text-transform: lowercase;
+  margin: 0;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Inverse chrome: system / terminal / error titlebars (dark fills) */
+.win--inverse .win-bar {
+  color: var(--color-bg);
+}
+
+.win--inverse .win-title {
+  color: var(--color-bg);
+}
+
+.win-controls {
+  display: inline-flex;
+  gap: 4px;
+  opacity: 0.45;
+  transition: opacity var(--t-fast);
+}
+
+.win-bar:hover .win-controls,
+.win-bar:focus-within .win-controls {
+  opacity: 1; /* dimmed-controls trick */
+}
+
+/* No hover to restore them on touch — controls stay full-strength */
+@media (hover: none) {
+  .win-controls {
+    opacity: 1;
+  }
+}
+
+.win-btn {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  font: 700 12px var(--font-mono);
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: var(--border-w) solid var(--color-ink);
+  box-shadow: var(--shadow-hard-sm);
+  cursor: pointer;
+}
+
+/* Invisible expanded hit area (adjacent controls sit 4px apart, so the
+   horizontal reach stops at the gap's midpoint) */
+.win-btn::after {
+  content: '';
+  position: absolute;
+  inset: -7px -4px;
+}
+
+.win-btn:active {
+  translate: 2px 2px;
+  box-shadow: none;
+}
+
+.win-btn[hidden] {
+  display: none;
+}
+
+.win-body {
+  padding: var(--win-pad, 1.25rem); /* pages override --win-pad per window */
+}
+
+.win-statusbar {
+  min-height: var(--statusbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-inline: 10px;
+  font: 400 12px var(--font-mono);
+  color: var(--color-ink-muted);
+  border-top: 1px solid var(--color-border-faint);
+  background: var(--color-bg-alt);
+}
+
+.win.is-collapsed .win-body,
+.win.is-collapsed .win-statusbar {
+  display: none; /* v1: instant collapse */
+}
+
+/* Maximized page windows: edge-to-edge on small screens */
+@media (max-width: 719.98px) {
+  .win--page {
+    border-left: 0;
+    border-right: 0;
+  }
+}
+
+/* ── Keycap button (single element, no markup ceremony) ─────────────── */
+
+.keycap {
+  display: inline-block;
+  font: 600 13px var(--font-mono);
+  text-transform: lowercase;
+  padding: 8px 14px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: var(--border-w) solid var(--color-ink);
+  box-shadow: var(--shadow-hard);
+  translate: 0 0;
+  cursor: pointer;
+  transition: translate var(--t-fast), box-shadow var(--t-fast);
+}
+
+.keycap:hover {
+  translate: -2px -2px;
+  box-shadow: var(--shadow-hard-lg);
+}
+
+.keycap:active {
+  translate: 2px 2px;
+  box-shadow: var(--shadow-hard-sm); /* press travel */
+}
+
+.keycap--primary {
+  background: var(--color-accent);
+}
+
+/* ── Chip (tags, stack items — border + sm shadow, no travel) ───────── */
+
+.chip {
+  display: inline-block;
+  font: 500 12px var(--font-mono);
+  text-transform: lowercase;
+  padding: 3px 8px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: var(--border-w) solid var(--color-ink);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+a.chip:hover,
+button.chip:hover {
+  background: var(--app-tint, var(--color-accent-soft));
+}
+
+/* ── Fixed chrome offsets (set via body classes by BaseLayout) ──────── */
+
+body.has-menubar {
+  padding-top: var(--menubar-h);
+}
+
+@media (min-width: 720px) {
+  body.has-taskbar {
+    padding-bottom: calc(var(--taskbar-h) + 16px);
+  }
+}
+
+/* ── Menu bar (every route) ─────────────────────────────────────────── */
+
+.menubar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--menubar-h);
+  z-index: var(--z-menubar);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding-inline: 10px;
+  background: var(--color-surface);
+  border-bottom: var(--border-w) solid var(--color-ink);
+}
+
+.menubar-left {
+  display: flex;
+  align-items: center;
+  justify-self: start;
+}
+
+.menubar-center {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: center;
+  min-width: 0;
+  font: 400 12px var(--font-mono);
+  color: var(--color-ink-muted);
+}
+
+.menubar-path {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.menubar-back {
+  font: 500 12px var(--font-mono);
+  color: var(--color-ink);
+}
+
+.menubar-back:hover {
+  color: var(--color-accent);
+}
+
+.menubar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-self: end;
+}
+
+.menubar-hint {
+  font: 400 11px var(--font-mono);
+  color: var(--color-ink-muted);
+}
+
+.menubar-hint:empty {
+  display: none;
+}
+
+.menubar-hint kbd {
+  font: 600 10px var(--font-mono);
+  padding: 0 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-ink);
+  box-shadow: 1px 1px 0 var(--color-ink);
+}
+
+.menubar-clock {
+  font: 700 11px/1 var(--font-pixel);
+  min-width: 42px;
+  text-align: right;
+}
+
+.menubar-glyph,
+.taskbar-glyph {
+  font: 700 11px/1 var(--font-pixel);
+  text-transform: lowercase;
+  color: var(--color-ink);
+  padding: 3px 6px;
+  border: 1px solid transparent;
+}
+
+.menubar-glyph:hover,
+.taskbar-glyph:hover {
+  border-color: var(--color-ink);
+  background: var(--color-accent-soft);
+}
+
+@media (max-width: 719.98px) {
+  /* mobile: start button + clock only */
+  .menubar-center,
+  .menubar-hint,
+  .menubar-glyph {
+    display: none;
+  }
+}
+
+/* ── Start menu (<details>, keyboard-accessible for free) ───────────── */
+
+.startmenu {
+  position: relative;
+}
+
+.startmenu-summary {
+  position: relative;
+  list-style: none;
+  cursor: pointer;
+  font: 700 12px/1 var(--font-pixel);
+  text-transform: lowercase;
+  color: var(--color-ink);
+  padding: 5px 8px;
+  border: var(--border-w) solid transparent;
+  user-select: none;
+}
+
+/* Only nav trigger on mobile — stretch the hit area to the full bar */
+.startmenu-summary::after {
+  content: '';
+  position: absolute;
+  inset: -6px -4px;
+}
+
+.startmenu-summary::-webkit-details-marker {
+  display: none;
+}
+
+.startmenu-summary:hover {
+  border-color: var(--color-ink);
+  background: var(--color-accent-soft);
+}
+
+.startmenu[open] > .startmenu-summary {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+
+.startmenu-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 190px;
+  padding: 6px;
+  background: var(--color-surface);
+  border: var(--border-w) solid var(--color-ink);
+  box-shadow: var(--shadow-hard-sm);
+  z-index: var(--z-menubar);
+}
+
+.startmenu--up .startmenu-panel {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+.startmenu-link {
+  display: block;
+  padding: 6px 10px;
+  font: 500 13px var(--font-mono);
+  text-transform: lowercase;
+  color: var(--color-ink);
+}
+
+.startmenu-link:hover {
+  background: var(--color-accent-soft);
+}
+
+.startmenu-link--shutdown:hover {
+  background: var(--color-error);
+  color: var(--color-bg);
+}
+
+.startmenu-sep {
+  border: 0;
+  border-top: 1px solid var(--color-border-faint);
+  margin: 4px 0;
+}
+
+/* ── Taskbar (home only, ≥720px only) ───────────────────────────────── */
+
+.taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--taskbar-h);
+  z-index: var(--z-taskbar);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-inline: 10px;
+  background: var(--color-surface);
+  border-top: var(--border-w) solid var(--color-ink);
+}
+
+.taskbar-left,
+.taskbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.taskbar-apps {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
+}
+
+.taskbar-app {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font: 700 11px/1 var(--font-pixel);
+  text-transform: lowercase;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: var(--border-w) solid var(--color-ink);
+  box-shadow: var(--shadow-hard-sm);
+  translate: 0 0;
+  transition: translate var(--t-fast), box-shadow var(--t-fast),
+    background-color var(--t-fast);
+}
+
+.taskbar-app:hover {
+  background: var(--app-tint, var(--color-accent-soft));
+}
+
+/* window is open (desktop mode) — tinted, but not pressed-in like active */
+.taskbar-app.is-open {
+  background: var(--app-tint, var(--color-accent-soft));
+}
+
+.taskbar-app.is-active {
+  background: var(--app, var(--color-accent));
+  box-shadow: none;
+  translate: 1px 1px; /* pressed-in */
+}
+
+.taskbar-app-num {
+  font: 400 10px/1 var(--font-mono);
+  color: var(--color-ink-muted);
+}
+
+.taskbar-app.is-active .taskbar-app-num {
+  color: inherit;
+}
+
+@media (max-width: 719.98px) {
+  .taskbar {
+    display: none; /* no fixed bottom chrome on mobile by design */
+  }
+}
+
+/* ── Desktop zone + icons (pattern classes; markup lives in pages) ──── */
+
+[data-desktop] {
+  position: relative; /* constraint box for floating windows */
+}
+
+.desktop-icon {
+  width: var(--icon-cell);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.desktop-icon svg {
+  width: 24px;
+  height: 24px;
+  shape-rendering: crispEdges;
+}
+
+.desktop-icon-label {
+  font: 700 10px/1.3 var(--font-pixel);
+  text-transform: lowercase;
+  color: var(--color-ink);
+  background: var(--color-bg);
+  padding: 1px 4px;
+  border: 1px solid var(--color-border-faint);
+}
+
+.desktop-icon:hover,
+.desktop-icon:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.desktop-icon:hover .desktop-icon-label,
+.desktop-icon:focus-visible .desktop-icon-label {
+  background: var(--app-tint, var(--color-accent-soft));
+}
+
+/* ── Toast (window.ts showToast — joke closes, easter eggs) ─────────── */
+
+.os-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  translate: -50% 8px;
+  z-index: var(--z-toast);
+  padding: 10px 14px;
+  font: 700 11px/1.4 var(--font-pixel);
+  text-transform: lowercase;
+  color: var(--color-bg);
+  background: var(--color-ink);
+  border: var(--border-w) solid var(--color-ink);
+  box-shadow: var(--shadow-hard-sm);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-normal), translate var(--t-normal);
+}
+
+.os-toast.is-visible {
+  opacity: 1;
+  translate: -50% 0;
+}
+
+/* Only clear the taskbar where it actually renders (home, ≥720px). */
+@media (min-width: 720px) {
+  body.has-taskbar .os-toast {
+    bottom: calc(var(--taskbar-h) + 16px);
+  }
+}
+
+/* ── sudo CRT mode (easter egg) ─────────────────────────────────────────
+   Class toggled by home.ts (typing "sudo" on home), persisted to
+   localStorage and restored by window.ts on EVERY page. */
+
+html.crt::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1200; /* above toast; pointer-events none so it never blocks */
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(10, 10, 10, 0.09) 0 1px,
+    transparent 1px 3px
+  );
+}
+
+html.crt body {
+  text-shadow: 0 0 2px rgba(255, 106, 26, 0.22);
+}
+
+/* ── Consolidated reduced-motion block ──────────────────────────────────
+   ALL new OS-chrome motion is disabled here — the single home for it.
+   Add new rules HERE, never scattered per-file. Note: dragging stays
+   ENABLED under reduced motion (user-initiated, not an animation); it is
+   gated only on fine pointers in draggable.ts. */
+
+@media (prefers-reduced-motion: reduce) {
+  .keycap,
+  .win-btn,
+  .win-controls,
+  .taskbar-app,
+  .desktop-icon,
+  .os-toast {
+    transition: none;
+  }
+
+  .keycap:hover,
+  .keycap:active,
+  .win-btn:active {
+    translate: 0 0;
+  }
+
+  .keycap:active {
+    filter: brightness(0.92); /* press feedback without travel */
+  }
+
+  .os-toast {
+    translate: -50% 0;
+  }
+}

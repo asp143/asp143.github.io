@@ -1,7 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import '../../styles/blog.css';
+import Window from '../../components/Window.astro';
+import '../../styles/projects.css';
 
 const projects = (await getCollection('projects', ({ data }) => !data.draft))
   .sort((a, b) => a.data.order - b.data.order);
@@ -44,158 +45,72 @@ const collectionPage = {
   description={description}
   canonicalURL={canonicalURL}
   breadcrumb={breadcrumb}
+  osPath="~/projects"
 >
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(collectionPage)}></script>
   </Fragment>
 
-  <main class="blog-page">
+  <a slot="menubar-back" class="menubar-back" href="/">&larr; ~/</a>
+
+  <main class="projects-page">
     <h1 class="visually-hidden">Projects by Ralph Jonas Mungcal</h1>
 
-    <div class="blog-shell-bar" role="banner">
-      <div class="blog-shell-bar-dots" aria-hidden="true">
-        <span class="blog-shell-bar-dot blog-shell-bar-dot--live"></span>
-        <span class="blog-shell-bar-dot"></span>
-        <span class="blog-shell-bar-dot"></span>
+    <Window
+      title={`~/projects — ${projects.length} items`}
+      app="projects"
+      variant="page"
+      headingLevel={2}
+      closeHref="/"
+      statusbar
+      class="projects-window"
+    >
+      <div class="projects-lead">
+        <p class="projects-prompt">
+          <span class="projects-prompt-sign">$</span>
+          <span class="projects-prompt-cmd">ls ./projects/</span>
+          <span class="projects-prompt-flag">--sort=order</span>
+        </p>
+        <p class="projects-intro">
+          the work i'm proudest of — payments, search, scrapers, and ai pipelines. each one has a write-up.
+        </p>
       </div>
-      <span>ralph@jonas:~/projects — ls</span>
-    </div>
 
-    <div class="blog-header">
-      <span class="blog-header-prompt">$</span>
-      <span class="blog-header-cmd">ls ./projects/</span>
-      <span class="blog-header-flag">--sort=order</span>
-    </div>
-    <hr class="blog-rule" role="presentation" />
+      <ul class="project-tiles" role="list">
+        {projects.map((project, i) => (
+          <li class="project-tile" style={`--row: ${i};`}>
+            <a href={`/projects/${project.id}/`} class="project-tile-link" aria-label={`Open project: ${project.data.name}`}>
+              <svg
+                class="project-tile-glyph"
+                viewBox="0 0 12 12"
+                width="32"
+                height="32"
+                shape-rendering="crispEdges"
+                aria-hidden="true"
+              >
+                <rect x="0" y="0" width="12" height="12" fill="var(--color-ink)" />
+                <rect x="1" y="3" width="10" height="8" fill="var(--color-surface)" />
+                <rect x="1" y="1" width="10" height="2" fill="var(--color-app-projects)" />
+                <rect x="9" y="1" width="1" height="1" fill="var(--color-surface)" />
+              </svg>
+              <span class="project-tile-name">{project.data.name}</span>
+              <span class="project-tile-tech">
+                {project.data.tech ?? project.data.stack.map((s) => s.toLowerCase()).join(' · ')}
+              </span>
+              <p class="project-tile-desc">{project.data.description.toLowerCase()}</p>
+              <span class="project-tile-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </li>
+        ))}
+      </ul>
 
-    <p class="blog-intro">
-      the work i'm proudest of — payments, search, scrapers, and ai pipelines. each one has a write-up.
-    </p>
-
-    <ul class="project-index-list" role="list">
-      {projects.map((project, i) => (
-        <li class="project-index-item" style={`--row: ${i};`}>
-          <a href={`/projects/${project.id}/`} class="project-index-link" aria-label={`Open project: ${project.data.name}`}>
-            <span class="project-index-name">{project.data.name}</span>
-            <span class="project-index-tech">
-              {project.data.tech ?? project.data.stack.map((s) => s.toLowerCase()).join(' · ')}
-            </span>
-            <p class="project-index-desc">{project.data.description.toLowerCase()}</p>
-            <span class="project-index-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-        </li>
-      ))}
-    </ul>
-
-    <div class="post-nav">
-      <a href="/" class="post-nav-link">$ cd ~/</a>
-      <a href="/now/" class="post-nav-link">/now &rarr;</a>
-    </div>
+      <Fragment slot="status">
+        <span class="projects-statusinfo">{projects.length} items · view: large icons</span>
+        <nav class="projects-statusnav" aria-label="Projects navigation">
+          <a href="/now/">/now &rarr;</a>
+          <a href="/">$ exit</a>
+        </nav>
+      </Fragment>
+    </Window>
   </main>
-
-  <style>
-    .project-index-list {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 2.5rem;
-      display: grid;
-      gap: 0.9rem;
-    }
-
-    /* Terminal "ls" output: rows print in one after another on load. */
-    .project-index-item {
-      opacity: 0;
-      animation: project-row-in 0.32s ease-out both;
-      animation-delay: calc(var(--row, 0) * 70ms);
-    }
-
-    @keyframes project-row-in {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .project-index-link {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      grid-template-areas:
-        'name arrow'
-        'tech arrow'
-        'desc arrow';
-      gap: 0.25rem 1rem;
-      align-items: center;
-      padding: 1rem 1.1rem;
-      text-decoration: none;
-      color: var(--color-ink);
-      border: var(--border-w) solid var(--color-border);
-      background: var(--color-surface);
-      box-shadow: var(--shadow-hard-sm);
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
-    }
-
-    .project-index-link:hover,
-    .project-index-link:focus-visible {
-      transform: translate(-2px, -2px);
-      box-shadow: var(--shadow-hard-lg);
-      outline: none;
-    }
-
-    .project-index-name {
-      grid-area: name;
-      font-weight: 700;
-      font-size: 1.05rem;
-    }
-
-    .project-index-tech {
-      grid-area: tech;
-      font-size: 0.78rem;
-      color: var(--color-ink-muted);
-    }
-
-    .project-index-desc {
-      grid-area: desc;
-      margin: 0.2rem 0 0;
-      font-size: 0.85rem;
-      color: var(--color-ink-soft);
-      line-height: 1.5;
-    }
-
-    .project-index-arrow {
-      grid-area: arrow;
-      color: var(--color-accent);
-      font-weight: 700;
-      transition: transform 0.12s ease;
-    }
-
-    .project-index-link:hover .project-index-arrow,
-    .project-index-link:focus-visible .project-index-arrow {
-      transform: translateX(4px);
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .project-index-item {
-        opacity: 1;
-        animation: none;
-      }
-
-      .project-index-arrow {
-        transition: none;
-      }
-
-      .project-index-link:hover,
-      .project-index-link:focus-visible {
-        transform: none;
-      }
-
-      .project-index-link:hover .project-index-arrow,
-      .project-index-link:focus-visible .project-index-arrow {
-        transform: none;
-      }
-    }
-  </style>
 </BaseLayout>

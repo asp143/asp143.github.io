@@ -1,0 +1,132 @@
+---
+/**
+ * ralphOS window chrome — the one shell every "app" on the site uses.
+ *
+ * Usage (page teams):
+ *   <Window title="about.md — 01" app="about" id="about" variant="section" collapsible>
+ *     ...existing section body...
+ *   </Window>
+ *
+ *   <Window title="~/writing — 11 items" app="writing" variant="page" closeHref="/" statusbar>
+ *     ...rows...
+ *     <Fragment slot="status">11 items · sorted by date desc</Fragment>
+ *   </Window>
+ *
+ * Notes:
+ * - `id` MUST match the pre-redesign section ids (vim nav + analytics rely on them).
+ * - `headingLevel` keeps the document outline identical to the old markup.
+ *   Pass `0` to render the title as a plain <span> — for pages whose only
+ *   <h1> lives in the window body (detail pages), so the titlebar never
+ *   ships an h2-before-h1 outline.
+ * - Close control: `closeHref` renders a real <a> (works without JS). Without
+ *   it, section windows get a hidden joke-close <button data-close-joke> that
+ *   window.ts unhides and wires to a toast. Floating/page windows without
+ *   closeHref render no close control.
+ * - Collapse control renders hidden; window.ts unhides + wires it.
+ * - Floating windows: add `data-draggable` (and position via your page CSS);
+ *   window.ts makes them draggable under the .js-desktop gate.
+ */
+
+type AppName =
+  | 'about'
+  | 'projects'
+  | 'side'
+  | 'writing'
+  | 'contact'
+  | 'error'
+  | 'terminal'
+  | 'system';
+
+interface Props extends astroHTML.JSX.HTMLAttributes {
+  title: string;
+  app?: AppName;
+  id?: string;
+  variant?: 'section' | 'page' | 'floating';
+  headingLevel?: 0 | 1 | 2 | 3;
+  closeHref?: string;
+  collapsible?: boolean;
+  statusbar?: boolean;
+}
+
+const APP_VARS: Record<AppName, { app: string; tint: string; inverse?: boolean }> = {
+  about: { app: 'var(--color-app-about)', tint: 'var(--tint-about)' },
+  projects: { app: 'var(--color-app-projects)', tint: 'var(--tint-projects)' },
+  side: { app: 'var(--color-app-side)', tint: 'var(--tint-side)' },
+  writing: { app: 'var(--color-app-writing)', tint: 'var(--tint-writing)' },
+  contact: { app: 'var(--color-app-contact)', tint: 'var(--tint-contact)' },
+  /* error is NOT inverse: ink on the red fill is ~5:1; bg-on-red fails 4.5:1
+     at the 11px titlebar size. */
+  error: { app: 'var(--color-error)', tint: 'var(--color-bg-alt)' },
+  terminal: { app: 'var(--color-ink)', tint: 'var(--color-bg-alt)', inverse: true },
+  system: { app: 'var(--color-ink)', tint: 'var(--color-bg-alt)', inverse: true }
+};
+
+const {
+  title,
+  app,
+  id,
+  variant = 'section',
+  headingLevel = 2,
+  closeHref,
+  collapsible = false,
+  statusbar = false,
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+
+const Heading = (headingLevel === 0 ? 'span' : `h${headingLevel}`) as
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'span';
+const appVars = app ? APP_VARS[app] : null;
+const appStyle = appVars ? `--app: ${appVars.app}; --app-tint: ${appVars.tint};` : '';
+const mergedStyle =
+  [appStyle, typeof style === 'string' ? style : ''].filter(Boolean).join(' ') || undefined;
+const jokeClose = !closeHref && variant === 'section';
+const hasControls = collapsible || Boolean(closeHref) || jokeClose;
+---
+
+<section
+  class:list={['win', `win--${variant}`, { 'win--inverse': appVars?.inverse ?? false }, className]}
+  id={id}
+  style={mergedStyle}
+  {...rest}
+>
+  <header class="win-bar">
+    <Heading class="win-title">{title}</Heading>
+    {hasControls && (
+      <span class="win-controls">
+        {collapsible && (
+          <button
+            type="button"
+            class="win-btn win-btn--min"
+            aria-label="collapse section"
+            aria-expanded="true"
+            hidden>_</button>
+        )}
+        {closeHref ? (
+          <a class="win-btn win-btn--close" href={closeHref} aria-label="close">×</a>
+        ) : (
+          jokeClose && (
+            <button
+              type="button"
+              class="win-btn win-btn--close"
+              data-close-joke
+              aria-label="close"
+              hidden>×</button>
+          )
+        )}
+      </span>
+    )}
+  </header>
+  <div class="win-body">
+    <slot />
+  </div>
+  {statusbar && (
+    <footer class="win-statusbar">
+      <slot name="status" />
+    </footer>
+  )}
+</section>
