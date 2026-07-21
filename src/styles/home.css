@@ -324,8 +324,17 @@ button.desktop-icon {
    focus-raised, scrolling internally. Flow layout (mobile / no-JS /
    coarse pointer) is untouched — content stays crawlable. */
 
+/* Hard scroll lock. The lock must sit on <html>: body overflow doesn't
+   propagate to the viewport because html already sets overflow-x. */
+.js-desktop:has(body.has-taskbar) {
+  overflow: hidden;
+}
+
 .js-desktop body.has-taskbar {
   overflow: hidden; /* the desktop is the viewport; windows scroll inside */
+  /* flow-mode taskbar clearance (os.css) would add 56px of scrollable
+     height under the desktop */
+  padding-bottom: 0;
 }
 
 .js-desktop .home-sections {
@@ -1014,6 +1023,16 @@ button.desktop-icon {
   animation: none;
 }
 
+/* contact.exe desktop icon wiggles on the same 2s cycle */
+.desktop-icon--wiggle {
+  animation: contact-wiggle 2s ease-in-out infinite;
+}
+
+.desktop-icon--wiggle:hover,
+.desktop-icon--wiggle:focus-visible {
+  animation: none;
+}
+
 @keyframes contact-wiggle {
   0%,
   20%,
@@ -1436,6 +1455,7 @@ button.desktop-icon {
 
   .hero-scroll-arrow,
   .contact-link--wiggle,
+  .desktop-icon--wiggle,
   .trash-shake {
     animation: none;
   }
