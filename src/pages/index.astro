@@ -18,6 +18,7 @@ const blogPosts = allPosts.slice(0, MAX_POSTS).map((post) => ({
   url: `/blog/${post.id}/`,
   isNew: isNewPost(post.data.pubDate)
 }));
+const newPostSlugs = blogPosts.filter((post) => post.isNew).map((post) => post.slug);
 
 const HERO_SUBTITLE = 'full-stack developer & ai integration specialist. i build scalable, practical software — backend architecture, cloud infra, dev tooling, ai-powered workflows.';
 
@@ -165,11 +166,17 @@ const sideProjectItemList = {
           </svg>
           <span class="desktop-icon-label">side-quests/</span>
         </a>
-        <a class="desktop-icon" href="#writing" style="--app-tint: var(--tint-writing);">
+        <a
+          class="desktop-icon"
+          href="#writing"
+          style="--app-tint: var(--tint-writing);"
+          data-new-slugs={newPostSlugs.length > 0 ? newPostSlugs.join(',') : undefined}
+        >
           <svg viewBox="0 0 12 12" aria-hidden="true">
             <path d="M1 2h4l1 1h5v7H1z" fill="var(--tint-writing)" stroke="var(--color-ink)" stroke-width="1" />
             <path d="M1 5h10" stroke="var(--color-ink)" stroke-width="1" />
           </svg>
+          <span class="desktop-icon-badge" hidden>new</span>
           <span class="desktop-icon-label">writing/</span>
         </a>
         <a class="desktop-icon desktop-icon--wiggle" href="#contact" style="--app-tint: var(--tint-contact);">

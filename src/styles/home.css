@@ -1033,6 +1033,58 @@ button.desktop-icon {
   animation: none;
 }
 
+/* writing/ icon: shakes + shows a "new" pixel badge while an unread post
+   is fresh (blog-badges.ts adds the class / unhides the badge) */
+.desktop-icon {
+  position: relative;
+}
+
+.desktop-icon-badge {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  padding: 1px 3px;
+  font: 700 8px/1.2 var(--font-pixel);
+  text-transform: uppercase;
+  color: var(--color-ink);
+  background: var(--app-tint, var(--color-surface));
+  border: 1px solid var(--color-ink);
+  box-shadow: 2px 2px 0 var(--color-ink);
+  pointer-events: none;
+}
+
+.desktop-icon--shake {
+  animation: icon-shake 2.4s ease-in-out infinite;
+}
+
+.desktop-icon--shake:hover,
+.desktop-icon--shake:focus-visible {
+  animation: none;
+}
+
+@keyframes icon-shake {
+  0%,
+  24%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+  4% {
+    transform: translateX(-2px) rotate(-3deg);
+  }
+  8% {
+    transform: translateX(2px) rotate(3deg);
+  }
+  12% {
+    transform: translateX(-2px) rotate(-2deg);
+  }
+  16% {
+    transform: translateX(2px) rotate(2deg);
+  }
+  20% {
+    transform: translateX(-1px) rotate(-1deg);
+  }
+}
+
 @keyframes contact-wiggle {
   0%,
   20%,
@@ -1456,6 +1508,7 @@ button.desktop-icon {
   .hero-scroll-arrow,
   .contact-link--wiggle,
   .desktop-icon--wiggle,
+  .desktop-icon--shake,
   .trash-shake {
     animation: none;
   }

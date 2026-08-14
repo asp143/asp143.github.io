@@ -4,6 +4,18 @@ type PostHogClient = {
 };
 
 import { markPostRead } from './read-posts';
+import { DESKTOP_GATE } from './window';
+
+/* Shared /blog/<slug>/ links open inside the home desktop's browser pane.
+   Only top-level visits on desktop-class viewports bounce — this same page
+   loaded inside the pane's iframe (self !== top) must render as-is, and
+   small screens keep the plain article. */
+const redirectingToDesktop =
+  window.self === window.top && window.matchMedia(DESKTOP_GATE).matches;
+if (redirectingToDesktop) {
+  const target = location.pathname + location.search + location.hash;
+  location.replace(`/?open=${encodeURIComponent(target)}`);
+}
 
 const posthog = (window as Window & { posthog?: PostHogClient }).posthog;
 const main = document.querySelector<HTMLElement>('main.post-page');
@@ -51,7 +63,7 @@ if (main && (progressBar || posthog)) {
   paintProgress(); // initial paint (deep links / restored scroll position)
 }
 
-if (posthog && main) {
+if (posthog && main && !redirectingToDesktop) {
   const slug = main.dataset.slug ?? '';
   const title = main.dataset.title ?? '';
   const tags = main.dataset.tags ?? '';
