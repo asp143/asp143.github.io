@@ -7,7 +7,7 @@ tags:
   - agents
   - engineering
   - developer-workflow
-draft: true
+draft: false
 ---
 
 I called it vibe coding for months. I was wrong, and so was the term.
