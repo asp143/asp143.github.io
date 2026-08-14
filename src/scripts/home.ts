@@ -281,6 +281,8 @@ function initDesktopWindows(): DesktopController {
     if (!browser) return;
     browser.classList.remove('is-open', 'is-focused');
     browserFrame?.setAttribute('src', 'about:blank'); // stop playback/loading
+    // the address bar mirrors the pane while it's open — restore home
+    if (window.location.pathname !== '/') history.replaceState(null, '', '/');
     const next = topOpenWin();
     if (next) focusWin(next);
     else setActiveTaskbarApp(null);
@@ -298,6 +300,8 @@ function initDesktopWindows(): DesktopController {
         loc.pathname + loc.search,
         browserFrame.contentDocument?.title?.split('—')[0]?.trim().toLowerCase()
       );
+      // mirror the pane in the real address bar so any pane page is sharable
+      if (loc.pathname !== '/') history.replaceState(null, '', loc.pathname + loc.search);
     } catch {
       /* cross-origin frame — leave the chrome as-is */
     }
@@ -323,6 +327,21 @@ function initDesktopWindows(): DesktopController {
       .forEach((menu) => { menu.open = false; });
     openBrowser(url);
   });
+
+  /* ── shared-link entry: post pages bounce desktop visitors here as
+     /?open=/blog/<slug>/ — open the path in the browser pane and put the
+     canonical URL back in the address bar. Small screens (someone shares
+     the /?open= form directly) go straight to the real page. ── */
+  const openParam = new URLSearchParams(window.location.search).get('open');
+  if (openParam && /^\/[^/]/.test(openParam)) {
+    if (isDesktop()) {
+      const url = new URL(openParam, window.location.origin);
+      history.replaceState(null, '', url.pathname + url.search + url.hash);
+      openBrowser(url);
+    } else {
+      window.location.replace(openParam);
+    }
+  }
 
   const syncMode = () => {
     if (isDesktop()) {
