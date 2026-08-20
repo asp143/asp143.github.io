@@ -21,10 +21,10 @@
  */
 
 import { makeDraggable, raiseWindow, canDrag, type DraggableController } from './draggable';
+import { DESKTOP_GATE } from './media';
 
 export { makeDraggable, raiseWindow, canDrag };
-
-export const DESKTOP_GATE = '(min-width: 1024px) and (pointer: fine)';
+export { DESKTOP_GATE } from './media';
 
 const CLOSE_JOKES = [
   'this window pays my bills',
