@@ -4,26 +4,43 @@ type PostHogClient = {
 };
 
 import { markPostRead } from './read-posts';
-import { DESKTOP_GATE } from './window';
+import { shouldRedirectToDesktop } from './media';
 
-/* The document-head redirect normally navigates before this module runs.
-   Keep this guard because parsing can continue briefly while location.replace()
-   is pending; no article work should start during that window. */
-const redirectingToDesktop =
-  window.self === window.top && window.matchMedia(DESKTOP_GATE).matches;
+/* Desktop readers enter the ralphOS view on their first real interaction.
+   Crawlers leave the article untouched because they do not interact. */
+if (shouldRedirectToDesktop()) {
+  const interactionEvents = ['pointermove', 'wheel', 'touchstart', 'keydown', 'scroll'] as const;
+  const listenerOptions = { once: true, passive: true };
+  let redirectStarted = false;
+
+  const redirectToDesktop = () => {
+    if (redirectStarted) return;
+    redirectStarted = true;
+    interactionEvents.forEach((eventName) => {
+      window.removeEventListener(eventName, redirectToDesktop, listenerOptions);
+    });
+
+    const target = location.pathname + location.search + location.hash;
+    location.replace('/?open=' + encodeURIComponent(target));
+  };
+
+  interactionEvents.forEach((eventName) => {
+    window.addEventListener(eventName, redirectToDesktop, listenerOptions);
+  });
+}
 
 const posthog = (window as Window & { posthog?: PostHogClient }).posthog;
 const main = document.querySelector<HTMLElement>('main.post-page');
 const progressBar = document.querySelector<HTMLElement>('.post-progress-bar');
 
-if (!redirectingToDesktop && main?.dataset.slug) {
+if (main?.dataset.slug) {
   markPostRead(main.dataset.slug);
 }
 
 /* ---------- Reading progress + scroll depth (single rAF-gated listener).
    The progress bar works even when PostHog is unavailable; depth events
    stay PostHog-gated. ---------- */
-if (!redirectingToDesktop && main && (progressBar || posthog)) {
+if (main && (progressBar || posthog)) {
   const slug = main.dataset.slug ?? '';
   const depthMarks = new Set<number>();
   let depthTicking = false;
@@ -67,7 +84,7 @@ if (!redirectingToDesktop && main && (progressBar || posthog)) {
   paintProgress(); // initial paint (deep links / restored scroll position)
 }
 
-if (posthog && main && !redirectingToDesktop) {
+if (posthog && main) {
   const slug = main.dataset.slug ?? '';
   const title = main.dataset.title ?? '';
   const tags = main.dataset.tags ?? '';
