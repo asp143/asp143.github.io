@@ -16,11 +16,13 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.8",
+    "@astrojs/markdown-remark": "^7.1.0",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.2",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@fontsource/silkscreen": "^5.3.0",
     "astro": "^6.1.6",
+    "github-slugger": "^2.0.0",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
