@@ -1,7 +1,8 @@
 import sharp from 'sharp';
-import { readdirSync, readFileSync, mkdirSync, existsSync, statSync } from 'node:fs';
+import { mkdirSync, existsSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
+import { getContentFileEntries } from './lib/content-files.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECTS_DIR = resolve(__dirname, '../src/content/projects');
@@ -18,32 +19,6 @@ function escapeXml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
-}
-
-function readFrontmatter(file) {
-  const src = readFileSync(file, 'utf8');
-  const match = src.match(/^---([\s\S]*?)---/);
-  if (!match) return {};
-  const data = {};
-  let listKey = null;
-  for (const line of match[1].split('\n')) {
-    const item = line.match(/^\s+-\s+(.+)$/);
-    if (item && listKey) {
-      data[listKey].push(item[1].trim().replace(/^['"]|['"]$/g, ''));
-      continue;
-    }
-    const m = line.match(/^([a-zA-Z]+):\s*(.*)$/);
-    if (!m) continue;
-    const [, key, raw] = m;
-    if (raw.trim() === '') {
-      data[key] = [];
-      listKey = key;
-    } else {
-      data[key] = raw.trim().replace(/^['"]|['"]$/g, '');
-      listKey = null;
-    }
-  }
-  return data;
 }
 
 function wrapLines(title, maxChars, maxLines) {
@@ -147,15 +122,13 @@ function isDraft(value) {
   return ['true', 'yes', 'on', '1'].includes(normalized);
 }
 
-const entries = readdirSync(PROJECTS_DIR).filter((f) => f.endsWith('.md'));
+const entries = getContentFileEntries(PROJECTS_DIR);
 const generations = [];
 let skipped = 0;
-for (const entry of entries) {
-  const slug = entry.replace(/\.md$/, '');
-  const source = join(PROJECTS_DIR, entry);
-  const fm = readFrontmatter(source);
+for (const { slug, filePath: source, frontmatter: fm } of entries) {
   if (isDraft(fm.draft)) continue;
   const out = join(OUT_DIR, `${slug}.png`);
+  mkdirSync(dirname(out), { recursive: true });
   if (existsSync(out) && statSync(out).mtimeMs >= statSync(source).mtimeMs) {
     skipped += 1;
     continue;

@@ -1,33 +1,25 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
-import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { getContentFileEntries } from './scripts/lib/content-files.mjs';
+import { isNoindexPath } from './src/utils/seo.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BLOG_DIR = join(__dirname, 'src/content/blog');
 const NOW_UPDATED = '2026-04-22';
 const BUILD_DATE = new Date();
 
-function readFrontmatterDate(file, key) {
-  const src = readFileSync(file, 'utf8');
-  const fm = src.match(/^---([\s\S]*?)---/);
-  if (!fm) return null;
-  const re = new RegExp(`^${key}:\\s*(.+)$`, 'm');
-  const match = fm[1].match(re);
-  if (!match) return null;
-  const raw = match[1].trim().replace(/^['"]|['"]$/g, '');
-  const date = new Date(raw);
+function toDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
   return Number.isNaN(date.valueOf()) ? null : date;
 }
 
 const blogDates = new Map();
-for (const entry of readdirSync(BLOG_DIR)) {
-  if (!entry.endsWith('.md')) continue;
-  const slug = entry.replace(/\.md$/, '');
-  const full = join(BLOG_DIR, entry);
-  const pub = readFrontmatterDate(full, 'pubDate');
-  const updated = readFrontmatterDate(full, 'updatedDate');
+for (const { slug, frontmatter } of getContentFileEntries(BLOG_DIR)) {
+  const pub = toDate(frontmatter.pubDate);
+  const updated = toDate(frontmatter.updatedDate);
   blogDates.set(`/blog/${slug}/`, updated ?? pub ?? BUILD_DATE);
 }
 
@@ -60,7 +52,7 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/blog/tags/'),
+      filter: (page) => !isNoindexPath(new URL(page).pathname),
       changefreq: 'monthly',
       priority: 0.7,
       serialize(item) {

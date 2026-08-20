@@ -1,7 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { DESKTOP_GATE } from '../../scripts/media';
 import {
   getPublishedPosts,
   formatPubDateLong,
@@ -88,14 +87,6 @@ const breadcrumb = {
   osPath={`~/writing/${post.id}`}
 >
   <Fragment slot="head">
-    <script is:inline define:vars={{ desktopGate: DESKTOP_GATE }}>
-      // Redirect top-level desktop visits before the article is painted.
-      // Framed previews and small-screen visits continue rendering in place.
-      if (navigator.webdriver !== true && window.self === window.top && window.matchMedia(desktopGate).matches) {
-        var target = location.pathname + location.search + location.hash;
-        location.replace('/?open=' + encodeURIComponent(target));
-      }
-    </script>
     <script is:inline type="application/ld+json" set:html={JSON.stringify(blogPosting)}></script>
   </Fragment>
 

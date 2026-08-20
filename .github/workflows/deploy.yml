@@ -19,9 +19,42 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      indexnow_host: ${{ steps.indexnow_config.outputs.host }}
+      indexnow_key: ${{ steps.indexnow_config.outputs.key }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+      - name: Resolve IndexNow configuration
+        id: indexnow_config
+        continue-on-error: true
+        shell: bash
+        run: |
+          key=""
+          for key_file in public/*.txt; do
+            candidate="$(basename "$key_file" .txt)"
+            key="$(tr -d '[:space:]' < "$key_file")"
+            [[ "$key" == "$candidate" ]] && break
+            key=""
+          done
+
+          if [[ -z "$key" ]]; then
+            echo "No valid IndexNow key file found in public/." >&2
+            exit 1
+          fi
+          if [[ ! -f public/CNAME ]]; then
+            echo "public/CNAME is required to derive the IndexNow host." >&2
+            exit 1
+          fi
+
+          host="$(tr -d '[:space:]' < public/CNAME)"
+          if [[ -z "$host" ]]; then
+            echo "public/CNAME does not contain a host." >&2
+            exit 1
+          fi
+
+          echo "key=$key" >> "$GITHUB_OUTPUT"
+          echo "host=$host" >> "$GITHUB_OUTPUT"
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Setup Node
@@ -43,7 +76,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: indexnow-sitemap
-          path: dist/sitemap-0.xml
+          path: dist/sitemap-[0-9]*.xml
+          if-no-files-found: error
           retention-days: 1
 
   deploy:
@@ -53,22 +87,137 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Snapshot live sitemap
+        if: needs.build.outputs.indexnow_host != ''
+        continue-on-error: true
+        shell: bash
+        env:
+          INDEXNOW_HOST: ${{ needs.build.outputs.indexnow_host }}
+        run: |
+          live_dir="$RUNNER_TEMP/indexnow-live"
+          mkdir -p "$live_dir"
+
+          curl --fail --silent --show-error \
+            "https://${INDEXNOW_HOST}/sitemap-index.xml" \
+            --output "$live_dir/sitemap-index.xml"
+
+          mapfile -t sitemap_urls < <(
+            python3 - "$live_dir/sitemap-index.xml" <<'PY'
+          import re
+          import sys
+          import xml.etree.ElementTree as ET
+          from urllib.parse import urlparse
+
+          root = ET.parse(sys.argv[1]).getroot()
+          for element in root.iter():
+              if element.tag.rsplit('}', 1)[-1] != 'loc' or not element.text:
+                  continue
+              url = element.text.strip()
+              if re.search(r'/sitemap-[0-9]+\.xml$', urlparse(url).path):
+                  print(url)
+          PY
+          )
+
+          if (( ${#sitemap_urls[@]} == 0 )); then
+            echo "No numbered sitemap shards found on the live site." >&2
+            exit 1
+          fi
+
+          for index in "${!sitemap_urls[@]}"; do
+            curl --fail --silent --show-error \
+              "${sitemap_urls[$index]}" \
+              --output "$live_dir/shard-$index.xml"
+          done
+
+          python3 - "$live_dir/snapshot.txt" "$live_dir"/shard-*.xml <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+
+          output_path, *sitemap_paths = sys.argv[1:]
+          entries = set()
+          for sitemap_path in sitemap_paths:
+              root = ET.parse(sitemap_path).getroot()
+              for url in root.iter():
+                  if url.tag.rsplit('}', 1)[-1] != 'url':
+                      continue
+                  values = {child.tag.rsplit('}', 1)[-1]: (child.text or '').strip() for child in url}
+                  if values.get('loc'):
+                      entries.add((values['loc'], values.get('lastmod', '')))
+
+          with open(output_path, 'w', encoding='utf-8') as output:
+              for loc, lastmod in sorted(entries):
+                  output.write(f'{loc}\t{lastmod}\n')
+          PY
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
       - name: Download sitemap for IndexNow
+        continue-on-error: true
         uses: actions/download-artifact@v5
         with:
           name: indexnow-sitemap
           path: dist
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-      - name: Notify IndexNow
+      - name: Compare live and built sitemaps
+        id: sitemap_changes
         continue-on-error: true
         shell: bash
         run: |
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          fresh_snapshot="$RUNNER_TEMP/indexnow-fresh-sitemap.txt"
+          live_snapshot="$RUNNER_TEMP/indexnow-live/snapshot.txt"
+          sitemap_files=(dist/sitemap-[0-9]*.xml)
+
+          if [[ ! -f "${sitemap_files[0]}" ]]; then
+            echo "Fresh sitemap shards are unavailable; defaulting to notification." >&2
+            exit 0
+          fi
+
+          if ! python3 - "$fresh_snapshot" "${sitemap_files[@]}" <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+
+          output_path, *sitemap_paths = sys.argv[1:]
+          entries = set()
+          for sitemap_path in sitemap_paths:
+              root = ET.parse(sitemap_path).getroot()
+              for url in root.iter():
+                  if url.tag.rsplit('}', 1)[-1] != 'url':
+                      continue
+                  values = {child.tag.rsplit('}', 1)[-1]: (child.text or '').strip() for child in url}
+                  if values.get('loc'):
+                      entries.add((values['loc'], values.get('lastmod', '')))
+
+          with open(output_path, 'w', encoding='utf-8') as output:
+              for loc, lastmod in sorted(entries):
+                  output.write(f'{loc}\t{lastmod}\n')
+          PY
+          then
+            echo "Fresh sitemap comparison failed; defaulting to notification." >&2
+            exit 0
+          fi
+
+          if [[ -f "$live_snapshot" ]] && cmp --silent "$live_snapshot" "$fresh_snapshot"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Live and built sitemap entries match; skipping IndexNow."
+          else
+            echo "Live sitemap is unavailable or differs; notifying IndexNow."
+          fi
+      - name: Notify IndexNow
+        if: >-
+          steps.sitemap_changes.outputs.changed == 'true' &&
+          needs.build.outputs.indexnow_key != '' &&
+          needs.build.outputs.indexnow_host != ''
+        continue-on-error: true
+        shell: bash
+        env:
+          INDEXNOW_HOST: ${{ needs.build.outputs.indexnow_host }}
+          INDEXNOW_KEY: ${{ needs.build.outputs.indexnow_key }}
+        run: |
           mapfile -t urls < <(
-            grep -o '<loc>[^<]*</loc>' dist/sitemap-0.xml \
+            grep -ho '<loc>[^<]*</loc>' dist/sitemap-[0-9]*.xml \
               | sed -e 's#<loc>##' -e 's#</loc>##' \
-              | head -n 100
+                -e 's/&quot;/"/g' -e "s/&apos;/'/g" \
+                -e 's/&lt;/</g' -e 's/&gt;/>/g' -e 's/&amp;/\&/g'
           )
 
           if (( ${#urls[@]} == 0 )); then
@@ -85,9 +234,9 @@ jobs:
             --data-binary @- \
             https://api.indexnow.org/indexnow <<JSON
           {
-            "host": "ralphjonas.com",
-            "key": "7ce1b2f5bc1577e7a86ea8bcd9a29815",
-            "keyLocation": "https://ralphjonas.com/7ce1b2f5bc1577e7a86ea8bcd9a29815.txt",
+            "host": "${INDEXNOW_HOST}",
+            "key": "${INDEXNOW_KEY}",
+            "keyLocation": "https://${INDEXNOW_HOST}/${INDEXNOW_KEY}.txt",
             "urlList": [
           ${url_list}
             ]

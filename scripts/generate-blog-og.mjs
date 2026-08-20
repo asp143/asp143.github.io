@@ -1,7 +1,8 @@
 import sharp from 'sharp';
-import { readdirSync, readFileSync, mkdirSync, existsSync, statSync } from 'node:fs';
+import { mkdirSync, existsSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
+import { getContentFileEntries } from './lib/content-files.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BLOG_DIR = resolve(__dirname, '../src/content/blog');
@@ -18,32 +19,6 @@ function escapeXml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
-}
-
-function readFrontmatter(file) {
-  const src = readFileSync(file, 'utf8');
-  const match = src.match(/^---([\s\S]*?)---/);
-  if (!match) return {};
-  const data = {};
-  let listKey = null;
-  for (const line of match[1].split('\n')) {
-    const item = line.match(/^\s+-\s+(.+)$/);
-    if (item && listKey) {
-      data[listKey].push(item[1].trim().replace(/^['"]|['"]$/g, ''));
-      continue;
-    }
-    const m = line.match(/^([a-zA-Z]+):\s*(.*)$/);
-    if (!m) continue;
-    const [, key, raw] = m;
-    if (raw.trim() === '') {
-      data[key] = [];
-      listKey = key;
-    } else {
-      data[key] = raw.trim().replace(/^['"]|['"]$/g, '');
-      listKey = null;
-    }
-  }
-  return data;
 }
 
 function wrapLines(title, maxChars, maxLines) {
@@ -136,19 +111,6 @@ function buildSvg({ title, tags }) {
 `;
 }
 
-function parseTags(raw) {
-  if (!raw) return [];
-  const trimmed = raw.trim();
-  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-    return trimmed
-      .slice(1, -1)
-      .split(',')
-      .map((t) => t.trim().replace(/^['"]|['"]$/g, ''))
-      .filter(Boolean);
-  }
-  return [];
-}
-
 function isDraft(value) {
   if (value === true) return true;
   if (typeof value !== 'string') return false;
@@ -160,21 +122,19 @@ function isDraft(value) {
   return ['true', 'yes', 'on', '1'].includes(normalized);
 }
 
-const entries = readdirSync(BLOG_DIR).filter((f) => f.endsWith('.md'));
+const entries = getContentFileEntries(BLOG_DIR);
 const generations = [];
 let skipped = 0;
-for (const entry of entries) {
-  const slug = entry.replace(/\.md$/, '');
-  const source = join(BLOG_DIR, entry);
-  const fm = readFrontmatter(source);
+for (const { slug, filePath: source, frontmatter: fm } of entries) {
   if (isDraft(fm.draft)) continue;
   const out = join(OUT_DIR, `${slug}.png`);
+  mkdirSync(dirname(out), { recursive: true });
   if (existsSync(out) && statSync(out).mtimeMs >= statSync(source).mtimeMs) {
     skipped += 1;
     continue;
   }
   const title = fm.title ?? slug;
-  const tags = Array.isArray(fm.tags) ? fm.tags : parseTags(fm.tags);
+  const tags = Array.isArray(fm.tags) ? fm.tags : [];
   const svg = buildSvg({ title, tags });
   generations.push(sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toFile(out));
 }

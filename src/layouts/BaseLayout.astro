@@ -11,6 +11,7 @@ import '../styles/global.css';
 import '../styles/os.css';
 import MenuBar from '../components/MenuBar.astro';
 import Taskbar from '../components/Taskbar.astro';
+import { isNoindexPath } from '../utils/seo.mjs';
 
 const SITE_URL = 'https://ralphjonas.com';
 const OG_IMAGE = `${SITE_URL}/og.png`;
@@ -29,7 +30,7 @@ const {
   dateModified,
   datePublished,
   articleTags = [],
-  noindex = false,
+  noindex = isNoindexPath(Astro.url.pathname),
   /* ralphOS chrome: menubar renders on every route unless opted out
      (404 sets menubar={false} — the OS crashed). Taskbar is home-only:
      index.astro sets taskbar. osPath overrides the menubar path label. */
