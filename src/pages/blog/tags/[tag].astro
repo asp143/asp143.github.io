@@ -6,6 +6,7 @@ import {
   formatPubDate,
   tagToSlug
 } from '../../../utils/blog';
+import { isNoindexPath } from '../../../utils/seo.mjs';
 import '../../../styles/blog.css';
 
 export async function getStaticPaths() {
@@ -34,6 +35,7 @@ const slug = Astro.params.tag;
 const title = `#${tag} — Writing by Ralph Jonas Mungcal`;
 const description = `Posts tagged ${tag}: ${posts.length} ${posts.length === 1 ? 'post' : 'posts'} on ${tag} by Ralph Jonas Mungcal.`;
 const canonicalURL = `https://ralphjonas.com/blog/tags/${slug}/`;
+const noindex = isNoindexPath(Astro.url.pathname);
 const dateModified = posts
   .map((p) => (p.data.updatedDate ?? p.data.pubDate).valueOf())
   .reduce((a, b) => Math.max(a, b), 0);
@@ -74,7 +76,7 @@ const collectionPage = {
   canonicalURL={canonicalURL}
   breadcrumb={breadcrumb}
   dateModified={new Date(dateModified).toISOString()}
-  noindex
+  noindex={noindex}
   osPath={`~/writing?tag=${tag}`}
 >
   <Fragment slot="head">

@@ -2,7 +2,8 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
+import { dirname, join, sep } from 'node:path';
+import { isNoindexPath } from './src/utils/seo.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BLOG_DIR = join(__dirname, 'src/content/blog');
@@ -22,9 +23,9 @@ function readFrontmatterDate(file, key) {
 }
 
 const blogDates = new Map();
-for (const entry of readdirSync(BLOG_DIR)) {
+for (const entry of readdirSync(BLOG_DIR, { recursive: true })) {
   if (!entry.endsWith('.md')) continue;
-  const slug = entry.replace(/\.md$/, '');
+  const slug = entry.replace(/\.md$/, '').split(sep).join('/');
   const full = join(BLOG_DIR, entry);
   const pub = readFrontmatterDate(full, 'pubDate');
   const updated = readFrontmatterDate(full, 'updatedDate');
@@ -60,7 +61,7 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/blog/tags/'),
+      filter: (page) => !isNoindexPath(new URL(page).pathname),
       changefreq: 'monthly',
       priority: 0.7,
       serialize(item) {

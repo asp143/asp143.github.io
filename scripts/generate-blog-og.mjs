@@ -1,7 +1,7 @@
 import sharp from 'sharp';
 import { readdirSync, readFileSync, mkdirSync, existsSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname, resolve, join } from 'node:path';
+import { dirname, resolve, join, sep } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BLOG_DIR = resolve(__dirname, '../src/content/blog');
@@ -160,15 +160,16 @@ function isDraft(value) {
   return ['true', 'yes', 'on', '1'].includes(normalized);
 }
 
-const entries = readdirSync(BLOG_DIR).filter((f) => f.endsWith('.md'));
+const entries = readdirSync(BLOG_DIR, { recursive: true }).filter((entry) => entry.endsWith('.md'));
 const generations = [];
 let skipped = 0;
 for (const entry of entries) {
-  const slug = entry.replace(/\.md$/, '');
+  const slug = entry.replace(/\.md$/, '').split(sep).join('/');
   const source = join(BLOG_DIR, entry);
   const fm = readFrontmatter(source);
   if (isDraft(fm.draft)) continue;
   const out = join(OUT_DIR, `${slug}.png`);
+  mkdirSync(dirname(out), { recursive: true });
   if (existsSync(out) && statSync(out).mtimeMs >= statSync(source).mtimeMs) {
     skipped += 1;
     continue;

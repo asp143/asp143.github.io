@@ -2,6 +2,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Window from '../../../components/Window.astro';
 import { getAllTags } from '../../../utils/blog';
+import { isNoindexPath } from '../../../utils/seo.mjs';
 import '../../../styles/blog.css';
 
 const tags = await getAllTags();
@@ -9,6 +10,7 @@ const tags = await getAllTags();
 const title = 'Tags — Writing by Ralph Jonas Mungcal';
 const description = 'Browse posts by topic — software engineering, AI integration, career, and craft.';
 const canonicalURL = 'https://ralphjonas.com/blog/tags/';
+const noindex = isNoindexPath(Astro.url.pathname);
 
 const breadcrumb = {
   '@context': 'https://schema.org',
@@ -26,7 +28,7 @@ const breadcrumb = {
   description={description}
   canonicalURL={canonicalURL}
   breadcrumb={breadcrumb}
-  noindex
+  noindex={noindex}
   osPath="~/writing/tags"
 >
   <a slot="menubar-back" class="menubar-back" href="/blog/">&larr; ~/writing</a>
