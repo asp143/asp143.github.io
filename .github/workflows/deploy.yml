@@ -19,9 +19,70 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      content_changed: ${{ steps.content_changes.outputs.changed }}
+      indexnow_host: ${{ steps.indexnow_config.outputs.host }}
+      indexnow_key: ${{ steps.indexnow_config.outputs.key }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Detect content changes
+        id: content_changes
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          changed=true
+
+          if [[ "$EVENT_NAME" == "push" \
+            && -n "$BEFORE_SHA" \
+            && ! "$BEFORE_SHA" =~ ^0+$ \
+            && $(git cat-file -t "$BEFORE_SHA" 2>/dev/null || true) == "commit" ]]; then
+            if git diff --quiet "$BEFORE_SHA" "$AFTER_SHA" -- 'src/content/**'; then
+              changed=false
+            fi
+          else
+            echo "Previous commit is unavailable; treating content as changed."
+          fi
+
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+      - name: Resolve IndexNow configuration
+        id: indexnow_config
+        continue-on-error: true
+        shell: bash
+        run: |
+          key=""
+          for key_file in public/*.txt; do
+            candidate="$(basename "$key_file" .txt)"
+            body="$(<"$key_file")"
+            bytes="$(wc -c < "$key_file")"
+            if [[ "$body" == "$candidate" && "$bytes" -eq "${#candidate}" ]]; then
+              key="$candidate"
+              break
+            fi
+          done
+
+          if [[ -z "$key" ]]; then
+            echo "No valid IndexNow key file found in public/." >&2
+            exit 1
+          fi
+          if [[ ! -f public/CNAME ]]; then
+            echo "public/CNAME is required to derive the IndexNow host." >&2
+            exit 1
+          fi
+
+          host="$(tr -d '\r\n' < public/CNAME)"
+          if [[ -z "$host" ]]; then
+            echo "public/CNAME does not contain a host." >&2
+            exit 1
+          fi
+
+          echo "key=$key" >> "$GITHUB_OUTPUT"
+          echo "host=$host" >> "$GITHUB_OUTPUT"
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Setup Node
@@ -43,7 +104,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: indexnow-sitemap
-          path: dist/sitemap-0.xml
+          path: dist/sitemap-*.xml
+          if-no-files-found: error
           retention-days: 1
 
   deploy:
@@ -53,22 +115,29 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
       - name: Download sitemap for IndexNow
+        if: needs.build.outputs.content_changed == 'true'
+        continue-on-error: true
         uses: actions/download-artifact@v5
         with:
           name: indexnow-sitemap
           path: dist
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
       - name: Notify IndexNow
+        if: needs.build.outputs.content_changed == 'true'
         continue-on-error: true
         shell: bash
+        env:
+          INDEXNOW_HOST: ${{ needs.build.outputs.indexnow_host }}
+          INDEXNOW_KEY: ${{ needs.build.outputs.indexnow_key }}
         run: |
           mapfile -t urls < <(
-            grep -o '<loc>[^<]*</loc>' dist/sitemap-0.xml \
+            grep -ho '<loc>[^<]*</loc>' dist/sitemap-*.xml \
               | sed -e 's#<loc>##' -e 's#</loc>##' \
-              | head -n 100
+                -e 's/&quot;/"/g' -e "s/&apos;/'/g" \
+                -e 's/&lt;/</g' -e 's/&gt;/>/g' -e 's/&amp;/\&/g'
           )
 
           if (( ${#urls[@]} == 0 )); then
@@ -85,9 +154,9 @@ jobs:
             --data-binary @- \
             https://api.indexnow.org/indexnow <<JSON
           {
-            "host": "ralphjonas.com",
-            "key": "7ce1b2f5bc1577e7a86ea8bcd9a29815",
-            "keyLocation": "https://ralphjonas.com/7ce1b2f5bc1577e7a86ea8bcd9a29815.txt",
+            "host": "${INDEXNOW_HOST}",
+            "key": "${INDEXNOW_KEY}",
+            "keyLocation": "https://${INDEXNOW_HOST}/${INDEXNOW_KEY}.txt",
             "urlList": [
           ${url_list}
             ]
