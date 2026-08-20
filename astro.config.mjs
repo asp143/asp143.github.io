@@ -60,6 +60,7 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
+      filter: (page) => !page.includes('/blog/tags/'),
       changefreq: 'monthly',
       priority: 0.7,
       serialize(item) {
