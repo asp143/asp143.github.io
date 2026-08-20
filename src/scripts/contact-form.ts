@@ -44,35 +44,49 @@ function initContactForm() {
   const bar = form.querySelector<HTMLElement>('.mail-composer-bar');
   if (bar) {
     let dragging = false;
+    let pointerId = -1;
     let offsetX = 0;
     let offsetY = 0;
+    let modalWidth = 0;
+    let modalHeight = 0;
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (!dragging || event.pointerId !== pointerId) return;
+      const maxLeft = window.innerWidth - modalWidth - 8;
+      const maxTop = window.innerHeight - modalHeight - 8;
+      modal.style.margin = '0';
+      modal.style.left = `${Math.min(Math.max(event.clientX - offsetX, 8), maxLeft)}px`;
+      modal.style.top = `${Math.min(Math.max(event.clientY - offsetY, 8), maxTop)}px`;
+    };
+
+    const endDrag = (event: PointerEvent) => {
+      if (!dragging || event.pointerId !== pointerId) return;
+      dragging = false;
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', endDrag);
+      window.removeEventListener('pointercancel', endDrag);
+      if (bar.hasPointerCapture(event.pointerId)) {
+        bar.releasePointerCapture(event.pointerId);
+      }
+      pointerId = -1;
+      modal.classList.remove('mail-modal--dragging');
+    };
 
     bar.addEventListener('pointerdown', (event) => {
       if ((event.target as HTMLElement).closest('button')) return;
       const rect = modal.getBoundingClientRect();
       dragging = true;
+      pointerId = event.pointerId;
       offsetX = event.clientX - rect.left;
       offsetY = event.clientY - rect.top;
+      modalWidth = rect.width;
+      modalHeight = rect.height;
       modal.classList.add('mail-modal--dragging');
       bar.setPointerCapture(event.pointerId);
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerup', endDrag);
+      window.addEventListener('pointercancel', endDrag);
     });
-
-    bar.addEventListener('pointermove', (event) => {
-      if (!dragging) return;
-      const rect = modal.getBoundingClientRect();
-      const maxLeft = window.innerWidth - rect.width - 8;
-      const maxTop = window.innerHeight - rect.height - 8;
-      modal.style.margin = '0';
-      modal.style.left = `${Math.min(Math.max(event.clientX - offsetX, 8), maxLeft)}px`;
-      modal.style.top = `${Math.min(Math.max(event.clientY - offsetY, 8), maxTop)}px`;
-    });
-
-    const endDrag = () => {
-      dragging = false;
-      modal.classList.remove('mail-modal--dragging');
-    };
-    bar.addEventListener('pointerup', endDrag);
-    bar.addEventListener('pointercancel', endDrag);
   }
 
   // Click on the backdrop (the dialog element itself) closes the modal
