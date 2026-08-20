@@ -1,6 +1,6 @@
 ---
 title: Taste Is the New Seniority
-description: AI made software output cheap. The scarce engineering skill now is taste — knowing what good looks like, what to reject, and whose judgment to trust.
+description: AI made software output cheap. The scarce engineering skill now is taste — knowing what good looks like, what to reject, and whose judgment teams can trust.
 pubDate: 2026-08-21
 tags:
   - ai
