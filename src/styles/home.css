@@ -1497,6 +1497,15 @@ button.desktop-icon {
   transform: none;
 }
 
+/* Infinite decorative motion does no work while the page is backgrounded. */
+.is-document-hidden .hero-cursor,
+.is-document-hidden .hero-scroll-arrow,
+.is-document-hidden .contact-link--wiggle,
+.is-document-hidden .desktop-icon--wiggle,
+.is-document-hidden .desktop-icon--shake {
+  animation-play-state: paused;
+}
+
 /* ===== Reduced Motion (home-owned motion only; OS chrome motion is
    handled by the consolidated block in os.css) ===== */
 @media (prefers-reduced-motion: reduce) {

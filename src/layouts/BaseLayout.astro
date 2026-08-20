@@ -2,6 +2,7 @@
 /* Variable font: one 40KB woff2 covers weights 100-800 (replaces five
    ~21KB static weight files — smaller AND fewer requests). */
 import '@fontsource-variable/jetbrains-mono/index.css';
+import jetbrainsWoff2 from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
 /* Pixel font — OS chrome only (window titles, menubar/taskbar, clock,
    icon labels, badges). Never body copy. 700 only — everything pixel
    renders bold, so the 400 file would be dead weight. */
@@ -166,12 +167,18 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={jetbrainsWoff2}
+      crossorigin="anonymous"
+    />
     <link rel="dns-prefetch" href="https://us.i.posthog.com" />
     <link rel="dns-prefetch" href="https://us-assets.i.posthog.com" />
     <title>{title}</title>
 
     <link rel="apple-touch-icon" href="/favicons/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/favicons/icon-512.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicons/icon-192.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />

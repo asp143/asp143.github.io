@@ -6,35 +6,34 @@ type PostHogClient = {
 import { markPostRead } from './read-posts';
 import { DESKTOP_GATE } from './window';
 
-/* Shared /blog/<slug>/ links open inside the home desktop's browser pane.
-   Only top-level visits on desktop-class viewports bounce — this same page
-   loaded inside the pane's iframe (self !== top) must render as-is, and
-   small screens keep the plain article. */
+/* The document-head redirect normally navigates before this module runs.
+   Keep this guard because parsing can continue briefly while location.replace()
+   is pending; no article work should start during that window. */
 const redirectingToDesktop =
   window.self === window.top && window.matchMedia(DESKTOP_GATE).matches;
-if (redirectingToDesktop) {
-  const target = location.pathname + location.search + location.hash;
-  location.replace(`/?open=${encodeURIComponent(target)}`);
-}
 
 const posthog = (window as Window & { posthog?: PostHogClient }).posthog;
 const main = document.querySelector<HTMLElement>('main.post-page');
 const progressBar = document.querySelector<HTMLElement>('.post-progress-bar');
 
-if (main?.dataset.slug) {
+if (!redirectingToDesktop && main?.dataset.slug) {
   markPostRead(main.dataset.slug);
 }
 
 /* ---------- Reading progress + scroll depth (single rAF-gated listener).
    The progress bar works even when PostHog is unavailable; depth events
    stay PostHog-gated. ---------- */
-if (main && (progressBar || posthog)) {
+if (!redirectingToDesktop && main && (progressBar || posthog)) {
   const slug = main.dataset.slug ?? '';
   const depthMarks = new Set<number>();
   let depthTicking = false;
+  let docHeight = 0;
+
+  const refreshDocHeight = () => {
+    docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  };
 
   const paintProgress = (): number => {
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
     const ratio =
       docHeight > 0 ? Math.min(Math.max(window.scrollY / docHeight, 0), 1) : 0;
     if (progressBar) {
@@ -59,6 +58,11 @@ if (main && (progressBar || posthog)) {
       depthTicking = false;
     });
   };
+
+  refreshDocHeight();
+  const resizeObserver = new ResizeObserver(refreshDocHeight);
+  resizeObserver.observe(document.documentElement);
+  window.addEventListener('resize', refreshDocHeight, { passive: true });
   window.addEventListener('scroll', onScrollDepth, { passive: true });
   paintProgress(); // initial paint (deep links / restored scroll position)
 }

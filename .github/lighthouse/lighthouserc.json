@@ -2,7 +2,11 @@
   "ci": {
     "collect": {
       "staticDistDir": "./dist",
-      "url": ["http://localhost/index.html"],
+      "url": [
+        "http://localhost/index.html",
+        "http://localhost/blog/agentic-engineering-is-not-vibe-coding/",
+        "http://localhost/projects/"
+      ],
       "numberOfRuns": 3,
       "settings": {
         "preset": "desktop",

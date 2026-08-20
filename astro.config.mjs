@@ -51,6 +51,10 @@ function resolveLastmod(url) {
 export default defineConfig({
   site: 'https://ralphjonas.com',
   trailingSlash: 'always',
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'viewport'
+  },
   build: {
     format: 'directory'
   },

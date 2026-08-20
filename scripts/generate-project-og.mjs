@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import { readdirSync, readFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readdirSync, readFileSync, mkdirSync, existsSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
 
@@ -136,18 +136,35 @@ function buildSvg({ slug, title, stack }) {
 `;
 }
 
+function isDraft(value) {
+  if (value === true) return true;
+  if (typeof value !== 'string') return false;
+  const normalized = value
+    .replace(/\s+#.*$/, '')
+    .trim()
+    .replace(/^['"]|['"]$/g, '')
+    .toLowerCase();
+  return ['true', 'yes', 'on', '1'].includes(normalized);
+}
+
 const entries = readdirSync(PROJECTS_DIR).filter((f) => f.endsWith('.md'));
-let count = 0;
+const generations = [];
+let skipped = 0;
 for (const entry of entries) {
   const slug = entry.replace(/\.md$/, '');
-  const fm = readFrontmatter(join(PROJECTS_DIR, entry));
-  if (fm.draft === 'true') continue;
+  const source = join(PROJECTS_DIR, entry);
+  const fm = readFrontmatter(source);
+  if (isDraft(fm.draft)) continue;
+  const out = join(OUT_DIR, `${slug}.png`);
+  if (existsSync(out) && statSync(out).mtimeMs >= statSync(source).mtimeMs) {
+    skipped += 1;
+    continue;
+  }
   const title = fm.title ?? slug;
   const stack = Array.isArray(fm.stack) ? fm.stack : [];
   const svg = buildSvg({ slug, title, stack });
-  const out = join(OUT_DIR, `${slug}.png`);
-  await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toFile(out);
-  count += 1;
+  generations.push(sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toFile(out));
 }
 
-console.log(`generated ${count} project OG images → ${OUT_DIR}`);
+await Promise.all(generations);
+console.log(`generated ${generations.length} project OG images, skipped ${skipped} unchanged → ${OUT_DIR}`);

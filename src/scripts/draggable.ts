@@ -93,6 +93,9 @@ export function makeDraggable(
     dragging = true;
     pointerId = event.pointerId;
     handle.setPointerCapture(event.pointerId);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
     event.preventDefault();
   };
 
@@ -110,13 +113,24 @@ export function makeDraggable(
   const endDrag = (event: PointerEvent) => {
     if (!dragging || event.pointerId !== pointerId) return;
     dragging = false;
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', endDrag);
+    window.removeEventListener('pointercancel', endDrag);
     if (handle.hasPointerCapture(event.pointerId)) {
       handle.releasePointerCapture(event.pointerId);
     }
+    pointerId = -1;
   };
 
   const reset = () => {
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', endDrag);
+    window.removeEventListener('pointercancel', endDrag);
+    if (dragging && handle.hasPointerCapture(pointerId)) {
+      handle.releasePointerCapture(pointerId);
+    }
     dragging = false;
+    pointerId = -1;
     el.style.left = '';
     el.style.top = '';
     el.style.right = '';
@@ -132,17 +146,11 @@ export function makeDraggable(
   widthQuery.addEventListener('change', onBreakpointChange);
 
   handle.addEventListener('pointerdown', onPointerDown);
-  handle.addEventListener('pointermove', onPointerMove);
-  handle.addEventListener('pointerup', endDrag);
-  handle.addEventListener('pointercancel', endDrag);
 
   const destroy = () => {
     reset();
     widthQuery.removeEventListener('change', onBreakpointChange);
     handle.removeEventListener('pointerdown', onPointerDown);
-    handle.removeEventListener('pointermove', onPointerMove);
-    handle.removeEventListener('pointerup', endDrag);
-    handle.removeEventListener('pointercancel', endDrag);
   };
 
   return { reset, destroy };

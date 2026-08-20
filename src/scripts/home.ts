@@ -42,17 +42,58 @@ function runTypewriter() {
   }
 
   textSpan.textContent = '';
-  let i = 0;
   const speed = 18;
-  const tick = () => {
-    if (i <= full.length) {
-      textSpan.textContent = full.slice(0, i);
-      i += 1;
-      window.setTimeout(tick, speed);
+  const initialDelay = 350;
+  let elapsed = 0;
+  let lastFrame: number | null = null;
+  let renderedChars = 0;
+  let frameId = 0;
+
+  const step = (now: number) => {
+    if (document.hidden) {
+      lastFrame = null;
+      return;
+    }
+
+    if (lastFrame !== null) elapsed += now - lastFrame;
+    lastFrame = now;
+
+    const chars = Math.min(
+      full.length,
+      Math.floor(Math.max(0, elapsed - initialDelay) / speed)
+    );
+    if (chars !== renderedChars) {
+      renderedChars = chars;
+      textSpan.textContent = full.slice(0, renderedChars);
+    }
+
+    if (renderedChars < full.length) {
+      frameId = requestAnimationFrame(step);
+    } else {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     }
   };
-  // Small delay so it feels like the shell booted
-  window.setTimeout(tick, 350);
+
+  const onVisibilityChange = () => {
+    if (document.hidden) {
+      cancelAnimationFrame(frameId);
+      lastFrame = null;
+    } else {
+      frameId = requestAnimationFrame(step);
+    }
+  };
+
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  if (!document.hidden) frameId = requestAnimationFrame(step);
+}
+
+/* ---------- Pause idle CSS motion in background tabs ---------- */
+function wireAnimationVisibility() {
+  const apply = () => {
+    document.documentElement.classList.toggle('is-document-hidden', document.hidden);
+  };
+  apply();
+  document.addEventListener('visibilitychange', apply);
 }
 
 /* ---------- Stat counter ---------- */
@@ -572,6 +613,7 @@ function wireSectionObserver(desktop: DesktopController) {
 }
 
 /* ---------- Bootstrap ---------- */
+wireAnimationVisibility();
 const supportsAnimate = typeof Element.prototype.animate === 'function';
 if (!prefersReducedMotion && supportsAnimate) {
   runEntranceAnimations();
@@ -590,16 +632,30 @@ wireSectionObserver(desktop);
 /* ---------- PostHog ---------- */
 const posthog = (window as Window & { posthog?: PostHogClient }).posthog;
 if (posthog) {
+  const scrollDepthMarks = [25, 50, 75, 100];
   const depthMarks = new Set<number>();
   let depthTicking = false;
+  let docHeight = 0;
+
+  const refreshDocHeight = () => {
+    docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  };
+
+  const resizeObserver = new ResizeObserver(refreshDocHeight);
+
+  const stopScrollDepthTracking = () => {
+    window.removeEventListener('scroll', onScrollDepth);
+    window.removeEventListener('resize', refreshDocHeight);
+    resizeObserver.disconnect();
+  };
+
   const onScrollDepth = () => {
     if (depthTicking) return;
     depthTicking = true;
     requestAnimationFrame(() => {
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (docHeight > 0) {
         const pct = Math.round((window.scrollY / docHeight) * 100);
-        [25, 50, 75, 100].forEach((mark) => {
+        scrollDepthMarks.forEach((mark) => {
           if (pct >= mark && !depthMarks.has(mark)) {
             depthMarks.add(mark);
             posthog.capture('scroll_depth', { percent: mark });
@@ -607,8 +663,13 @@ if (posthog) {
         });
       }
       depthTicking = false;
+      if (depthMarks.size === scrollDepthMarks.length) stopScrollDepthTracking();
     });
   };
+
+  refreshDocHeight();
+  resizeObserver.observe(document.documentElement);
+  window.addEventListener('resize', refreshDocHeight, { passive: true });
   window.addEventListener('scroll', onScrollDepth, { passive: true });
 
   document.addEventListener('click', (ev) => {
