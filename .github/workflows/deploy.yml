@@ -39,6 +39,12 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
+      - name: Upload sitemap for IndexNow
+        uses: actions/upload-artifact@v4
+        with:
+          name: indexnow-sitemap
+          path: dist/sitemap-0.xml
+          retention-days: 1
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,6 +53,43 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Download sitemap for IndexNow
+        uses: actions/download-artifact@v5
+        with:
+          name: indexnow-sitemap
+          path: dist
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Notify IndexNow
+        continue-on-error: true
+        shell: bash
+        run: |
+          mapfile -t urls < <(
+            grep -o '<loc>[^<]*</loc>' dist/sitemap-0.xml \
+              | sed -e 's#<loc>##' -e 's#</loc>##' \
+              | head -n 100
+          )
+
+          if (( ${#urls[@]} == 0 )); then
+            echo "No sitemap URLs found for IndexNow" >&2
+            exit 1
+          fi
+
+          url_list="$(printf '%s\n' "${urls[@]}" \
+            | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/^/    "/' -e 's/$/"/' -e '$!s/$/,/')"
+
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header 'Content-Type: application/json; charset=utf-8' \
+            --data-binary @- \
+            https://api.indexnow.org/indexnow <<JSON
+          {
+            "host": "ralphjonas.com",
+            "key": "7ce1b2f5bc1577e7a86ea8bcd9a29815",
+            "keyLocation": "https://ralphjonas.com/7ce1b2f5bc1577e7a86ea8bcd9a29815.txt",
+            "urlList": [
+          ${url_list}
+            ]
+          }
+          JSON

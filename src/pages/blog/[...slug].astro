@@ -56,7 +56,7 @@ const blogPosting = {
   author: { '@id': 'https://ralphjonas.com/#person' },
   publisher: { '@id': 'https://ralphjonas.com/#person' },
   mainEntityOfPage: canonicalURL,
-  image: ogImage,
+  image: { '@type': 'ImageObject', url: ogImage, width: 1200, height: 630 },
   inLanguage: 'en',
   wordCount,
   timeRequired: `PT${readingTime}M`,
@@ -91,7 +91,7 @@ const breadcrumb = {
     <script is:inline define:vars={{ desktopGate: DESKTOP_GATE }}>
       // Redirect top-level desktop visits before the article is painted.
       // Framed previews and small-screen visits continue rendering in place.
-      if (window.self === window.top && window.matchMedia(desktopGate).matches) {
+      if (navigator.webdriver !== true && window.self === window.top && window.matchMedia(desktopGate).matches) {
         var target = location.pathname + location.search + location.hash;
         location.replace('/?open=' + encodeURIComponent(target));
       }
