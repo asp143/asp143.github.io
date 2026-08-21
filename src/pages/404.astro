@@ -219,15 +219,23 @@ import Window from '../components/Window.astro';
   </style>
 
   <script>
+    type PostHogClient = {
+      capture: (eventName: string, properties?: Record<string, string>) => void;
+    };
+
     const path = window.location.pathname;
     const target = document.getElementById('nf-path');
     const target2 = document.getElementById('nf-path-2');
     if (target) target.textContent = path;
     if (target2) target2.textContent = path;
 
-    const ph = (window as any).posthog;
-    if (ph) {
-      ph.capture('404_hit', { path });
+    const posthog = (window as Window & { posthog?: PostHogClient }).posthog;
+    if (posthog) {
+      posthog.capture('404_hit', {
+        path,
+        referrer: document.referrer,
+        search: location.search
+      });
     }
 
     // [ go back ] — history.back with home fallback
