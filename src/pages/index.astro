@@ -220,7 +220,7 @@ const sideProjectItemList = {
     <!-- ── Section windows 01–05 ────────────────────────────────────── -->
     <div class="home-sections">
       <!-- 01. About -->
-      <Window title="about.md — 01" app="about" id="about" variant="section" headingLevel={2} collapsible>
+      <Window title="about.md — 01" headingText="About Ralph Jonas Mungcal" app="about" id="about" variant="section" headingLevel={2} collapsible>
         <p class="win-cmdline" aria-hidden="true">
           <span class="cmd-prompt">$</span> cat about.md <span class="cmd-flag">--format=plain</span>
         </p>
@@ -271,7 +271,7 @@ const sideProjectItemList = {
       </Window>
 
       <!-- 02. Projects -->
-      <Window title="ls ./projects — 02" app="projects" id="projects" variant="section" headingLevel={2} collapsible>
+      <Window title="ls ./projects — 02" headingText="Projects" app="projects" id="projects" variant="section" headingLevel={2} collapsible>
         <p class="win-cmdline" aria-hidden="true">
           <span class="cmd-prompt">$</span> ls ./projects/ <span class="cmd-flag">-la</span>
         </p>
@@ -336,7 +336,7 @@ const sideProjectItemList = {
       </Window>
 
       <!-- 04. Writing -->
-      <Window title="git log ./writing — 04" app="writing" id="writing" variant="section" headingLevel={2} collapsible>
+      <Window title="git log ./writing — 04" headingText="Writing" app="writing" id="writing" variant="section" headingLevel={2} collapsible>
         <p class="win-cmdline" aria-hidden="true">
           <span class="cmd-prompt">$</span> git log ./writing/ <span class="cmd-flag">--oneline -5</span>
         </p>
@@ -368,7 +368,7 @@ const sideProjectItemList = {
       </Window>
 
       <!-- 05. Contact -->
-      <Window title="mail — 05" app="contact" id="contact" variant="section" headingLevel={2} collapsible>
+      <Window title="mail — 05" headingText="Contact" app="contact" id="contact" variant="section" headingLevel={2} collapsible>
         <p class="win-cmdline" aria-hidden="true">
           <span class="cmd-prompt">$</span> echo "let's build" <span class="cmd-flag">| mail -s hi</span>
         </p>
@@ -420,6 +420,7 @@ const sideProjectItemList = {
 
         <div class="contact-links">
           <button type="button" class="keycap keycap--primary contact-link contact-link--wiggle motion-stagger" id="open-contact-modal">email</button>
+          <a href="https://github.com/asp143" class="keycap contact-link motion-stagger" target="_blank" rel="noopener noreferrer">github</a>
           <a href="https://www.linkedin.com/in/ralphjonasmungcal" class="keycap contact-link motion-stagger" target="_blank" rel="noopener noreferrer">linkedin</a>
           <a href="https://x.com/ralphsenpaidev" class="keycap contact-link motion-stagger" target="_blank" rel="noopener noreferrer">x</a>
           <a href="https://bsky.app/profile/ralphdev.bsky.social" class="keycap contact-link motion-stagger" target="_blank" rel="noopener noreferrer">bluesky</a>

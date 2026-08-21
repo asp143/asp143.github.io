@@ -39,6 +39,7 @@ type AppName =
 
 interface Props extends astroHTML.JSX.HTMLAttributes {
   title: string;
+  headingText?: string;
   app?: AppName;
   id?: string;
   variant?: 'section' | 'page' | 'floating';
@@ -63,6 +64,7 @@ const APP_VARS: Record<AppName, { app: string; tint: string; inverse?: boolean }
 
 const {
   title,
+  headingText,
   app,
   id,
   variant = 'section',
@@ -95,7 +97,14 @@ const hasControls = collapsible || Boolean(closeHref) || jokeClose;
   {...rest}
 >
   <header class="win-bar">
-    <Heading class="win-title">{title}</Heading>
+    <Heading class="win-title">
+      {headingText ? (
+        <Fragment>
+          <span class="visually-hidden">{headingText}</span>
+          <span aria-hidden="true">{title}</span>
+        </Fragment>
+      ) : title}
+    </Heading>
     {hasControls && (
       <span class="win-controls">
         {collapsible && (
