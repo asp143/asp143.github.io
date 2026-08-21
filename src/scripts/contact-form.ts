@@ -6,8 +6,11 @@ type ContactPostHog = {
 
 const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
 
-const posthogCapture = (eventName: string) => {
-  (window as Window & { posthog?: ContactPostHog }).posthog?.capture(eventName);
+const posthogCapture = (
+  eventName: string,
+  properties?: Record<string, number | string>
+) => {
+  (window as Window & { posthog?: ContactPostHog }).posthog?.capture(eventName, properties);
 };
 
 function initContactForm() {
@@ -35,7 +38,7 @@ function initContactForm() {
     modal.style.margin = '';
     modal.showModal();
     nameInput?.focus();
-    posthogCapture('contact_modal_opened');
+    posthogCapture('contact_modal_opened', { path: location.pathname });
   });
 
   closeBtn?.addEventListener('click', () => modal.close());
@@ -101,20 +104,40 @@ function initContactForm() {
     sendBtn.disabled = true;
     setStatus('sending', 'sending message…');
 
+    let failureReason = 'network_error';
+
     try {
       const response = await fetch(WEB3FORMS_ENDPOINT, {
         method: 'POST',
         body: new FormData(form),
         headers: { Accept: 'application/json' }
       });
-      const result = (await response.json()) as { success?: boolean };
-      if (!response.ok || !result.success) throw new Error('delivery failed');
+      if (!response.ok) {
+        failureReason = `http_${response.status}`;
+        throw new Error('delivery failed');
+      }
+
+      let result: { success?: boolean };
+      try {
+        result = (await response.json()) as { success?: boolean };
+      } catch {
+        failureReason = 'invalid_response';
+        throw new Error('invalid response');
+      }
+      if (!result.success) {
+        failureReason = 'api_rejected';
+        throw new Error('delivery rejected');
+      }
 
       form.reset();
       setStatus('success', "sent — exit 0. i'll get back to you soon.");
-      posthogCapture('contact_form_submitted');
+      posthogCapture('contact_form_submitted', { path: location.pathname });
     } catch {
       setStatus('error', 'exit 1 — delivery failed. email me: ralphmungcal09@gmail.com');
+      posthogCapture('contact_form_error', {
+        path: location.pathname,
+        reason: failureReason
+      });
     } finally {
       sendBtn.disabled = false;
     }
