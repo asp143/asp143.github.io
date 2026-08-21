@@ -8,6 +8,7 @@ import {
   CRT_STORAGE_KEY,
   DESKTOP_GATE
 } from './window';
+import { bindOutboundLinkTracking } from './outbound';
 
 type PostHogCaptureProps = Record<string, number | string>;
 type PostHogClient = {
@@ -632,6 +633,9 @@ wireSectionObserver(desktop);
 /* ---------- PostHog ---------- */
 const posthog = (window as Window & { posthog?: PostHogClient }).posthog;
 if (posthog) {
+  const main = document.querySelector<HTMLElement>('main.portfolio-page');
+  if (main) bindOutboundLinkTracking(posthog, { root: main });
+
   const scrollDepthMarks = [25, 50, 75, 100];
   const depthMarks = new Set<number>();
   let depthTicking = false;
