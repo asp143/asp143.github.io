@@ -4,7 +4,11 @@ export type BlogEntry = CollectionEntry<'blog'>;
 
 export async function getPublishedPosts(): Promise<BlogEntry[]> {
   // Drafts are visible in dev for preview; still excluded from production builds
-  const posts = await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft);
+  const now = Date.now();
+  const posts = await getCollection(
+    'blog',
+    ({ data }) => data.pubDate.valueOf() <= now && (import.meta.env.DEV || !data.draft)
+  );
   return posts.sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
   );
@@ -26,7 +30,8 @@ export function formatPubDateLong(date: Date): string {
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'UTC'
   });
 }
 

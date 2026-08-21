@@ -4,13 +4,13 @@ import rehypeExternalLinks from 'rehype-external-links';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { getContentFileEntries } from './scripts/lib/content-files.mjs';
+import { NOW_UPDATED } from './src/data/site.mjs';
 import { isNoindexPath } from './src/utils/seo.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BLOG_DIR = join(__dirname, 'src/content/blog');
+const PROJECTS_DIR = join(__dirname, 'src/content/projects');
 const SITE_URL = 'https://ralphjonas.com';
-const NOW_UPDATED = '2026-04-22';
-const BUILD_DATE = new Date();
 
 function toDate(value) {
   if (!value) return null;
@@ -19,15 +19,27 @@ function toDate(value) {
 }
 
 const blogDates = new Map();
+let newestBlogDate = null;
 for (const { slug, frontmatter } of getContentFileEntries(BLOG_DIR)) {
   const pub = toDate(frontmatter.pubDate);
+  if (!pub || frontmatter.draft || pub.valueOf() > Date.now()) continue;
+
   const updated = toDate(frontmatter.updatedDate);
-  blogDates.set(`/blog/${slug}/`, updated ?? pub ?? BUILD_DATE);
+  const lastmod = updated ?? pub;
+  blogDates.set(`/blog/${slug}/`, lastmod);
+  if (!newestBlogDate || lastmod > newestBlogDate) newestBlogDate = lastmod;
+}
+
+const projectDates = new Map();
+for (const { slug, frontmatter } of getContentFileEntries(PROJECTS_DIR)) {
+  if (frontmatter.draft) continue;
+
+  const updated = toDate(frontmatter.updatedDate);
+  if (updated) projectDates.set(`/projects/${slug}/`, updated);
 }
 
 const staticDates = new Map([
-  ['/', BUILD_DATE],
-  ['/blog/', BUILD_DATE],
+  ...(newestBlogDate ? [['/', newestBlogDate], ['/blog/', newestBlogDate]] : []),
   ['/now/', new Date(`${NOW_UPDATED}T00:00:00Z`)]
 ]);
 
@@ -35,11 +47,12 @@ function resolveLastmod(url) {
   try {
     const { pathname } = new URL(url);
     if (blogDates.has(pathname)) return blogDates.get(pathname);
+    if (projectDates.has(pathname)) return projectDates.get(pathname);
     if (staticDates.has(pathname)) return staticDates.get(pathname);
   } catch {
     /* ignore */
   }
-  return BUILD_DATE;
+  return null;
 }
 
 function isExternalHttpLink(element) {
@@ -58,35 +71,23 @@ function isExternalHttpLink(element) {
   }
 }
 
-function rehypeTargetBlank() {
-  return function transform(tree) {
-    function visit(node) {
-      if (node.type === 'element' && node.tagName === 'a') {
-        node.properties.target = '_blank';
-      }
-
-      if (Array.isArray(node.children)) {
-        for (const child of node.children) visit(child);
-      }
-    }
-
-    visit(tree);
-  };
-}
-
 export default defineConfig({
   site: SITE_URL,
   trailingSlash: 'always',
+  redirects: {
+    '/sitemap.xml': '/sitemap-index.xml',
+    '/feed.xml': '/rss.xml'
+  },
   markdown: {
     rehypePlugins: [
       [
         rehypeExternalLinks,
         {
-          rel: ['noopener', 'noreferrer'],
+          target: '_blank',
+          rel: ['noopener'],
           test: isExternalHttpLink
         }
-      ],
-      rehypeTargetBlank
+      ]
     ]
   },
   prefetch: {
@@ -102,10 +103,8 @@ export default defineConfig({
       changefreq: 'monthly',
       priority: 0.7,
       serialize(item) {
-        return {
-          ...item,
-          lastmod: resolveLastmod(item.url).toISOString()
-        };
+        const lastmod = resolveLastmod(item.url);
+        return lastmod ? { ...item, lastmod: lastmod.toISOString() } : item;
       }
     })
   ],
