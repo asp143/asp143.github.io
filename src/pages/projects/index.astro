@@ -69,7 +69,7 @@ const collectionPage = {
 
   <a slot="menubar-back" class="menubar-back" href="/">&larr; ~/</a>
 
-  <main class="projects-page">
+  <main class="projects-page" data-project-count={projects.length}>
     <h1 class="visually-hidden">Projects by Ralph Jonas Mungcal</h1>
 
     <Window
@@ -95,7 +95,12 @@ const collectionPage = {
       <ul class="project-tiles" role="list">
         {projects.map((project, i) => (
           <li class="project-tile" style={`--row: ${i};`}>
-            <a href={`/projects/${project.id}/`} class="project-tile-link" aria-label={`Open project: ${project.data.name}`}>
+            <a
+              href={`/projects/${project.id}/`}
+              class="project-tile-link"
+              aria-label={`Open project: ${project.data.name}`}
+              data-slug={project.id}
+            >
               <svg
                 class="project-tile-glyph"
                 viewBox="0 0 12 12"
@@ -158,4 +163,8 @@ const collectionPage = {
       </Fragment>
     </Window>
   </main>
+
+  <script>
+    import '../../scripts/projects';
+  </script>
 </BaseLayout>
