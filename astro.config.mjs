@@ -74,6 +74,10 @@ function isExternalHttpLink(element) {
 export default defineConfig({
   site: SITE_URL,
   trailingSlash: 'always',
+  redirects: {
+    '/sitemap.xml': '/sitemap-index.xml',
+    '/feed.xml': '/rss.xml'
+  },
   markdown: {
     rehypePlugins: [
       [
