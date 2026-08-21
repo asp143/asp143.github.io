@@ -263,6 +263,23 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
             capture_dead_clicks: false,
             capture_performance: false,
           });
+          var normalizedPath = location.pathname.replace(/\/+$/, '') || '/';
+          var analyticsPageType = normalizedPath === '/'
+            ? 'home'
+            : normalizedPath === '/blog'
+              ? 'blog_index'
+              : /^\/blog\/[^/]+$/.test(normalizedPath) && normalizedPath !== '/blog/tags'
+                ? 'blog_post'
+                : normalizedPath === '/projects'
+                  ? 'projects_index'
+                  : /^\/projects\/[^/]+$/.test(normalizedPath)
+                    ? 'project'
+                    : normalizedPath === '/now'
+                      ? 'now'
+                      : normalizedPath === '/404' || document.querySelector('main.not-found')
+                        ? '404'
+                        : 'other';
+          posthog.register({ page_type: analyticsPageType });
           // init replaced .capture with the real queueing stub — flush.
           for (var qi = 0; qi < earlyQ.length; qi++) {
             posthog.capture.apply(posthog, earlyQ[qi]);

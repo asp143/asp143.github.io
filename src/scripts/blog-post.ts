@@ -63,7 +63,7 @@ if (main && (progressBar || posthog)) {
         [25, 50, 75, 100].forEach((mark) => {
           if (pct >= mark && !depthMarks.has(mark)) {
             depthMarks.add(mark);
-            posthog.capture('blog_scroll_depth', { slug, percent: mark });
+            posthog.capture('scroll_depth', { slug, percent: mark });
           }
         });
       }
