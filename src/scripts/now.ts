@@ -3,6 +3,8 @@ type PostHogClient = {
   capture: (eventName: string, properties?: PostHogCaptureProps) => void;
 };
 
+import { bindOutboundLinkTracking } from './outbound';
+
 const posthog = (window as Window & { posthog?: PostHogClient }).posthog;
 const main = document.querySelector<HTMLElement>('main.now-page');
 
@@ -11,6 +13,7 @@ if (posthog && main) {
   const projectCount = Number(main.dataset.projectCount ?? rows.length);
 
   posthog.capture('now_viewed', { project_count: projectCount });
+  bindOutboundLinkTracking(posthog, { root: main, selector: '.now-project-row' });
 
   document.addEventListener('click', (ev) => {
     const link = (ev.target as HTMLElement).closest('a[href]') as HTMLAnchorElement | null;

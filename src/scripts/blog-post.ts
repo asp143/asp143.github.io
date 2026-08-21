@@ -5,6 +5,7 @@ type PostHogClient = {
 
 import { markPostRead } from './read-posts';
 import { shouldRedirectToDesktop } from './media';
+import { bindOutboundLinkTracking } from './outbound';
 
 const posthog = (window as Window & { posthog?: PostHogClient }).posthog;
 const main = document.querySelector<HTMLElement>('main.post-page');
@@ -86,6 +87,11 @@ if (posthog && main) {
   const pubDate = main.dataset.pubDate ?? '';
 
   posthog.capture('blog_post_viewed', { slug, title, tags, pub_date: pubDate });
+  bindOutboundLinkTracking(posthog, {
+    root: main,
+    selector: '.post-content a[href]',
+    slug
+  });
 
   /* ---------- Read time (active dwell, visibility-gated) ---------- */
   let activeMs = 0;
@@ -165,21 +171,6 @@ if (posthog && main) {
         href
       });
       return;
-    }
-
-    if (link.closest('.post-content')) {
-      try {
-        const url = new URL(href);
-        if (url.hostname && url.hostname !== location.hostname) {
-          posthog.capture('blog_external_link_clicked', {
-            slug,
-            href,
-            text: (link.textContent?.trim() ?? '').slice(0, 120)
-          });
-        }
-      } catch {
-        /* non-http href, ignore */
-      }
     }
   });
 }
