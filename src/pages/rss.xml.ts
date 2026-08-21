@@ -1,6 +1,10 @@
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
+import MarkdownIt from 'markdown-it';
+import sanitizeHtml from 'sanitize-html';
 import { getPublishedPosts } from '../utils/blog';
+
+const parser = new MarkdownIt();
 
 export async function GET(context: APIContext) {
   const posts = await getPublishedPosts();
@@ -12,6 +16,9 @@ export async function GET(context: APIContext) {
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
+      content: sanitizeHtml(parser.render(post.body ?? ''), {
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img'])
+      }),
       pubDate: post.data.pubDate,
       link: `/blog/${post.id}/`,
       categories: post.data.tags
