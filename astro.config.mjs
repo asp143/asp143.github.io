@@ -58,22 +58,6 @@ function isExternalHttpLink(element) {
   }
 }
 
-function rehypeTargetBlank() {
-  return function transform(tree) {
-    function visit(node) {
-      if (node.type === 'element' && node.tagName === 'a') {
-        node.properties.target = '_blank';
-      }
-
-      if (Array.isArray(node.children)) {
-        for (const child of node.children) visit(child);
-      }
-    }
-
-    visit(tree);
-  };
-}
-
 export default defineConfig({
   site: SITE_URL,
   trailingSlash: 'always',
@@ -82,11 +66,11 @@ export default defineConfig({
       [
         rehypeExternalLinks,
         {
-          rel: ['noopener', 'noreferrer'],
+          target: '_blank',
+          rel: ['noopener'],
           test: isExternalHttpLink
         }
-      ],
-      rehypeTargetBlank
+      ]
     ]
   },
   prefetch: {
