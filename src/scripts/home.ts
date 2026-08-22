@@ -34,21 +34,48 @@ function setStatValuesFinal() {
 function runTypewriter() {
   const el = document.querySelector<HTMLElement>('.hero-subtitle');
   const textSpan = el?.querySelector<HTMLElement>('.hero-subtitle-text');
-  if (!el || !textSpan) return;
+  const typedSpan = el?.querySelector<HTMLElement>('.hero-subtitle-typed');
+  const cursor = el?.querySelector<HTMLElement>('.hero-cursor');
+  const textNode = textSpan?.firstChild;
+  if (!el || !textSpan || !typedSpan || !cursor || !(textNode instanceof Text)) return;
 
-  const full = el.dataset.typewriter ?? textSpan.textContent ?? '';
-  if (prefersReducedMotion) {
-    textSpan.textContent = full;
-    return;
-  }
+  const full = el.dataset.typewriter ?? textNode.data;
+  if (prefersReducedMotion || !full) return;
 
-  textSpan.textContent = '';
   const speed = 18;
   const initialDelay = 350;
   let elapsed = 0;
   let lastFrame: number | null = null;
   let renderedChars = 0;
   let frameId = 0;
+
+  typedSpan.classList.add('is-typewriting');
+
+  const reveal = (chars: number) => {
+    const textBounds = textSpan.getBoundingClientRect();
+    const range = document.createRange();
+    range.setStart(textNode, 0);
+    range.setEnd(textNode, Math.max(1, chars));
+
+    const lineRects = Array.from(range.getClientRects());
+    const currentLine = lineRects.at(-1);
+    if (!currentLine) return;
+
+    const lineTop = currentLine.top - textBounds.top;
+    const lineBottom = currentLine.bottom - textBounds.top;
+    const cursorX = (chars === 0 ? currentLine.left : currentLine.right) - textBounds.left;
+    const cursorY = lineTop + (currentLine.height - cursor.offsetHeight) / 2;
+
+    textSpan.style.clipPath = chars === 0
+      ? 'inset(0 100% 0 0)'
+      : chars === full.length
+        ? 'none'
+        : `polygon(0 0, 100% 0, 100% ${lineTop}px, ${cursorX}px ${lineTop}px, ${cursorX}px ${lineBottom}px, 0 ${lineBottom}px)`;
+    cursor.style.transform = `translate3d(${cursorX + (chars === 0 ? 0 : 2)}px, ${cursorY}px, 0)`;
+  };
+
+  reveal(0);
+  new ResizeObserver(() => reveal(renderedChars)).observe(textSpan);
 
   const step = (now: number) => {
     if (document.hidden) {
@@ -65,7 +92,7 @@ function runTypewriter() {
     );
     if (chars !== renderedChars) {
       renderedChars = chars;
-      textSpan.textContent = full.slice(0, renderedChars);
+      reveal(renderedChars);
     }
 
     if (renderedChars < full.length) {
