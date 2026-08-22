@@ -68,7 +68,7 @@
   border-top: 1px solid var(--color-border-faint);
   opacity: 0;
   animation: project-row-in 0.32s ease-out both;
-  animation-delay: calc(var(--row, 0) * 70ms);
+  animation-delay: min(calc(var(--row, 0) * 70ms), 280ms);
 }
 
 @keyframes project-row-in {
