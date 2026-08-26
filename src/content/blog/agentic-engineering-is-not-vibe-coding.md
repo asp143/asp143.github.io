@@ -8,6 +8,8 @@ tags:
   - engineering
   - developer-workflow
 draft: false
+# Republished on agentichq.co; that copy is the one meant to rank.
+canonical: https://agentichq.co/blog/agentic-engineering-is-not-vibe-coding/
 ---
 
 I called it vibe coding for months. I was wrong, and so was the term.
