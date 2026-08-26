@@ -6,6 +6,8 @@ tags:
   - ai
   - career
   - developer-workflow
+# Republished on agentichq.co; that copy is the one meant to rank.
+canonical: https://agentichq.co/blog/how-to-become-ai-native/
 ---
 
 Two developers. Same tools. Same Claude subscription. Same Cursor license. One ships a feature in 45 minutes. The other takes two days.
