@@ -8,6 +8,7 @@ import {
   CRT_STORAGE_KEY,
   DESKTOP_GATE
 } from './window';
+import { makeSnappable, restore as restoreSnap, syncMaxButton } from './snap';
 import { bindOutboundLinkTracking } from './outbound';
 
 type PostHogCaptureProps = Record<string, number | string>;
@@ -290,7 +291,7 @@ function initDesktopWindows(): DesktopController {
     dragWired = true;
     wins.forEach((el) => {
       const bar = el.querySelector<HTMLElement>('.win-bar');
-      makeDraggable(el, bar ?? el, constraint);
+      makeDraggable(el, bar ?? el, constraint, makeSnappable(el, constraint));
     });
   };
 
@@ -426,7 +427,14 @@ function initDesktopWindows(): DesktopController {
         const closeBtn = el.querySelector<HTMLButtonElement>('button[data-close-joke]');
         if (closeBtn) delete closeBtn.dataset.realClose;
         taskbarApp(el.id)?.classList.remove('is-open');
+        // flow layout must never inherit a snapped window's inline size
+        restoreSnap(el);
+        syncMaxButton(el);
       });
+      if (heroTerminal) {
+        restoreSnap(heroTerminal);
+        syncMaxButton(heroTerminal);
+      }
       closeBrowser(); // flow mode navigates for real — no in-desktop browser
     }
   };

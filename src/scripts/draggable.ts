@@ -23,6 +23,21 @@ export interface DraggableController {
   destroy(): void;
 }
 
+/**
+ * Optional drag reporting. Kept deliberately dumb: this module says where the
+ * pointer is and when the drag ends, and knows nothing about what a consumer
+ * does with that (see snap.ts).
+ */
+export interface DragHooks {
+  /**
+   * Fires BEFORE the drag origin is measured, so a handler may resize or
+   * reposition `el` (e.g. un-snapping) without the drag inheriting a stale rect.
+   */
+  onDragStart?(event: PointerEvent, el: HTMLElement): void;
+  onDragMove?(event: PointerEvent, el: HTMLElement, constraintRect: DOMRect | null): void;
+  onDragEnd?(event: PointerEvent, el: HTMLElement, constraintRect: DOMRect | null): void;
+}
+
 export function canDrag(): boolean {
   return typeof window !== 'undefined' && window.matchMedia(FINE_POINTER).matches;
 }
@@ -42,7 +57,8 @@ const clamp = (v: number, min: number, max: number) =>
 export function makeDraggable(
   el: HTMLElement,
   handle: HTMLElement = el,
-  constraint: HTMLElement | null = null
+  constraint: HTMLElement | null = null,
+  hooks: DragHooks = {}
 ): DraggableController | null {
   if (!canDrag()) return null;
 
@@ -56,6 +72,9 @@ export function makeDraggable(
   let maxLeft = Infinity;
   let minTop = -Infinity;
   let maxTop = Infinity;
+  // Measured once per drag and reused — never re-read mid-move, so a drag
+  // costs no forced layout.
+  let constraintRect: DOMRect | null = null;
 
   const isInteractive = (target: EventTarget | null): boolean =>
     target instanceof Element &&
@@ -65,6 +84,9 @@ export function makeDraggable(
     if (event.button !== 0) return;
     raiseWindow(el);
     if (isInteractive(event.target)) return;
+
+    // Before measuring: a hook may resize/reposition el (un-snap on drag-out).
+    hooks.onDragStart?.(event, el);
 
     const rect = el.getBoundingClientRect();
     const parent = el.offsetParent instanceof HTMLElement ? el.offsetParent : null;
@@ -77,8 +99,9 @@ export function makeDraggable(
     startX = event.clientX;
     startY = event.clientY;
 
-    if (constraint) {
-      const c = constraint.getBoundingClientRect();
+    constraintRect = constraint ? constraint.getBoundingClientRect() : null;
+    if (constraintRect) {
+      const c = constraintRect;
       minLeft = c.left - originX;
       minTop = c.top - originY;
       maxLeft = minLeft + c.width - rect.width;
@@ -108,11 +131,13 @@ export function makeDraggable(
     // once we own left/top, neutralize authored right/bottom offsets
     el.style.right = 'auto';
     el.style.bottom = 'auto';
+    hooks.onDragMove?.(event, el, constraintRect);
   };
 
   const endDrag = (event: PointerEvent) => {
     if (!dragging || event.pointerId !== pointerId) return;
     dragging = false;
+    hooks.onDragEnd?.(event, el, constraintRect);
     window.removeEventListener('pointermove', onPointerMove);
     window.removeEventListener('pointerup', endDrag);
     window.removeEventListener('pointercancel', endDrag);
