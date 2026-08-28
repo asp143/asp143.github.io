@@ -11,7 +11,8 @@
  *   "self" → whole element is the handle (sticky note)
  *   other  → CSS selector for the handle inside the element
  *   Constraint box = closest [data-desktop] ancestor, if any.
- * - Unhides + wires .win-btn--min (collapse) and [data-close-joke] buttons.
+ * - Unhides + wires .win-btn--min (collapse), .win-btn--max (maximize/snap,
+ *   inert without a [data-desktop] ancestor) and [data-close-joke] buttons.
  * - Start menu (<details class="startmenu">): Esc + outside-click close.
  * - Taskbar active state: listens for `os:section-viewed` CustomEvent
  *   (detail: { id }) or call setActiveTaskbarApp(id) directly.
@@ -21,6 +22,7 @@
  */
 
 import { makeDraggable, raiseWindow, canDrag, type DraggableController } from './draggable';
+import { makeSnappable, wireMaximize } from './snap';
 import { DESKTOP_GATE } from './media';
 
 export { makeDraggable, raiseWindow, canDrag };
@@ -98,12 +100,22 @@ function initDraggables(): void {
       handle = el.querySelector<HTMLElement>(value) ?? el;
     }
     const constraint = el.closest<HTMLElement>('[data-desktop]');
-    const controller = makeDraggable(el, handle, constraint);
+    // Snapping is opt-in: a window earns it by declaring `maximizable`, which
+    // is what puts a .win-btn--max in its chrome. Keeps the browser pane,
+    // sticky note and trash dialog draggable but un-snappable.
+    const hooks = el.querySelector('.win-btn--max')
+      ? makeSnappable(el, constraint)
+      : {};
+    const controller = makeDraggable(el, handle, constraint, hooks);
     if (controller) draggables.set(el, controller);
   });
 }
 
 function initWindowControls(): void {
+  document.querySelectorAll<HTMLElement>('.win').forEach((win) => {
+    wireMaximize(win, win.closest<HTMLElement>('[data-desktop]'));
+  });
+
   document.querySelectorAll<HTMLButtonElement>('.win-btn--min').forEach((btn) => {
     btn.hidden = false;
     btn.addEventListener('click', () => {

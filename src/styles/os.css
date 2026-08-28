@@ -121,6 +121,35 @@
   display: none;
 }
 
+/* ── Snap + maximize ────────────────────────────────────────────────────
+   Geometry is written inline by snap.ts; these rules only handle the
+   chrome that changes when a window is snapped. */
+
+.js-desktop .win--floating.is-snapped,
+.js-desktop .win--section.is-snapped {
+  /* a snapped window is flush to an edge — the hard shadow would read as a
+     gap that isn't there */
+  box-shadow: none;
+}
+
+.is-snapped .win-body {
+  overflow: auto; /* snapped height is fixed; long content scrolls in-window */
+}
+
+/* Drop preview. One reused node, appended to [data-desktop] by snap.ts. */
+.snap-ghost {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  background: color-mix(in srgb, var(--app, var(--color-ink)) 12%, transparent);
+  border: var(--border-w) dashed var(--app, var(--color-ink));
+  transition: opacity var(--t-fast);
+}
+
+.snap-ghost.is-visible {
+  opacity: 1;
+}
+
 .win-body {
   padding: var(--win-pad, 1.25rem); /* pages override --win-pad per window */
 }
@@ -580,7 +609,8 @@ html.crt body {
   .win-controls,
   .taskbar-app,
   .desktop-icon,
-  .os-toast {
+  .os-toast,
+  .snap-ghost {
     transition: none;
   }
 

@@ -370,6 +370,13 @@ button.desktop-icon {
   box-shadow: var(--shadow-hard-lg);
 }
 
+/* Snapped windows are sized inline by snap.ts. The cascade cap above would
+   otherwise clamp a half/maximized window to 62dvh — inline `height` does not
+   beat a stylesheet `max-height`, so it has to be lifted explicitly. */
+.js-desktop .home-sections .win--section.is-snapped {
+  max-height: none;
+}
+
 .js-desktop .home-sections .win--section.is-open {
   display: flex;
   animation: win-pop var(--t-normal);

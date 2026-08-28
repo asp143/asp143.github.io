@@ -98,6 +98,7 @@ const sideProjectItemList = {
         <header class="win-bar">
           <span class="win-title">readme.md — ralph jonas</span>
           <span class="win-controls">
+            <button type="button" class="win-btn win-btn--max" aria-label="maximize" aria-pressed="false" hidden>□</button>
             <button type="button" class="win-btn win-btn--close" data-close-joke aria-label="close" hidden>×</button>
           </span>
         </header>
@@ -220,7 +221,7 @@ const sideProjectItemList = {
     <!-- ── Section windows 01–05 ────────────────────────────────────── -->
     <div class="home-sections">
       <!-- 01. About -->
-      <Window title="about.md — 01" headingText="About Ralph Jonas Mungcal" app="about" id="about" variant="section" headingLevel={2} collapsible>
+      <Window title="about.md — 01" headingText="About Ralph Jonas Mungcal" app="about" id="about" variant="section" headingLevel={2} collapsible maximizable>
         <p class="win-cmdline" aria-hidden="true">
           <span class="cmd-prompt">$</span> cat about.md <span class="cmd-flag">--format=plain</span>
         </p>
@@ -271,7 +272,7 @@ const sideProjectItemList = {
       </Window>
 
       <!-- 02. Projects -->
-      <Window title="ls ./projects — 02" headingText="Projects" app="projects" id="projects" variant="section" headingLevel={2} collapsible>
+      <Window title="ls ./projects — 02" headingText="Projects" app="projects" id="projects" variant="section" headingLevel={2} collapsible maximizable>
         <p class="win-cmdline" aria-hidden="true">
           <span class="cmd-prompt">$</span> ls ./projects/ <span class="cmd-flag">-la</span>
         </p>
@@ -307,7 +308,7 @@ const sideProjectItemList = {
       </Window>
 
       <!-- 03. Side Projects -->
-      <Window title="side-quests — 03" app="side" id="side-projects" variant="section" headingLevel={2} collapsible>
+      <Window title="side-quests — 03" app="side" id="side-projects" variant="section" headingLevel={2} collapsible maximizable>
         <p class="win-cmdline" aria-hidden="true">
           <span class="cmd-prompt">$</span> cd ~/side-projects/ <span class="cmd-flag">&amp;&amp; ls</span>
         </p>
@@ -336,7 +337,7 @@ const sideProjectItemList = {
       </Window>
 
       <!-- 04. Writing -->
-      <Window title="git log ./writing — 04" headingText="Writing" app="writing" id="writing" variant="section" headingLevel={2} collapsible>
+      <Window title="git log ./writing — 04" headingText="Writing" app="writing" id="writing" variant="section" headingLevel={2} collapsible maximizable>
         <p class="win-cmdline" aria-hidden="true">
           <span class="cmd-prompt">$</span> git log ./writing/ <span class="cmd-flag">--oneline -5</span>
         </p>
@@ -368,7 +369,7 @@ const sideProjectItemList = {
       </Window>
 
       <!-- 05. Contact -->
-      <Window title="mail — 05" headingText="Contact" app="contact" id="contact" variant="section" headingLevel={2} collapsible>
+      <Window title="mail — 05" headingText="Contact" app="contact" id="contact" variant="section" headingLevel={2} collapsible maximizable>
         <p class="win-cmdline" aria-hidden="true">
           <span class="cmd-prompt">$</span> echo "let's build" <span class="cmd-flag">| mail -s hi</span>
         </p>

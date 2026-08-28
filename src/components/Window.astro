@@ -23,6 +23,8 @@
  *   window.ts unhides and wires to a toast. Floating/page windows without
  *   closeHref render no close control.
  * - Collapse control renders hidden; window.ts unhides + wires it.
+ * - `maximizable` renders a hidden maximize control; home.ts unhides + wires
+ *   it (snap/restore lives with the desktop window manager, not window.ts).
  * - Floating windows: add `data-draggable` (and position via your page CSS);
  *   window.ts makes them draggable under the .js-desktop gate.
  */
@@ -46,6 +48,7 @@ interface Props extends astroHTML.JSX.HTMLAttributes {
   headingLevel?: 0 | 1 | 2 | 3;
   closeHref?: string;
   collapsible?: boolean;
+  maximizable?: boolean;
   statusbar?: boolean;
 }
 
@@ -71,6 +74,7 @@ const {
   headingLevel = 2,
   closeHref,
   collapsible = false,
+  maximizable = false,
   statusbar = false,
   class: className,
   style,
@@ -87,7 +91,7 @@ const appStyle = appVars ? `--app: ${appVars.app}; --app-tint: ${appVars.tint};`
 const mergedStyle =
   [appStyle, typeof style === 'string' ? style : ''].filter(Boolean).join(' ') || undefined;
 const jokeClose = !closeHref && variant === 'section';
-const hasControls = collapsible || Boolean(closeHref) || jokeClose;
+const hasControls = collapsible || maximizable || Boolean(closeHref) || jokeClose;
 ---
 
 <section
@@ -114,6 +118,14 @@ const hasControls = collapsible || Boolean(closeHref) || jokeClose;
             aria-label="collapse section"
             aria-expanded="true"
             hidden>_</button>
+        )}
+        {maximizable && (
+          <button
+            type="button"
+            class="win-btn win-btn--max"
+            aria-label="maximize"
+            aria-pressed="false"
+            hidden>□</button>
         )}
         {closeHref ? (
           <a class="win-btn win-btn--close" href={closeHref} aria-label="close">×</a>
