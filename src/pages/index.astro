@@ -280,7 +280,7 @@ const sideProjectItemList = {
         <ul class="project-list" role="list">
           {featuredProjects.map((project) => (
             <li class="project-row motion-stagger">
-              <a class="project-link" href={project.url} aria-label={`Open project: ${project.name}`}>
+              <a class="project-link" href={project.url}>
                 <span class="project-name">{project.name}</span>
                 <span class="project-tech">{project.tech}</span>
                 <p class="project-desc">{project.description.toLowerCase()}</p>
