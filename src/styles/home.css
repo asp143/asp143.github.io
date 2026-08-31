@@ -7,6 +7,11 @@
 /* ===== Layout ===== */
 .portfolio-page {
   position: relative;
+  --color-home-accent-text: #a94300;
+}
+
+:root[data-theme='dark'] .portfolio-page {
+  --color-home-accent-text: var(--color-accent);
 }
 
 /* ===== Desktop zone =====
@@ -592,7 +597,7 @@ button.desktop-icon {
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: var(--color-accent);
+  color: var(--color-home-accent-text);
   line-height: 1;
 }
 
@@ -937,7 +942,7 @@ button.desktop-icon {
 .writing-date {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-accent);
+  color: var(--color-home-accent-text);
   flex-shrink: 0;
   min-width: 12ch;
   font-variant-numeric: tabular-nums;

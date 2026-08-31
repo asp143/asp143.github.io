@@ -1,6 +1,4 @@
-type PostHogClient = {
-  capture: (eventName: string, properties?: Record<string, number | string>) => void;
-};
+import { capturePostHog, type PostHogClient } from './analytics';
 
 type OutboundLinkOptions = {
   root?: Document | HTMLElement;
@@ -32,7 +30,7 @@ export function bindOutboundLinkTracking(
       const linkText = link.textContent?.replace(/\s+/g, ' ').trim().slice(0, 120);
       if (linkText) properties.link_text = linkText;
 
-      posthog.capture('outbound_link_clicked', properties);
+      capturePostHog(posthog, 'outbound_link_clicked', properties);
     } catch {
       /* non-URL href, ignore */
     }

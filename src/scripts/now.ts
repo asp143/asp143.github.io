@@ -1,8 +1,4 @@
-type PostHogCaptureProps = Record<string, number | string>;
-type PostHogClient = {
-  capture: (eventName: string, properties?: PostHogCaptureProps) => void;
-};
-
+import { capturePostHog, type PostHogClient } from './analytics';
 import { bindOutboundLinkTracking } from './outbound';
 
 const posthog = (window as Window & { posthog?: PostHogClient }).posthog;
@@ -12,7 +8,7 @@ if (posthog && main) {
   const rows = Array.from(document.querySelectorAll<HTMLAnchorElement>('.now-project-row'));
   const projectCount = Number(main.dataset.projectCount ?? rows.length);
 
-  posthog.capture('now_viewed', { project_count: projectCount });
+  capturePostHog(posthog, 'now_viewed', { project_count: projectCount });
   bindOutboundLinkTracking(posthog, { root: main, selector: '.now-project-row' });
 
   document.addEventListener('click', (ev) => {
@@ -22,7 +18,7 @@ if (posthog && main) {
 
     if (link.matches('.now-project-row')) {
       const position = rows.indexOf(link) + 1;
-      posthog.capture('now_project_clicked', {
+      capturePostHog(posthog, 'now_project_clicked', {
         name: link.dataset.name ?? '',
         status: link.dataset.status ?? '',
         url: href,
@@ -32,7 +28,7 @@ if (posthog && main) {
     }
 
     if (link.matches('.post-nav-link')) {
-      posthog.capture('now_nav_clicked', { href });
+      capturePostHog(posthog, 'now_nav_clicked', { href });
     }
   });
 }

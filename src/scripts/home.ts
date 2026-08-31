@@ -10,11 +10,7 @@ import {
 } from './window';
 import { makeSnappable, restore as restoreSnap, syncMaxButton } from './snap';
 import { bindOutboundLinkTracking } from './outbound';
-
-type PostHogCaptureProps = Record<string, number | string>;
-type PostHogClient = {
-  capture: (eventName: string, properties?: PostHogCaptureProps) => void;
-};
+import { capturePostHog, type PostHogClient } from './analytics';
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -344,7 +340,11 @@ function initDesktopWindows(): DesktopController {
     }
     raiseWindow(browser);
     browser.focus({ preventScroll: true });
-    (window as Window & { posthog?: PostHogClient }).posthog?.capture('browser_window_opened', { path });
+    capturePostHog(
+      (window as Window & { posthog?: PostHogClient }).posthog,
+      'browser_window_opened',
+      { path }
+    );
   };
 
   const closeBrowser = () => {
@@ -511,7 +511,11 @@ function toggleCrt() {
     /* storage unavailable — session-only toggle */
   }
   showToast(on ? 'root access granted' : 'root session closed');
-  (window as Window & { posthog?: PostHogClient }).posthog?.capture('crt_toggled', { on: on ? 1 : 0 });
+  capturePostHog(
+    (window as Window & { posthog?: PostHogClient }).posthog,
+    'crt_toggled',
+    { on: on ? 1 : 0 }
+  );
 }
 
 function wireKeyboardNav(desktop: DesktopController) {
@@ -574,12 +578,20 @@ function wireKeyboardNav(desktop: DesktopController) {
         // desktop mode: open the window instead of scrolling
         if (id === 'hero') desktop.raiseHero();
         else desktop.openWin(id);
-        (window as Window & { posthog?: PostHogClient }).posthog?.capture('keyboard_nav', { section: id });
+        capturePostHog(
+          (window as Window & { posthog?: PostHogClient }).posthog,
+          'keyboard_nav',
+          { section: id }
+        );
       } else {
         const el = document.getElementById(id);
         if (el) {
           el.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
-          (window as Window & { posthog?: PostHogClient }).posthog?.capture('keyboard_nav', { section: id });
+          capturePostHog(
+            (window as Window & { posthog?: PostHogClient }).posthog,
+            'keyboard_nav',
+            { section: id }
+          );
         }
       }
     }
@@ -600,7 +612,10 @@ function wireTrash() {
     // re-center in case a previous drag moved it
     getDraggableController(dialog)?.reset();
     dialog.showModal();
-    (window as Window & { posthog?: PostHogClient }).posthog?.capture('trash_opened');
+    capturePostHog(
+      (window as Window & { posthog?: PostHogClient }).posthog,
+      'trash_opened'
+    );
   });
 
   closeBtn?.addEventListener('click', () => dialog.close());
@@ -638,7 +653,11 @@ function wireSectionObserver(desktop: DesktopController) {
       if (!desktop.isDesktop()) setActiveTaskbarApp(id);
       if (viewedSections.has(id)) return;
       viewedSections.add(id);
-      (window as Window & { posthog?: PostHogClient }).posthog?.capture('section_viewed', { section: id });
+      capturePostHog(
+        (window as Window & { posthog?: PostHogClient }).posthog,
+        'section_viewed',
+        { section: id }
+      );
     });
   }, { threshold: 0.3 });
 
@@ -697,7 +716,7 @@ if (posthog) {
         scrollDepthMarks.forEach((mark) => {
           if (pct >= mark && !depthMarks.has(mark)) {
             depthMarks.add(mark);
-            posthog.capture('scroll_depth', { percent: mark });
+            capturePostHog(posthog, 'scroll_depth', { percent: mark });
           }
         });
       }
@@ -717,21 +736,21 @@ if (posthog) {
     const href = link.href;
 
     if (link.closest('#contact')) {
-      posthog.capture('contact_clicked', {
+      capturePostHog(posthog, 'contact_clicked', {
         method: link.textContent?.trim().toLowerCase() || href,
         href
       });
       return;
     }
     if (link.closest('#writing')) {
-      posthog.capture('writing_clicked', {
+      capturePostHog(posthog, 'writing_clicked', {
         title: link.querySelector('.writing-title')?.textContent?.trim() || href,
         href
       });
       return;
     }
     if (link.closest('#side-projects')) {
-      posthog.capture('side_project_clicked', {
+      capturePostHog(posthog, 'side_project_clicked', {
         name: link.querySelector('.side-project-name')?.textContent?.trim() || href,
         href
       });

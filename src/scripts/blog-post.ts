@@ -1,8 +1,5 @@
-type PostHogCaptureProps = Record<string, number | string>;
-type PostHogClient = {
-  capture: (eventName: string, properties?: PostHogCaptureProps) => void;
-};
-
+import { capturePostHog, type PostHogClient } from './analytics';
+import { slugFromHref } from './blog-url';
 import { markPostRead } from './read-posts';
 import { shouldRedirectToDesktop } from './media';
 import { bindOutboundLinkTracking } from './outbound';
@@ -64,7 +61,7 @@ if (main && (progressBar || posthog)) {
         [25, 50, 75, 100].forEach((mark) => {
           if (pct >= mark && !depthMarks.has(mark)) {
             depthMarks.add(mark);
-            posthog.capture('scroll_depth', { slug, percent: mark });
+            capturePostHog(posthog, 'scroll_depth', { slug, percent: mark });
           }
         });
       }
@@ -86,7 +83,7 @@ if (posthog && main) {
   const tags = main.dataset.tags ?? '';
   const pubDate = main.dataset.pubDate ?? '';
 
-  posthog.capture('blog_post_viewed', { slug, title, tags, pub_date: pubDate });
+  capturePostHog(posthog, 'blog_post_viewed', { slug, title, tags, pub_date: pubDate });
   bindOutboundLinkTracking(posthog, {
     root: main,
     selector: '.post-content a[href]',
@@ -116,7 +113,7 @@ if (posthog && main) {
     thresholds.forEach((mark) => {
       if (seconds >= mark && !readMarks.has(mark)) {
         readMarks.add(mark);
-        posthog.capture('blog_read_time', { slug, seconds: mark });
+        capturePostHog(posthog, 'blog_read_time', { slug, seconds: mark });
       }
     });
     if (readMarks.size === thresholds.length) clearInterval(intervalId);
@@ -124,33 +121,23 @@ if (posthog && main) {
   const intervalId = window.setInterval(checkRead, 5000);
 
   /* ---------- Clicks ---------- */
-  const slugFromHref = (href: string): string => {
-    try {
-      const path = new URL(href).pathname;
-      const match = path.match(/^\/blog\/([^/]+)\/?$/);
-      return match ? match[1] : '';
-    } catch {
-      return '';
-    }
-  };
-
   document.addEventListener('click', (ev) => {
     const link = (ev.target as HTMLElement).closest('a[href]') as HTMLAnchorElement | null;
     if (!link) return;
     const href = link.href;
 
     if (link.matches('.post-back')) {
-      posthog.capture('blog_post_back_clicked', { from_slug: slug });
+      capturePostHog(posthog, 'blog_post_back_clicked', { from_slug: slug });
       return;
     }
 
     if (link.matches('.post-follow-cta')) {
-      posthog.capture('blog_follow_x_clicked', { slug, href });
+      capturePostHog(posthog, 'blog_follow_x_clicked', { slug, href });
       return;
     }
 
     if (link.matches('.related-posts-link')) {
-      posthog.capture('blog_related_clicked', {
+      capturePostHog(posthog, 'blog_related_clicked', {
         from_slug: slug,
         to_slug: slugFromHref(href),
         to_title: link.querySelector('.related-posts-link-title')?.textContent?.trim() ?? ''
@@ -164,7 +151,7 @@ if (posthog && main) {
       if (text.startsWith('←')) direction = 'prev';
       else if (text.endsWith('→')) direction = 'next';
       else if (text.includes('cd ~/')) direction = 'home';
-      posthog.capture('blog_post_nav_clicked', {
+      capturePostHog(posthog, 'blog_post_nav_clicked', {
         from_slug: slug,
         direction,
         to_slug: slugFromHref(href),

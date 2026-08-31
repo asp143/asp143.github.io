@@ -2,20 +2,21 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Window from '../../../components/Window.astro';
 import { getAllTags } from '../../../utils/blog';
+import { SITE_URL } from '../../../data/site.mjs';
 import '../../../styles/blog.css';
 
 const tags = await getAllTags();
 
 const title = 'Tags — Writing by Ralph Jonas Mungcal';
 const description = 'Browse posts by topic — software engineering, AI integration, career, and craft.';
-const canonicalURL = 'https://ralphjonas.com/blog/tags/';
+const canonicalURL = `${SITE_URL}/blog/tags/`;
 
 const breadcrumb = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ralphjonas.com/' },
-    { '@type': 'ListItem', position: 2, name: 'Writing', item: 'https://ralphjonas.com/blog/' },
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'Writing', item: `${SITE_URL}/blog/` },
     { '@type': 'ListItem', position: 3, name: 'Tags', item: canonicalURL }
   ]
 };
