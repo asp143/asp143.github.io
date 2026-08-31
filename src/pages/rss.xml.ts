@@ -3,6 +3,7 @@ import type { APIContext } from 'astro';
 import MarkdownIt from 'markdown-it';
 import sanitizeHtml from 'sanitize-html';
 import { getPublishedPosts } from '../utils/blog';
+import { SITE_URL } from '../data/site.mjs';
 
 const parser = new MarkdownIt();
 
@@ -12,7 +13,7 @@ export async function GET(context: APIContext) {
     title: 'Ralph Jonas Mungcal — Writing',
     description:
       'Notes on software engineering, AI integration, career, and craft by Ralph Jonas Mungcal.',
-    site: context.site ?? 'https://ralphjonas.com',
+    site: context.site ?? SITE_URL,
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
@@ -25,6 +26,6 @@ export async function GET(context: APIContext) {
     })),
     xmlns: { atom: 'http://www.w3.org/2005/Atom' },
     customData:
-      '<language>en</language><atom:link href="https://ralphjonas.com/rss.xml" rel="self" type="application/rss+xml"/>'
+      `<language>en</language><atom:link href="${SITE_URL}/rss.xml" rel="self" type="application/rss+xml"/>`
   });
 }

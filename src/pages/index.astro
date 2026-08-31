@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Window from '../components/Window.astro';
 import { getPublishedPosts, formatPubDate, toIsoDate, isNewPost } from '../utils/blog';
 import { otherWork, sideProjects } from '../data/projects';
+import { SITE_URL } from '../data/site.mjs';
 import '../styles/home.css';
 
 const currentYear = new Date().getFullYear();
@@ -45,15 +46,15 @@ const projectItemList = {
   itemListElement: featuredProjects.map((project, index) => ({
     '@type': 'ListItem',
     position: index + 1,
-    url: `https://ralphjonas.com${project.url}`,
+    url: `${SITE_URL}${project.url}`,
     item: {
       '@type': 'CreativeWork',
-      '@id': `https://ralphjonas.com${project.url}#project`,
+      '@id': `${SITE_URL}${project.url}#project`,
       name: project.name,
-      url: `https://ralphjonas.com${project.url}`,
+      url: `${SITE_URL}${project.url}`,
       description: project.description,
       keywords: project.stack.join(', '),
-      creator: { '@id': 'https://ralphjonas.com/#person' }
+      creator: { '@id': `${SITE_URL}/#person` }
     }
   }))
 };
@@ -70,7 +71,7 @@ const sideProjectItemList = {
       name: project.name,
       url: project.url,
       description: project.description,
-      creator: { '@id': 'https://ralphjonas.com/#person' }
+      creator: { '@id': `${SITE_URL}/#person` }
     }
   }))
 };

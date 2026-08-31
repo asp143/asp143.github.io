@@ -6,6 +6,7 @@ import {
   formatPubDate,
   tagToSlug
 } from '../../../utils/blog';
+import { SITE_URL } from '../../../data/site.mjs';
 import '../../../styles/blog.css';
 
 export async function getStaticPaths() {
@@ -33,7 +34,7 @@ const slug = Astro.params.tag;
 
 const title = `#${tag} — Writing by Ralph Jonas Mungcal`;
 const description = `Posts tagged ${tag}: ${posts.length} ${posts.length === 1 ? 'post' : 'posts'} on ${tag} by Ralph Jonas Mungcal.`;
-const canonicalURL = `https://ralphjonas.com/blog/tags/${slug}/`;
+const canonicalURL = `${SITE_URL}/blog/tags/${slug}/`;
 const dateModified = posts
   .map((p) => (p.data.updatedDate ?? p.data.pubDate).valueOf())
   .reduce((a, b) => Math.max(a, b), 0);
@@ -42,8 +43,8 @@ const breadcrumb = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ralphjonas.com/' },
-    { '@type': 'ListItem', position: 2, name: 'Writing', item: 'https://ralphjonas.com/blog/' },
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'Writing', item: `${SITE_URL}/blog/` },
     { '@type': 'ListItem', position: 3, name: `#${tag}`, item: canonicalURL }
   ]
 };
@@ -56,13 +57,13 @@ const collectionPage = {
   name: title,
   description,
   inLanguage: 'en',
-  isPartOf: { '@id': 'https://ralphjonas.com/#website' },
+  isPartOf: { '@id': `${SITE_URL}/#website` },
   about: { name: tag },
   hasPart: posts.map((post) => ({
     '@type': 'BlogPosting',
-    '@id': `https://ralphjonas.com/blog/${post.id}/#blogposting`,
+    '@id': `${SITE_URL}/blog/${post.id}/#blogposting`,
     headline: post.data.title,
-    url: `https://ralphjonas.com/blog/${post.id}/`,
+    url: `${SITE_URL}/blog/${post.id}/`,
     datePublished: post.data.pubDate.toISOString()
   }))
 };

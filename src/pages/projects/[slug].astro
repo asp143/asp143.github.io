@@ -2,6 +2,7 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Window from '../../components/Window.astro';
+import { SITE_URL } from '../../data/site.mjs';
 import '../../styles/blog.css';
 import '../../styles/projects.css';
 
@@ -26,10 +27,10 @@ const roleItems = roleResponsibilities
   : [];
 
 const canonicalURL = project.data.canonical
-  ?? `https://ralphjonas.com/projects/${project.id}/`;
+  ?? `${SITE_URL}/projects/${project.id}/`;
 
 const dateModified = project.data.updatedDate?.toISOString();
-const ogImage = `https://ralphjonas.com/og/projects/${project.id}.png`;
+const ogImage = `${SITE_URL}/og/projects/${project.id}.png`;
 const ogImageAlt = `${project.data.title} — project by Ralph Jonas Mungcal`;
 
 const keywords = [
@@ -48,9 +49,9 @@ const creativeWork = {
   url: canonicalURL,
   programmingLanguage: project.data.stack,
   keywords: keywords.join(', '),
-  author: { '@id': 'https://ralphjonas.com/#person' },
-  creator: { '@id': 'https://ralphjonas.com/#person' },
-  isPartOf: { '@id': 'https://ralphjonas.com/#website' },
+  author: { '@id': `${SITE_URL}/#person` },
+  creator: { '@id': `${SITE_URL}/#person` },
+  isPartOf: { '@id': `${SITE_URL}/#website` },
   ...(dateModified ? { dateModified } : {}),
   image: ogImage
 };
@@ -59,8 +60,8 @@ const breadcrumb = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ralphjonas.com/' },
-    { '@type': 'ListItem', position: 2, name: 'Projects', item: 'https://ralphjonas.com/projects/' },
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'Projects', item: `${SITE_URL}/projects/` },
     { '@type': 'ListItem', position: 3, name: project.data.title, item: canonicalURL }
   ]
 };

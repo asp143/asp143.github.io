@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Window from '../../components/Window.astro';
 import { otherWork, sideProjects } from '../../data/projects';
+import { SITE_URL } from '../../data/site.mjs';
 import '../../styles/projects.css';
 
 const projects = (await getCollection('projects', ({ data }) => !data.draft))
@@ -12,13 +13,13 @@ const totalItems = projects.length + otherWork.length + sideProjects.length;
 const title = 'Projects — Ralph Jonas Mungcal';
 const description =
   'Selected projects by Ralph Jonas Mungcal — payment platforms, flight search engines, AI media pipelines, and developer tooling.';
-const canonicalURL = 'https://ralphjonas.com/projects/';
+const canonicalURL = `${SITE_URL}/projects/`;
 
 const breadcrumb = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ralphjonas.com/' },
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
     { '@type': 'ListItem', position: 2, name: 'Projects', item: canonicalURL }
   ]
 };
@@ -31,13 +32,13 @@ const collectionPage = {
   name: title,
   description,
   inLanguage: 'en',
-  isPartOf: { '@id': 'https://ralphjonas.com/#website' },
+  isPartOf: { '@id': `${SITE_URL}/#website` },
   hasPart: [
     ...projects.map((project) => ({
       '@type': 'SoftwareSourceCode',
-      '@id': `https://ralphjonas.com/projects/${project.id}/#project`,
+      '@id': `${SITE_URL}/projects/${project.id}/#project`,
       name: project.data.title,
-      url: `https://ralphjonas.com/projects/${project.id}/`,
+      url: `${SITE_URL}/projects/${project.id}/`,
       description: project.data.description
     })),
     ...otherWork.map((item) => ({
