@@ -95,7 +95,8 @@ export default defineConfig({
     defaultStrategy: 'viewport'
   },
   build: {
-    format: 'directory'
+    format: 'directory',
+    inlineStylesheets: 'always'
   },
   integrations: [
     sitemap({
