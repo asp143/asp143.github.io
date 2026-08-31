@@ -2,3 +2,7 @@ node_modules
 .astro
 dist
 public/og/
+unsloth_compiled_cache/
+.omo/
+.codex
+docs/plans/
