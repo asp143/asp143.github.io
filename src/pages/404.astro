@@ -219,9 +219,7 @@ import Window from '../components/Window.astro';
   </style>
 
   <script>
-    type PostHogClient = {
-      capture: (eventName: string, properties?: Record<string, string>) => void;
-    };
+    import { capturePostHog, type PostHogClient } from '../scripts/analytics';
 
     const path = window.location.pathname;
     const target = document.getElementById('nf-path');
@@ -231,7 +229,7 @@ import Window from '../components/Window.astro';
 
     const posthog = (window as Window & { posthog?: PostHogClient }).posthog;
     if (posthog) {
-      posthog.capture('404_hit', {
+      capturePostHog(posthog, '404_hit', {
         path,
         referrer: document.referrer,
         search: location.search
