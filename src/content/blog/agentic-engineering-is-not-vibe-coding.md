@@ -1,6 +1,6 @@
 ---
 title: Agentic Engineering Is Not Vibe Coding
-description: Same tools, different job. Why Karpathy retired his own term, what the March CVE numbers actually indict, and what a real multi-agent setup looks like at my desk with herdr.
+description: Same tools, different job. Why Karpathy retired his own term, what March's CVE numbers indict, and how a multi-agent setup looks at my desk with herdr.
 pubDate: 2026-08-14
 tags:
   - ai

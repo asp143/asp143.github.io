@@ -27,7 +27,7 @@ const breadcrumb = {
   canonicalURL={canonicalURL}
   breadcrumb={breadcrumb}
 >
-  <a slot="menubar-back" class="menubar-back" href="/">&larr; ~/</a>
+  <a slot="menubar-back" class="menubar-back" href="/" aria-label="Back to home">&larr; ~/</a>
 
   <main class="blog-page">
     <h1 class="visually-hidden">Writing by Ralph Jonas Mungcal</h1>
@@ -80,8 +80,8 @@ const breadcrumb = {
         <span class="statusbar-info">{posts.length} items &middot; sorted by date desc</span>
         <span class="statusbar-unread" data-unread-count></span>
         <span class="statusbar-links">
-          <a href="/rss.xml" class="statusbar-link post-nav-link">rss.xml</a>
-          <a href="/" class="statusbar-link">$ exit</a>
+          <a href="/rss.xml" class="statusbar-link post-nav-link" data-astro-prefetch="false">rss.xml</a>
+          <a href="/" class="statusbar-link" aria-label="Back to home">$ exit</a>
         </span>
       </Fragment>
     </Window>

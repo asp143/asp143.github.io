@@ -106,7 +106,10 @@ const breadcrumb = {
         </div>
 
         <h1 class="post-title">
-          {project.data.name}<span class="post-period">_</span>
+          <span class="visually-hidden">{project.data.title}</span>
+          <span aria-hidden="true">
+            {project.data.name}<span class="post-period">_</span>
+          </span>
         </h1>
 
         <p class="project-tagline">{project.data.summary}</p>
@@ -182,7 +185,7 @@ const breadcrumb = {
         </span>
         <nav class="project-statusnav" aria-label="Project navigation">
           <a href="/projects/">&larr; all projects</a>
-          <a href="/">$ exit</a>
+          <a href="/" aria-label="Back to home">$ exit</a>
         </nav>
       </Fragment>
     </Window>
