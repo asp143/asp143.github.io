@@ -2,6 +2,7 @@
 name: airline-data-bots
 title: Airline Data Bots — Scheduled Availability Scrapers
 description: Scheduled scrapers collecting flight availability from multiple airline sources — TypeScript and Puppeteer with BullMQ job scheduling and retries.
+updatedDate: 2026-06-10
 summary: A fleet of scheduled scrapers that pull flight availability from multiple airline sources, normalize the results, and publish them into the search platform. Built around a Puppeteer pool, a BullMQ-backed queue, and retry/backoff policies that survive the messy realities of public airline endpoints.
 stack:
   - TypeScript

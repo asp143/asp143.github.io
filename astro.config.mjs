@@ -3,7 +3,10 @@ import sitemap from '@astrojs/sitemap';
 import rehypeExternalLinks from 'rehype-external-links';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { getContentFileEntries } from './scripts/lib/content-files.mjs';
+import {
+  getContentFileEntries,
+  hasExternalHttpCanonical
+} from './scripts/lib/content-files.mjs';
 import { NOW_UPDATED } from './src/data/site.mjs';
 import { isNoindexPath } from './src/utils/seo.mjs';
 
@@ -18,15 +21,21 @@ function toDate(value) {
   return Number.isNaN(date.valueOf()) ? null : date;
 }
 
+const externalCanonicalBlogPaths = new Set();
 const blogDates = new Map();
 let newestBlogDate = null;
 for (const { slug, frontmatter } of getContentFileEntries(BLOG_DIR)) {
+  const blogPath = `/blog/${slug}/`;
+  if (hasExternalHttpCanonical(frontmatter.canonical, SITE_URL)) {
+    externalCanonicalBlogPaths.add(blogPath);
+  }
+
   const pub = toDate(frontmatter.pubDate);
   if (!pub || frontmatter.draft || pub.valueOf() > Date.now()) continue;
 
   const updated = toDate(frontmatter.updatedDate);
   const lastmod = updated ?? pub;
-  blogDates.set(`/blog/${slug}/`, lastmod);
+  blogDates.set(blogPath, lastmod);
   if (!newestBlogDate || lastmod > newestBlogDate) newestBlogDate = lastmod;
 }
 
@@ -34,8 +43,11 @@ const projectDates = new Map();
 for (const { slug, frontmatter } of getContentFileEntries(PROJECTS_DIR)) {
   if (frontmatter.draft) continue;
 
-  const updated = toDate(frontmatter.updatedDate);
-  if (updated) projectDates.set(`/projects/${slug}/`, updated);
+  const lastmod =
+    toDate(frontmatter.updatedDate) ??
+    toDate(frontmatter.pubDate) ??
+    toDate(frontmatter.date);
+  if (lastmod) projectDates.set(`/projects/${slug}/`, lastmod);
 }
 
 const staticDates = new Map([
@@ -79,6 +91,9 @@ export default defineConfig({
     '/feed.xml': '/rss.xml'
   },
   markdown: {
+    shikiConfig: {
+      theme: 'github-dark-default'
+    },
     rehypePlugins: [
       [
         rehypeExternalLinks,
@@ -91,16 +106,28 @@ export default defineConfig({
     ]
   },
   prefetch: {
-    prefetchAll: true,
-    defaultStrategy: 'viewport'
+    prefetchAll: false,
+    defaultStrategy: 'hover'
   },
   build: {
     format: 'directory',
     inlineStylesheets: 'always'
   },
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          experimentalMinChunkSize: 10000
+        }
+      }
+    }
+  },
   integrations: [
     sitemap({
-      filter: (page) => !isNoindexPath(new URL(page).pathname),
+      filter(page) {
+        const { pathname } = new URL(page);
+        return !isNoindexPath(pathname) && !externalCanonicalBlogPaths.has(pathname);
+      },
       changefreq: 'monthly',
       priority: 0.7,
       serialize(item) {

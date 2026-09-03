@@ -5,6 +5,7 @@ import jetbrainsWoff2 from '@fontsource-variable/jetbrains-mono/files/jetbrains-
 /* Pixel font — OS chrome only (window titles, menubar/taskbar, clock,
    icon labels, badges). Never body copy. 700 only — everything pixel
    renders bold, so the 400 file would be dead weight. */
+import silkscreenWoff2 from '@fontsource/silkscreen/files/silkscreen-latin-700-normal.woff2?url';
 import '@fontsource/silkscreen/latin-700.css';
 import '../styles/global.css';
 import '../styles/os.css';
@@ -15,6 +16,7 @@ import { SITE_URL } from '../data/site.mjs';
 
 const OG_IMAGE = `${SITE_URL}/og.png`;
 const DEFAULT_OG_ALT = 'Ralph Jonas Mungcal — terminal-styled portfolio cover with name set in monospace type.';
+const SITE_TITLE_SUFFIX = ' — Ralph Jonas Mungcal';
 
 const {
   title = 'Ralph Jonas Mungcal — Full-Stack & AI Developer',
@@ -39,6 +41,10 @@ const {
 } = Astro.props;
 
 const canonicalURL = canonicalOverride ?? new URL(Astro.url.pathname, SITE_URL).toString();
+const documentTitle =
+  title.length > 60 && title.endsWith(SITE_TITLE_SUFFIX)
+    ? title.slice(0, -SITE_TITLE_SUFFIX.length)
+    : title;
 
 const pathname = Astro.url.pathname;
 const derivedOsPath =
@@ -104,7 +110,7 @@ const profilePage = pageType === 'profile'
           '@type': 'ProfilePage',
           '@id': `${canonicalURL}#profilepage`,
           url: canonicalURL,
-          name: title,
+          name: documentTitle,
           description,
           inLanguage: 'en',
           isPartOf: { '@id': `${SITE_URL}/#website` },
@@ -127,7 +133,7 @@ const profilePage = pageType === 'profile'
           '@type': 'WebPage',
           '@id': `${canonicalURL}#webpage`,
           url: canonicalURL,
-          name: title,
+          name: documentTitle,
           description,
           inLanguage: 'en',
           isPartOf: { '@id': `${SITE_URL}/#website` },
@@ -160,6 +166,15 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      try {
+        if (localStorage.getItem('ralphos:motion') === '0') {
+          document.documentElement.classList.add('motion-off');
+        }
+      } catch {
+        // Storage can be unavailable in privacy-restricted contexts.
+      }
+    </script>
     <link
       rel="preload"
       as="font"
@@ -167,9 +182,16 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
       href={jetbrainsWoff2}
       crossorigin="anonymous"
     />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={silkscreenWoff2}
+      crossorigin="anonymous"
+    />
     <link rel="dns-prefetch" href="https://us.i.posthog.com" />
     <link rel="dns-prefetch" href="https://us-assets.i.posthog.com" />
-    <title>{title}</title>
+    <title>{documentTitle}</title>
 
     <link rel="apple-touch-icon" href="/favicons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicons/icon-192.png" />
@@ -183,6 +205,7 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
       type="application/rss+xml"
       title="Ralph Jonas — Writing"
       href="/rss.xml"
+      data-astro-prefetch="false"
     />
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
 
@@ -194,7 +217,7 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
 
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="Ralph Jonas Mungcal" />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={documentTitle} />
     <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:description" content={description} />
@@ -220,7 +243,7 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@ralphsenpaidev" />
     <meta name="twitter:site" content="@ralphsenpaidev" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={documentTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={ogImageAlt} />
@@ -262,6 +285,8 @@ const resolvedBreadcrumb = breadcrumb ?? (suppressDefaultBreadcrumb ? null : def
             disable_surveys: true,
             capture_dead_clicks: false,
             capture_performance: false,
+            capture_heatmaps: false,
+            disable_external_dependency_loading: true,
           });
           var normalizedPath = location.pathname.replace(/\/+$/, '') || '/';
           var analyticsPageType = normalizedPath === '/'
