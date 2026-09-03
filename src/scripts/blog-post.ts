@@ -10,7 +10,7 @@ const progressBar = document.querySelector<HTMLElement>('.post-progress-bar');
 
 /* Mark the post read only after a real user signal. Desktop readers then enter
    the ralphOS view; crawlers and webdriver-driven audits remain on the article. */
-const interactionEvents = ['pointermove', 'wheel', 'touchstart', 'keydown'] as const;
+const interactionEvents = ['pointermove', 'wheel', 'touchstart'] as const;
 const interactionController = new AbortController();
 const onFirstInteraction = () => {
   interactionController.abort();

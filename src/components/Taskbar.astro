@@ -37,7 +37,7 @@ const appStyle = (app: TaskbarApp['app']) =>
 
 <nav class="taskbar" aria-label="Taskbar">
   <div class="taskbar-left">
-    <StartMenu direction="up" label="▸ ralph" />
+    <StartMenu direction="up" label="▸ ralph" navLabel="Start menu (taskbar)" settings />
   </div>
   <div class="taskbar-apps">
     {apps.map((a) => (
@@ -47,7 +47,7 @@ const appStyle = (app: TaskbarApp['app']) =>
     ))}
   </div>
   <div class="taskbar-right">
-    <a class="taskbar-glyph" href="/rss.xml" aria-label="RSS feed">rss</a>
+    <a class="taskbar-glyph" href="/rss.xml" data-astro-prefetch="false" aria-label="RSS feed">rss</a>
     <a class="taskbar-glyph" href="https://github.com/asp143" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">github</a>
   </div>
 </nav>

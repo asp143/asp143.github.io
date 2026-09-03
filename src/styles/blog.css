@@ -108,11 +108,6 @@
 .blog-list-link:hover,
 .blog-list-link:focus-visible {
   background: var(--tint-writing);
-  outline: none;
-}
-
-.blog-list-link:focus-visible {
-  box-shadow: inset 3px 0 0 var(--color-accent);
 }
 
 .blog-list-date {
@@ -202,7 +197,7 @@
 }
 
 .statusbar-unread {
-  color: var(--color-accent);
+  color: var(--color-ink);
   font-weight: 700;
 }
 
@@ -330,6 +325,25 @@
   font-variant-numeric: tabular-nums;
 }
 
+.post-byline {
+  font-size: 0.85rem;
+  color: var(--color-ink-muted);
+  margin-bottom: 0.75rem;
+}
+
+.post-byline a {
+  color: var(--color-ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: 2px;
+}
+
+.post-byline a:hover,
+.post-byline a:focus-visible {
+  text-decoration-thickness: 2px;
+}
+
 .post-title {
   font-size: clamp(1.9rem, 4.5vw, 2.7rem);
   font-weight: 800;
@@ -423,11 +437,6 @@
 .post-content a:hover,
 .post-content a:focus-visible {
   background-size: 100% 36%;
-}
-
-.post-content a:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
 }
 
 .post-content ul,
@@ -544,7 +553,7 @@
 }
 
 .post-follow-handle {
-  color: var(--color-accent);
+  color: var(--color-ink);
 }
 
 .post-follow-desc {
@@ -625,11 +634,6 @@
 .related-posts-link:hover,
 .related-posts-link:focus-visible {
   background: var(--tint-writing);
-  outline: none;
-}
-
-.related-posts-link:focus-visible {
-  box-shadow: inset 3px 0 0 var(--color-accent); /* visible focus: tint alone is sub-threshold */
 }
 
 .related-posts-link-title {
