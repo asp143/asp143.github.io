@@ -2,6 +2,7 @@
 name: flight-rewards-search
 title: Flight Rewards Search Engine
 description: Reward flight availability search across major airlines — Node.js and TypeScript backend, PostgreSQL search index, and GCP ingestion pipelines.
+updatedDate: 2026-06-10
 summary: Technical lead on a UK-based SaaS that searches reward flight availability across major airline programs. Backend, data ingestion, and search infrastructure built on Node.js, TypeScript, PostgreSQL, and Google Cloud Platform.
 stack:
   - Node.js

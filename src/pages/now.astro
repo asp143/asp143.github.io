@@ -76,11 +76,12 @@ const formattedUpdated = new Date(`${NOW_UPDATED}T00:00:00Z`).toLocaleDateString
     <script is:inline type="application/ld+json" set:html={JSON.stringify(nowItemList)}></script>
   </Fragment>
 
-  <a slot="menubar-back" class="menubar-back" href="/">&larr; ~/</a>
+  <a slot="menubar-back" class="menubar-back" href="/" aria-label="Back to home">&larr; ~/</a>
 
   <main class="now-page" data-project-count={nowProjects.length}>
     <Window
       title="taskmgr — now"
+      headingText="What Ralph Jonas Mungcal is working on now"
       app="system"
       variant="page"
       headingLevel={1}
@@ -156,7 +157,7 @@ const formattedUpdated = new Date(`${NOW_UPDATED}T00:00:00Z`).toLocaleDateString
         </span>
         <span class="now-statusbar-nav">
           <a href="/blog/" class="post-nav-link">/blog &rarr;</a>
-          <a href="/" class="post-nav-link">$ exit</a>
+          <a href="/" class="post-nav-link" aria-label="Back to home">$ exit</a>
         </span>
       </Fragment>
     </Window>

@@ -68,7 +68,7 @@ const collectionPage = {
     <script is:inline type="application/ld+json" set:html={JSON.stringify(collectionPage)}></script>
   </Fragment>
 
-  <a slot="menubar-back" class="menubar-back" href="/">&larr; ~/</a>
+  <a slot="menubar-back" class="menubar-back" href="/" aria-label="Back to home">&larr; ~/</a>
 
   <main class="projects-page" data-project-count={projects.length}>
     <h1 class="visually-hidden">Projects by Ralph Jonas Mungcal</h1>
@@ -159,7 +159,7 @@ const collectionPage = {
         <span class="projects-statusinfo">{totalItems} items · view: large icons</span>
         <nav class="projects-statusnav" aria-label="Projects navigation">
           <a href="/now/">/now &rarr;</a>
-          <a href="/">$ exit</a>
+          <a href="/" aria-label="Back to home">$ exit</a>
         </nav>
       </Fragment>
     </Window>

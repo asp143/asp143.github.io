@@ -15,7 +15,7 @@ const sizes = [
 for (const { size, name } of sizes) {
   await sharp(SRC)
     .resize(size, size, { fit: 'contain', background: { r: 253, g: 251, b: 240, alpha: 1 } })
-    .png({ compressionLevel: 9 })
+    .png({ compressionLevel: 9, palette: true, quality: 75, effort: 10 })
     .toFile(resolve(FAVICONS, name));
   console.log(`generated ${name} (${size}x${size})`);
 }

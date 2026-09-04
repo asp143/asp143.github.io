@@ -12,19 +12,97 @@ import { makeSnappable, restore as restoreSnap, syncMaxButton } from './snap';
 import { bindOutboundLinkTracking } from './outbound';
 import { capturePostHog, type PostHogClient } from './analytics';
 
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const homeDocumentTitle = document.title;
+const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+const isMotionDisabled = () =>
+  reducedMotionQuery.matches || document.documentElement.classList.contains('motion-off');
+let keyboardShortcutsEnabled = true;
 
 function revealStaticContent() {
   document.querySelectorAll<HTMLElement>('.hero-name-letter, .motion-fade, .motion-stagger').forEach((el) => {
     el.style.opacity = '1';
     el.style.transform = 'none';
   });
+  const typed = document.querySelector<HTMLElement>('.hero-subtitle-typed');
+  const text = document.querySelector<HTMLElement>('.hero-subtitle-text');
+  typed?.classList.remove('is-typewriting');
+  if (text) text.style.clipPath = 'none';
 }
 
 function setStatValuesFinal() {
   document.querySelectorAll<HTMLElement>('.about-stat-number[data-count]').forEach((el) => {
     el.textContent = `${el.dataset.count ?? '0'}+`;
   });
+}
+
+function wireStartMenuSettings() {
+  const readSetting = (key: string) => {
+    try {
+      return localStorage.getItem(key) !== '0';
+    } catch {
+      return true;
+    }
+  };
+  const storeSetting = (key: string, enabled: boolean) => {
+    try {
+      localStorage.setItem(key, enabled ? '1' : '0');
+    } catch {
+      /* storage unavailable — session-only toggle */
+    }
+  };
+
+  keyboardShortcutsEnabled = readSetting('ralphos:shortcuts');
+  const motionEnabled = readSetting('ralphos:motion');
+  document.documentElement.classList.toggle('motion-off', !motionEnabled);
+
+  const sync = () => {
+    document.querySelectorAll<HTMLButtonElement>('[data-setting-toggle="shortcuts"]').forEach((button) => {
+      button.ariaPressed = String(keyboardShortcutsEnabled);
+      button.textContent = `keyboard shortcuts: ${keyboardShortcutsEnabled ? 'on' : 'off'}`;
+    });
+    document.querySelectorAll<HTMLButtonElement>('[data-setting-toggle="motion"]').forEach((button) => {
+      const enabled = !document.documentElement.classList.contains('motion-off');
+      button.ariaPressed = String(enabled);
+      button.textContent = `motion: ${enabled ? 'on' : 'off'}`;
+    });
+    document.querySelectorAll<HTMLElement>('[data-shortcuts-hint]').forEach((hint) => {
+      hint.hidden = hint.dataset.shortcutsHint !== (keyboardShortcutsEnabled ? 'on' : 'off');
+    });
+  };
+  const finishOwnedMotion = () => {
+    document.querySelector<HTMLElement>('main.portfolio-page')
+      ?.getAnimations({ subtree: true })
+      .forEach((animation) => animation.cancel());
+    revealStaticContent();
+    setStatValuesFinal();
+  };
+
+  reducedMotionQuery.addEventListener('change', (event) => {
+    if (event.matches) finishOwnedMotion();
+    document.dispatchEvent(new CustomEvent('home:motion-change'));
+  });
+
+
+  document.querySelectorAll<HTMLButtonElement>('[data-setting-toggle]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (button.dataset.settingToggle === 'shortcuts') {
+        keyboardShortcutsEnabled = !keyboardShortcutsEnabled;
+        storeSetting('ralphos:shortcuts', keyboardShortcutsEnabled);
+        document.dispatchEvent(new CustomEvent('home:shortcuts-change'));
+        if (!keyboardShortcutsEnabled) {
+          document.getElementById('kbd-toast')?.classList.remove('kbd-toast--visible');
+        }
+      } else if (button.dataset.settingToggle === 'motion') {
+        const enabled = document.documentElement.classList.contains('motion-off');
+        document.documentElement.classList.toggle('motion-off', !enabled);
+        storeSetting('ralphos:motion', enabled);
+        if (!enabled) finishOwnedMotion();
+        document.dispatchEvent(new CustomEvent('home:motion-change'));
+      }
+      sync();
+    });
+  });
+  sync();
 }
 
 /* ---------- Typewriter hero subtitle ---------- */
@@ -37,7 +115,7 @@ function runTypewriter() {
   if (!el || !textSpan || !typedSpan || !cursor || !(textNode instanceof Text)) return;
 
   const full = el.dataset.typewriter ?? textNode.data;
-  if (prefersReducedMotion || !full) return;
+  if (isMotionDisabled() || !full) return;
 
   const speed = 18;
   const initialDelay = 350;
@@ -72,9 +150,25 @@ function runTypewriter() {
   };
 
   reveal(0);
-  new ResizeObserver(() => reveal(renderedChars)).observe(textSpan);
+  const resizeObserver = new ResizeObserver(() => reveal(renderedChars));
+  resizeObserver.observe(textSpan);
+
+  const stopForDisabledMotion = () => {
+    if (!isMotionDisabled()) return;
+    cancelAnimationFrame(frameId);
+    resizeObserver.disconnect();
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+    document.removeEventListener('home:motion-change', stopForDisabledMotion);
+    typedSpan.classList.remove('is-typewriting');
+    textSpan.style.clipPath = 'none';
+    cursor.style.transform = '';
+  };
 
   const step = (now: number) => {
+    if (isMotionDisabled()) {
+      stopForDisabledMotion();
+      return;
+    }
     if (document.hidden) {
       lastFrame = null;
       return;
@@ -95,7 +189,9 @@ function runTypewriter() {
     if (renderedChars < full.length) {
       frameId = requestAnimationFrame(step);
     } else {
+      resizeObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      document.removeEventListener('home:motion-change', stopForDisabledMotion);
     }
   };
 
@@ -109,6 +205,7 @@ function runTypewriter() {
   };
 
   document.addEventListener('visibilitychange', onVisibilityChange);
+  document.addEventListener('home:motion-change', stopForDisabledMotion);
   if (!document.hidden) frameId = requestAnimationFrame(step);
 }
 
@@ -123,7 +220,7 @@ function wireAnimationVisibility() {
 
 /* ---------- Stat counter ---------- */
 function runStatCounter() {
-  if (prefersReducedMotion) {
+  if (isMotionDisabled()) {
     setStatValuesFinal();
     return;
   }
@@ -133,11 +230,20 @@ function runStatCounter() {
       if (!entry.isIntersecting) return;
       observer.unobserve(entry.target);
 
+      if (isMotionDisabled()) {
+        setStatValuesFinal();
+        return;
+      }
       entry.target.querySelectorAll<HTMLElement>('.about-stat-number[data-count]').forEach((el) => {
         const target = Number.parseInt(el.dataset.count ?? '0', 10);
         const duration = 1000;
         const start = performance.now();
+        el.textContent = '0+';
         const step = (now: number) => {
+          if (isMotionDisabled()) {
+            el.textContent = `${target}+`;
+            return;
+          }
           const p = Math.min((now - start) / duration, 1);
           const eased = 1 - Math.pow(1 - p, 3);
           el.textContent = `${Math.round(eased * target)}+`;
@@ -154,7 +260,7 @@ function runStatCounter() {
 
 /* ---------- Section entrance stagger (subtle) ---------- */
 function runEntranceAnimations() {
-  if (prefersReducedMotion) {
+  if (isMotionDisabled()) {
     revealStaticContent();
     return;
   }
@@ -183,6 +289,10 @@ function runEntranceAnimations() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
+      if (isMotionDisabled()) {
+        revealStaticContent();
+        return;
+      }
       observer.unobserve(entry.target);
 
       const targets = entry.target.querySelectorAll<HTMLElement>('.motion-fade, .motion-stagger');
@@ -227,7 +337,7 @@ const SECTION_MAP: Record<SectionKey, string> = {
    joke-close is overridden into a real close via data-real-close. */
 interface DesktopController {
   isDesktop(): boolean;
-  openWin(id: string): void;
+  openWin(id: string, opener?: HTMLElement): void;
   raiseHero(): void;
 }
 
@@ -240,6 +350,7 @@ function initDesktopWindows(): DesktopController {
     const el = document.querySelector<HTMLElement>(`.home-sections #${id}.win`);
     if (el) wins.set(id, el);
   });
+  const openers = new Map<string, HTMLElement>();
   const heroTerminal = document.querySelector<HTMLElement>('.hero-window');
   const constraint = document.querySelector<HTMLElement>('main[data-desktop]');
   const taskbarApp = (id: string) =>
@@ -263,9 +374,10 @@ function initDesktopWindows(): DesktopController {
       .filter((el) => el !== except && el.classList.contains('is-open'))
       .sort((a, b) => Number(b.style.zIndex || 0) - Number(a.style.zIndex || 0))[0];
 
-  const openWin = (id: string) => {
+  const openWin = (id: string, opener?: HTMLElement) => {
     const el = wins.get(id);
     if (!el) return;
+    if (opener) openers.set(id, opener);
     el.classList.add('is-open');
     taskbarApp(id)?.classList.add('is-open');
     focusWin(el);
@@ -275,8 +387,14 @@ function initDesktopWindows(): DesktopController {
     el.classList.remove('is-open', 'is-focused');
     taskbarApp(el.id)?.classList.remove('is-open');
     const next = topOpenWin(el);
-    if (next) focusWin(next);
-    else setActiveTaskbarApp(null);
+    if (next) {
+      focusWin(next);
+      return;
+    }
+    setActiveTaskbarApp(null);
+    const opener = openers.get(el.id);
+    const focusTarget = opener?.isConnected ? opener : taskbarApp(el.id);
+    focusTarget?.focus({ preventScroll: true });
   };
 
   /* wire each window once: drag by titlebar, raise on pointerdown,
@@ -312,6 +430,8 @@ function initDesktopWindows(): DesktopController {
   const browserAddress = document.getElementById('browser-address');
   const browserOpenTab = document.getElementById('browser-open-tab') as HTMLAnchorElement | null;
   let browserDragWired = false;
+  const neutralBrowserFrameTitle = browserFrame?.title ?? 'page preview';
+  let browserOpener: HTMLElement | null = null;
 
   const setBrowserLocation = (path: string, docTitle?: string) => {
     if (browserTitle) browserTitle.textContent = docTitle || `browser — ${path}`;
@@ -319,11 +439,12 @@ function initDesktopWindows(): DesktopController {
     if (browserOpenTab) browserOpenTab.href = path;
   };
 
-  const openBrowser = (url: URL) => {
+  const openBrowser = (url: URL, opener?: HTMLElement) => {
     if (!browser || !browserFrame) {
       window.location.href = url.href;
       return;
     }
+    browserOpener = opener ?? null;
     const path = url.pathname + url.search + url.hash;
     browser.classList.add('is-open');
     if (!browserDragWired) {
@@ -350,12 +471,41 @@ function initDesktopWindows(): DesktopController {
   const closeBrowser = () => {
     if (!browser) return;
     browser.classList.remove('is-open', 'is-focused');
-    browserFrame?.setAttribute('src', 'about:blank'); // stop playback/loading
+    document.title = homeDocumentTitle;
+    if (browserFrame) {
+      browserFrame.title = neutralBrowserFrameTitle;
+      browserFrame.setAttribute('src', 'about:blank'); // stop playback/loading
+    }
     // the address bar mirrors the pane while it's open — restore home
     if (window.location.pathname !== '/') history.replaceState(null, '', '/');
+    const opener = browserOpener;
+    browserOpener = null;
     const next = topOpenWin();
-    if (next) focusWin(next);
-    else setActiveTaskbarApp(null);
+    if (next) {
+      focusWin(next);
+      return;
+    }
+    setActiveTaskbarApp(null);
+    let focusTarget: HTMLElement | null = null;
+    if (opener?.isConnected) {
+      const startMenu = opener.closest<HTMLDetailsElement>('details.startmenu:not([open])');
+      if (startMenu) {
+        const summary = startMenu.querySelector<HTMLElement>(':scope > summary');
+        if (
+          summary?.isConnected &&
+          summary.checkVisibility() &&
+          getComputedStyle(summary).visibility !== 'hidden'
+        ) {
+          focusTarget = summary;
+        }
+      } else if (
+        opener.checkVisibility() &&
+        getComputedStyle(opener).visibility !== 'hidden'
+      ) {
+        focusTarget = opener;
+      }
+    }
+    focusTarget?.focus({ preventScroll: true });
   };
 
   document.getElementById('browser-close')?.addEventListener('click', closeBrowser);
@@ -366,9 +516,14 @@ function initDesktopWindows(): DesktopController {
       const loc = browserFrame.contentWindow?.location;
       if (!loc || loc.href === 'about:blank') return;
       if (loc.origin !== window.location.origin) return;
+      const loadedTitle = browserFrame.contentDocument?.title;
+      if (loadedTitle) {
+        document.title = loadedTitle;
+        browserFrame.title = loadedTitle;
+      }
       setBrowserLocation(
         loc.pathname + loc.search,
-        browserFrame.contentDocument?.title?.split('—')[0]?.trim().toLowerCase()
+        loadedTitle?.split('—')[0]?.trim().toLowerCase()
       );
       // mirror the pane in the real address bar so any pane page is sharable
       if (loc.pathname !== '/') history.replaceState(null, '', loc.pathname + loc.search);
@@ -395,7 +550,7 @@ function initDesktopWindows(): DesktopController {
     document
       .querySelectorAll<HTMLDetailsElement>('details.startmenu[open]')
       .forEach((menu) => { menu.open = false; });
-    openBrowser(url);
+    openBrowser(url, a);
   });
 
   /* ── shared-link entry: post pages bounce desktop visitors here as
@@ -458,12 +613,13 @@ function initDesktopWindows(): DesktopController {
     const el = wins.get(id);
     if (!el) return;
     ev.preventDefault();
+    openers.set(id, a);
     if (a.classList.contains('taskbar-app') && el.classList.contains('is-open')) {
       // taskbar: focused → close (minimize), unfocused → bring to front
       if (el.classList.contains('is-focused')) closeWin(el);
       else focusWin(el);
     } else {
-      openWin(id);
+      openWin(id, a);
     }
   });
 
@@ -541,8 +697,18 @@ function wireKeyboardNav(desktop: DesktopController) {
       prefixTimer = null;
     }
   };
+  document.addEventListener('home:shortcuts-change', () => {
+    sudoBuffer = '';
+    endPrefix();
+  });
+
 
   window.addEventListener('keydown', (ev) => {
+    if (!keyboardShortcutsEnabled) {
+      sudoBuffer = '';
+      endPrefix();
+      return;
+    }
     const target = ev.target as HTMLElement | null;
     if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
       return;
@@ -577,7 +743,10 @@ function wireKeyboardNav(desktop: DesktopController) {
       if (desktop.isDesktop()) {
         // desktop mode: open the window instead of scrolling
         if (id === 'hero') desktop.raiseHero();
-        else desktop.openWin(id);
+        else desktop.openWin(
+          id,
+          document.querySelector<HTMLElement>(`.taskbar-app[data-target="${id}"]`) ?? undefined
+        );
         capturePostHog(
           (window as Window & { posthog?: PostHogClient }).posthog,
           'keyboard_nav',
@@ -586,7 +755,7 @@ function wireKeyboardNav(desktop: DesktopController) {
       } else {
         const el = document.getElementById(id);
         if (el) {
-          el.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+          el.scrollIntoView({ behavior: isMotionDisabled() ? 'auto' : 'smooth', block: 'start' });
           capturePostHog(
             (window as Window & { posthog?: PostHogClient }).posthog,
             'keyboard_nav',
@@ -626,7 +795,7 @@ function wireTrash() {
   });
 
   emptyBtn?.addEventListener('click', () => {
-    if (!prefersReducedMotion) {
+    if (!isMotionDisabled()) {
       dialog.classList.remove('trash-shake');
       void dialog.offsetWidth; // restart the animation
       dialog.classList.add('trash-shake');
@@ -668,9 +837,10 @@ function wireSectionObserver(desktop: DesktopController) {
 }
 
 /* ---------- Bootstrap ---------- */
+wireStartMenuSettings();
 wireAnimationVisibility();
 const supportsAnimate = typeof Element.prototype.animate === 'function';
-if (!prefersReducedMotion && supportsAnimate) {
+if (!isMotionDisabled() && supportsAnimate) {
   runEntranceAnimations();
   runTypewriter();
   runStatCounter();

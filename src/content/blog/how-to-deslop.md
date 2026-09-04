@@ -1,6 +1,6 @@
 ---
 title: How to Deslop
-description: Slop is a review problem, not a generation problem. A repeatable pass for cleaning AI defaults out of your writing and your code, with before-and-after examples for both.
+description: Slop is a review problem, not a generation problem. A repeatable pass for removing AI defaults from your writing and code, with before-and-after examples.
 pubDate: 2026-09-01
 tags:
   - ai

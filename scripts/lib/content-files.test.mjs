@@ -3,7 +3,10 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import test from 'node:test';
-import { getContentFileEntries } from './content-files.mjs';
+import {
+  getContentFileEntries,
+  hasExternalHttpCanonical
+} from './content-files.mjs';
 
 test('matches Astro glob-loader content IDs', () => {
   const contentDir = mkdtempSync(join(tmpdir(), 'content-files-'));
@@ -31,4 +34,29 @@ test('matches Astro glob-loader content IDs', () => {
   } finally {
     rmSync(contentDir, { recursive: true, force: true });
   }
+});
+
+test('identifies only HTTP(S) canonicals on a different origin', () => {
+  const siteUrl = 'https://ralphjonas.com';
+
+  assert.equal(
+    hasExternalHttpCanonical('https://ralphjonas.com/blog/original/', siteUrl),
+    false,
+    'same-origin canonical stays in the sitemap'
+  );
+  assert.equal(
+    hasExternalHttpCanonical('https://agentichq.co/blog/republished/', siteUrl),
+    true,
+    'different-origin HTTP(S) canonical is excluded'
+  );
+  assert.equal(
+    hasExternalHttpCanonical(undefined, siteUrl),
+    false,
+    'absent canonical stays in the sitemap'
+  );
+  assert.equal(
+    hasExternalHttpCanonical('not a URL', siteUrl),
+    false,
+    'malformed canonical stays in the sitemap'
+  );
 });

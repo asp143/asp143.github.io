@@ -53,7 +53,12 @@ const blogPosting = {
   datePublished: post.data.pubDate.toISOString(),
   dateModified,
   keywords: post.data.tags.join(', '),
-  author: { '@id': `${SITE_URL}/#person` },
+  author: {
+    '@type': 'Person',
+    '@id': `${SITE_URL}/#person`,
+    name: 'Ralph Jonas Mungcal',
+    url: `${SITE_URL}/`
+  },
   publisher: { '@id': `${SITE_URL}/#person` },
   mainEntityOfPage: canonicalURL,
   image: { '@type': 'ImageObject', url: ogImage, width: 1200, height: 630 },
@@ -124,15 +129,26 @@ const breadcrumb = {
             <span class="post-meta-cmd">cat {post.id}.md</span>
           </div>
 
-          <time class="post-date" datetime={post.data.pubDate.toISOString()}>
-            {formatPubDateLong(post.data.pubDate)}
+          <p class="post-date">
+            <time datetime={post.data.pubDate.toISOString()}>
+              {formatPubDateLong(post.data.pubDate)}
+            </time>
             {post.data.updatedDate && (
-              <> &middot; updated {formatPubDateLong(post.data.updatedDate)}</>
+              <>
+                {' '}&middot; updated{' '}
+                <time datetime={post.data.updatedDate.toISOString()}>
+                  {formatPubDateLong(post.data.updatedDate)}
+                </time>
+              </>
             )}
             {readingTime > 0 && (
               <> &middot; {readingTime} min read</>
             )}
-          </time>
+          </p>
+
+          <p class="post-byline">
+            by <a href="/#about">Ralph Jonas Mungcal</a>
+          </p>
 
           <h1 class="post-title">
             {post.data.title}<span class="post-period">_</span>

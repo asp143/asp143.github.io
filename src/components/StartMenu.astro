@@ -7,23 +7,41 @@
 interface Props {
   direction?: 'down' | 'up';
   label?: string;
+  navLabel?: string;
+  settings?: boolean;
 }
 
-const { direction = 'down', label = 'ralphOS ▸' } = Astro.props;
+const {
+  direction = 'down',
+  label = 'ralphOS ▸',
+  navLabel = 'Start menu',
+  settings = false
+} = Astro.props;
 ---
 
 <details class:list={['startmenu', { 'startmenu--up': direction === 'up' }]}>
   <summary class="startmenu-summary">{label}</summary>
-  <nav class="startmenu-panel" aria-label="Start menu">
-    <a class="startmenu-link" href="/">home</a>
-    <a class="startmenu-link" href="/blog/">writing</a>
-    <a class="startmenu-link" href="/projects/">projects</a>
-    <a class="startmenu-link" href="/now/">now</a>
+  <nav class="startmenu-panel" aria-label={navLabel}>
+    <a class="startmenu-link" href="/" data-astro-prefetch>home</a>
+    <a class="startmenu-link" href="/blog/" data-astro-prefetch>writing</a>
+    <a class="startmenu-link" href="/projects/" data-astro-prefetch>projects</a>
+    <a class="startmenu-link" href="/now/" data-astro-prefetch>now</a>
     <a class="startmenu-link" href="/blog/tags/">tags</a>
     <hr class="startmenu-sep" />
-    <a class="startmenu-link" href="/rss.xml">rss</a>
+    <a class="startmenu-link" href="/rss.xml" data-astro-prefetch="false">rss</a>
     <a class="startmenu-link" href="https://github.com/asp143" target="_blank" rel="noopener noreferrer">github</a>
     <hr class="startmenu-sep" />
+    {settings && (
+      <>
+        <button type="button" class="startmenu-link startmenu-setting" data-setting-toggle="shortcuts" aria-pressed="true">
+          keyboard shortcuts: on
+        </button>
+        <button type="button" class="startmenu-link startmenu-setting" data-setting-toggle="motion" aria-pressed="true">
+          motion: on
+        </button>
+        <hr class="startmenu-sep" />
+      </>
+    )}
     <a class="startmenu-link startmenu-link--shutdown" href="/#contact">shut down</a>
   </nav>
 </details>

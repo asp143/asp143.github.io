@@ -2,6 +2,7 @@
 name: ai-meeting-editor
 title: AI Meeting Editor — Auto-Trim Dead Air
 description: AI meeting editor that detects where a discussion really starts and ends, trimming dead air with Whisper, Deepgram, FFmpeg, and PyTorch on AWS.
+updatedDate: 2026-06-10
 summary: A media pipeline that takes raw meeting recordings and returns clean cuts with the small talk, setup chatter, and dead air removed. Combines ASR (Whisper / Deepgram), voice-activity detection, and lightweight semantic boundary models to find where the conversation actually starts and ends.
 stack:
   - Python

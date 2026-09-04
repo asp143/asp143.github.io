@@ -46,6 +46,20 @@
   border-bottom: var(--border-w) solid var(--color-ink);
 }
 
+/* App bars need fixed dark focus/title ink in both themes; inverse bars retain
+   their surface-relative ink. Unstyled bars use the global theme ink. */
+.win[style*='--app:']:not(.win--inverse) > .win-bar {
+  --focus-ring-color: var(--color-ink-on-app);
+}
+
+.win[style*='--app:']:not(.win--inverse) > .win-bar .win-title {
+  color: var(--color-ink-on-app);
+}
+
+.win--inverse > .win-bar {
+  --focus-ring-color: var(--color-bg);
+}
+
 .js-desktop .win--floating .win-bar {
   touch-action: none; /* drag handle */
   cursor: move;
@@ -74,7 +88,7 @@
 .win-controls {
   display: inline-flex;
   gap: 4px;
-  opacity: 0.45;
+  opacity: 0.75;
   transition: opacity var(--t-fast);
 }
 
@@ -208,6 +222,7 @@
 
 .keycap--primary {
   background: var(--color-accent);
+  color: var(--color-ink-on-app);
 }
 
 /* ── Chip (tags, stack items — border + sm shadow, no travel) ───────── */
@@ -235,6 +250,10 @@ body.has-menubar {
 }
 
 @media (min-width: 720px) {
+  html:has(body.has-taskbar) {
+    scroll-padding-bottom: calc(var(--taskbar-h) + 16px);
+  }
+
   body.has-taskbar {
     padding-bottom: calc(var(--taskbar-h) + 16px);
   }
@@ -481,6 +500,7 @@ body.has-menubar {
 }
 
 .taskbar-app.is-active {
+  color: var(--color-ink-on-app);
   background: var(--app, var(--color-accent));
   box-shadow: none;
   translate: 1px 1px; /* pressed-in */
@@ -627,4 +647,29 @@ html.crt body {
   .os-toast {
     translate: -50% 0;
   }
+}
+
+/* The persisted custom motion setting mirrors the system preference above. */
+html.motion-off .keycap,
+html.motion-off .win-btn,
+html.motion-off .win-controls,
+html.motion-off .taskbar-app,
+html.motion-off .desktop-icon,
+html.motion-off .os-toast,
+html.motion-off .snap-ghost {
+  transition: none;
+}
+
+html.motion-off .keycap:hover,
+html.motion-off .keycap:active,
+html.motion-off .win-btn:active {
+  translate: 0 0;
+}
+
+html.motion-off .keycap:active {
+  filter: brightness(0.92); /* press feedback without travel */
+}
+
+html.motion-off .os-toast {
+  translate: -50% 0;
 }

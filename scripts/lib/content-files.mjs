@@ -15,6 +15,21 @@ function generateContentSlug(relativePath, frontmatter) {
     .replace(/\/index$/, '');
 }
 
+export function hasExternalHttpCanonical(canonical, siteUrl) {
+  if (typeof canonical !== 'string') return false;
+
+  try {
+    const canonicalUrl = new URL(canonical);
+    const siteOrigin = new URL(siteUrl).origin;
+    return (
+      (canonicalUrl.protocol === 'http:' || canonicalUrl.protocol === 'https:') &&
+      canonicalUrl.origin !== siteOrigin
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function getContentFileEntries(contentDir) {
   return readdirSync(contentDir, { recursive: true })
     .filter((entry) => entry.endsWith('.md'))

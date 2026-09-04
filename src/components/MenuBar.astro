@@ -18,7 +18,7 @@ const { path = '~/' } = Astro.props;
 
 <header class="menubar" role="banner">
   <div class="menubar-left">
-    <StartMenu />
+    <StartMenu settings={path === '~/portfolio'} />
   </div>
   <div class="menubar-center">
     <slot name="back" />
@@ -27,6 +27,6 @@ const { path = '~/' } = Astro.props;
   <div class="menubar-right">
     <span class="menubar-hint"><slot name="hint" /></span>
     <span class="menubar-clock" data-os-clock aria-hidden="true"></span>
-    <a class="menubar-glyph" href="/rss.xml" aria-label="RSS feed">rss</a>
+    <a class="menubar-glyph" href="/rss.xml" data-astro-prefetch="false" aria-label="RSS feed">rss</a>
   </div>
 </header>

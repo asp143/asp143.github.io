@@ -38,6 +38,7 @@
 
   /* ── ink ──────────────────────────────────────────────── */
   --color-ink: #0a0a0a;
+  --color-ink-on-app: #0a0a0a; /* fixed dark ink for text on app-colored fills */
   --color-ink-soft: #3a3a3a;
   --color-ink-muted: #6b6b66;
   --color-border-faint: #d9d4bf;  /* 1px hairline dividers inside windows (rows, statusbars) */
@@ -181,6 +182,10 @@ html {
   }
 }
 
+html.motion-off {
+  scroll-behavior: auto;
+}
+
 html,
 body {
   width: 100%;
@@ -219,7 +224,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 :focus-visible {
-  outline: var(--border-w-focus) solid var(--color-accent);
+  outline: var(--border-w-focus) solid var(--focus-ring-color, var(--color-ink));
   outline-offset: 2px;
 }
 
@@ -257,7 +262,7 @@ html {
   padding: 0.05rem 0.4rem;
   border: var(--border-w) solid var(--color-border);
   background: var(--color-accent);
-  color: var(--color-ink); /* ink-on-accent (keycap--primary grammar): 6.9:1 vs cream's failing 2.75:1 */
+  color: var(--color-ink-on-app); /* 6.9:1 on the orange app fill in both themes */
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.06em;
