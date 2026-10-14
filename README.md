@@ -17,6 +17,10 @@ npm run preview
 - Push to `main` or `master` to trigger deployment.
 - In GitHub repo settings, set `Pages -> Source` to `GitHub Actions`.
 
+## Scheduling a post
+
+Set the post's `pubDate` to a future date (`YYYY-MM-DD`), keep `draft: false`, and merge it. The daily deployment cron publishes it once the date arrives; it runs at 00:15 UTC.
+
 ## Project Structure
 
 - `src/layouts/BaseLayout.astro` - global metadata/SEO and page shell

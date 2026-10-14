@@ -3,6 +3,7 @@ import { mkdirSync, existsSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
 import { getContentFileEntries } from './lib/content-files.mjs';
+import { isPublishablePubDate } from './lib/publish-date.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BLOG_DIR = resolve(__dirname, '../src/content/blog');
@@ -126,7 +127,7 @@ const entries = getContentFileEntries(BLOG_DIR);
 const generations = [];
 let skipped = 0;
 for (const { slug, filePath: source, frontmatter: fm } of entries) {
-  if (isDraft(fm.draft)) continue;
+  if (isDraft(fm.draft) || !isPublishablePubDate(fm.pubDate)) continue;
   const out = join(OUT_DIR, `${slug}.png`);
   mkdirSync(dirname(out), { recursive: true });
   if (existsSync(out) && statSync(out).mtimeMs >= statSync(source).mtimeMs) {

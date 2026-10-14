@@ -6,6 +6,9 @@ on:
       - main
       - master
   workflow_dispatch:
+  # Rebuild daily so future-dated posts publish without a push.
+  schedule:
+    - cron: '15 0 * * *'
 
 permissions:
   contents: read
