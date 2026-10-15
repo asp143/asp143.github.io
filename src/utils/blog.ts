@@ -3,11 +3,11 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 export type BlogEntry = CollectionEntry<'blog'>;
 
 export async function getPublishedPosts(): Promise<BlogEntry[]> {
-  // Drafts are visible in dev for preview; still excluded from production builds
+  // Drafts and future-dated posts are visible in dev for preview.
   const now = Date.now();
   const posts = await getCollection(
     'blog',
-    ({ data }) => data.pubDate.valueOf() <= now && (import.meta.env.DEV || !data.draft)
+    ({ data }) => import.meta.env.DEV || (data.pubDate.valueOf() <= now && !data.draft)
   );
   return posts.sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
