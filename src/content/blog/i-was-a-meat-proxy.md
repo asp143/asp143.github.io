@@ -2,6 +2,7 @@
 title: I Was a Meat Proxy
 description: My PR review comments were accurate and unreadable, because I was relaying model output instead of understanding it first. Correct is not the bar.
 pubDate: 2026-09-16
+updatedDate: 2026-10-20
 tags:
   - ai
   - developer-workflow
@@ -34,7 +35,7 @@ When I relayed, I could not pitch anything. I did not know which part of the fin
 
 Accountability follows explanation. If I can explain a comment, I own it. If I cannot, the thread finds out the moment someone pushes back, and the honest answer is "that is what the tool said."
 
-That answer moves the work to the author while keeping the authority with me. I get to block a PR on reasoning I have not done. The author gets to argue with a position nobody in the conversation actually holds. Everything about that is backwards, and it was invisible while the findings kept being correct.
+That answer moves the work to the author while keeping the authority with me. I get to block a PR on reasoning I have not done. The author gets to argue with a position nobody in the conversation actually holds. Everything about that is backwards, and it was invisible while the findings kept being correct. The other failure, [when the finding itself is wrong](/blog/redundant-said-the-reviewer/), is just as invisible for the opposite reason.
 
 This is the same failure as shipping code you did not read, except review is where that failure is supposed to get caught. A reviewer running on relay is a hole in the exact place the process assumes there is a person.
 
